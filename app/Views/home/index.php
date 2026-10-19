@@ -16,7 +16,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
                 </p>
                 <div class="hero-actions">
                     <a href="#akademik" class="btn btn-primary">Lihat Program Akademik <span>›</span></a>
-                    <a href="/ppdb" class="btn btn-outline">Info PPDB</a>
+                    <a href="<?= url('ppdb') ?>" class="btn btn-outline">Info PPDB</a>
                 </div>
                 <div class="trust-line">
                     <span class="trust-icon">♟</span>
@@ -26,7 +26,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
 
             <div class="hero-visual">
                 <div class="hero-photo">
-                    <img src="assets/images/Pertemuan Wali Santri.jpg" alt="Pertemuan Wali Santri">
+                    <img src="<?= base_url('assets/images/Pertemuan Wali Santri.jpg') ?>" alt="Pertemuan Wali Santri">
                 </div>
             </div>
                 <div class="accreditation-card">
@@ -62,7 +62,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
                     <div><strong>Tenaga Pendidik.</strong> Diversifikasi melalui kurikulum Merdeka dan pendekatan experiential learning.</div>
                 </div>
             </div>
-            <a href="/akademik" class="mini-btn">Lihat Prestasi</a>
+            <a href="<?= url('akademik') ?>" class="mini-btn">Lihat Prestasi</a>
         </div>
     </section>
 
@@ -78,7 +78,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
             <div class="program-grid">
                 <article class="program-card">
                     <div class="program-image image-Perpustakaan">
-                    <img src="/assets/images/Belajar di Perpustakaan.jpg" alt="Kurikulum Terpadu">
+                    <img src="<?= base_url('assets/images/Belajar di Perpustakaan.jpg') ?>" alt="Kurikulum Terpadu">
                     <span>Pondasi Keilmuan</span>
             </div>
                     <div class="program-content">
@@ -89,7 +89,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
 
                 <article class="program-card">
                     <div class="program-image image-Grup Sholawat  MTS Al-Huda">
-                        <img src="/assets/images/Grup Sholawat  MTS Al-Huda.jpg" alt="Program sholawat">
+                        <img src="<?= base_url('assets/images/Grup Sholawat  MTS Al-Huda.jpg') ?>" alt="Program sholawat">
                         <span>Spiritual</span>
                     </div>
                     <div class="program-content">
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
 
                 <article class="program-card">
                     <div class="program-image image-Mengikuti Upacara Pembukaan Jambore Cabang">
-                        <img src="/assets/images/Mengikuti Upacara Pembukaan Jambore Cabang.jpg" alt="Ekstrakurikuler">
+                        <img src="<?= base_url('assets/images/Mengikuti Upacara Pembukaan Jambore Cabang.jpg') ?>" alt="Ekstrakurikuler">
                         <span>Pengembangan Diri</span>
                     </div>
                     <div class="program-content">
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
 
                 <article class="program-card">
                     <div class="program-image image-Senam Bersama">
-                        <img src="/assets/images/Senam Bersama.jpg" alt="Lingkungan Asri">
+                        <img src="<?= base_url('assets/images/Senam Bersama.jpg') ?>" alt="Lingkungan Asri">
                         <span>Fasilitas</span>
                     </div>
                     <div class="program-content">
@@ -122,7 +122,7 @@ require_once __DIR__ . '/../layouts/navbar.php';
             </div>
 
             <div class="program-cta">
-                <a href="/profil" class="btn btn-primary">Mulai Belajar Bersama Kami</a>
+                <a href="<?= url('profil') ?>" class="btn btn-primary">Mulai Belajar Bersama Kami</a>
             </div>
         </div>
     </section>

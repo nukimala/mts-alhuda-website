@@ -7,18 +7,18 @@
 
         <div>
             <h4>Navigasi</h4>
-            <a href="/profil">Profil Madrasah</a>
-            <a href="/akademik">Program Akademik</a>
-            <a href="/fasilitas">Fasilitas</a>
-            <a href="/galeri">Galeri</a>
+            <a href="<?= url('profil') ?>">Profil Madrasah</a>
+            <a href="<?= url('akademik') ?>">Program Akademik</a>
+            <a href="<?= url('fasilitas') ?>">Fasilitas</a>
+            <a href="<?= url('galeri') ?>">Galeri</a>
         </div>
 
         <div>
             <h4>Informasi</h4>
-            <a href="/berita">Berita & Artikel</a>
-            <a href="/ppdb">Pengumuman & Agenda</a>
-            <a href="/kontak">Kontak</a>
-            <a href="/">Lihat Website</a>
+            <a href="<?= url('berita') ?>">Berita &amp; Artikel</a>
+            <a href="<?= url('ppdb') ?>">Pengumuman &amp; Agenda</a>
+            <a href="<?= url('kontak') ?>">Kontak</a>
+            <a href="<?= url('/') ?>">Lihat Website</a>
         </div>
 
         <div>
@@ -31,9 +31,9 @@
 
     <div class="container footer-bottom">
         <span>© 2026 MTs Al-Huda Gondang. Seluruh hak cipta dilindungi.</span>
-        <span>Desain & pengembangan oleh Tim BKPM</span>
+        <span>Desain &amp; pengembangan oleh Tim BKPM</span>
     </div>
 </footer>
-<script src="/js/script.js"></script>
+<script src="<?= asset('js/script.js') ?>"></script>
 </body>
 </html>
