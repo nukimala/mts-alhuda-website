@@ -7,18 +7,18 @@
 
         <div>
             <h4>Navigasi</h4>
-            <a href="/website-sekolah/public/profil">Profil Madrasah</a>
-            <a href="/website-sekolah/public/akademik">Program Akademik</a>
-            <a href="/website-sekolah/public/fasilitas">Fasilitas</a>
-            <a href="/website-sekolah/public/galeri">Galeri</a>
+            <a href="/profil">Profil Madrasah</a>
+            <a href="/akademik">Program Akademik</a>
+            <a href="/fasilitas">Fasilitas</a>
+            <a href="/galeri">Galeri</a>
         </div>
 
         <div>
             <h4>Informasi</h4>
-            <a href="/website-sekolah/public/berita">Berita & Artikel</a>
-            <a href="/website-sekolah/public/ppdb">Pengumuman & Agenda</a>
-            <a href="/website-sekolah/public/kontak">Kontak</a>
-            <a href="/website-sekolah/public/">Lihat Website</a>
+            <a href="/berita">Berita & Artikel</a>
+            <a href="/ppdb">Pengumuman & Agenda</a>
+            <a href="/kontak">Kontak</a>
+            <a href="/">Lihat Website</a>
         </div>
 
         <div>
@@ -34,6 +34,6 @@
         <span>Desain & pengembangan oleh Tim BKPM</span>
     </div>
 </footer>
-<script src="/website-sekolah/public/js/script.js"></script>
+<script src="/js/script.js"></script>
 </body>
 </html>
