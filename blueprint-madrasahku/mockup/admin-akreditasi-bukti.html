@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Bukti Akreditasi — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+<style>
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(11, 61, 30, .34);
+        display: grid; place-items: center; z-index: 60; padding: 20px;
+        backdrop-filter: blur(2px);
+    }
+    .modal-overlay .modal-mock { width: 100%; max-width: 480px; }
+    .pick-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 9px; }
+    .pick-row { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-bottom: 1px solid #F1F6F3; font-size: 12.5px; }
+    .pick-row:last-child { border-bottom: 0; }
+    .pick-row b { font-weight: 700; }
+    .pick-row span { color: var(--gray); font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Akreditasi IA2024 / <b>Bank Bukti</b></div>
+                    <h1>Bank Bukti Akreditasi</h1>
+                    <p>148 bukti · 96 sudah terpetakan ke butir · 52 belum dipetakan</p>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline btn-sm" href="admin-akreditasi-dashboard.html">Dashboard</a>
+                    <button class="btn btn-primary btn-sm">+ Unggah Bukti</button>
+                </div>
+            </div>
+
+            <div class="notice info">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                <div><b>Satu bukti bisa dipakai untuk beberapa butir.</b> Contoh: SK Guru Honorer dipakai untuk
+                butir 1.3, 4.1, dan 4.2. Tidak perlu unggah berkas yang sama berulang kali.</div>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="card stat">
+                    <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg></div>
+                    <div><small>Total Bukti</small><b>148</b><span class="trend">+12 minggu ini</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico blue"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></div>
+                    <div><small>Terpetakan</small><b>96</b><span class="trend">65%</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+                    <div><small>Menjelang Kadaluarsa</small><b>3</b><span class="trend down">&lt; 6 bulan</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico red"><svg viewBox="0 0 24 24"><path d="M18.4 5.6a9 9 0 1 1-12.8 12.8"/><path d="M3 3l18 18"/></svg></div>
+                    <div><small>Sudah Kadaluarsa</small><b>1</b><span class="trend down">perlu diganti</span></div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="toolbar">
+                    <div class="field-inline" style="min-width:230px">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                        <input type="text" placeholder="Cari nama bukti...">
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Semua Komponen</option><option>1 — Karakteristik</option><option>2 — Mutu Lulusan</option><option>3 — Proses Pembelajaran</option><option>4 — Mutu GTK</option></select>
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Semua Status</option><option>Berlaku</option><option>Menjelang Kadaluarsa</option><option>Kadaluarsa</option></select>
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Semua Pemetaan</option><option>Sudah dipetakan</option><option>Belum dipetakan</option></select>
+                    </div>
+                    <div class="right"><span class="pill plain gray">Urut: terbaru</span></div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>Nama Bukti</th>
+                                <th>Jenis</th>
+                                <th>Komponen</th>
+                                <th>Butir Terpetakan</th>
+                                <th>Masa Berlaku</th>
+                                <th>Status</th>
+                                <th style="width:96px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--red-soft);color:var(--red)">PDF</div>
+                                        <div><div class="t-title">SK Guru Honorer 2025/2026</div><div class="t-sub">1,2 MB · diunggah 12 Agu 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Dokumen</td>
+                                <td>K1, K4</td>
+                                <td><span class="pill green">3 butir</span></td>
+                                <td>21 Nov 2026</td>
+                                <td><span class="pill red">Segera berakhir</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn" title="Pemetaan"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn" title="Lihat"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn" title="Hapus"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--red-soft);color:var(--red)">PDF</div>
+                                        <div><div class="t-title">Kurikulum Operasional Madrasah 2026/2027</div><div class="t-sub">4,6 MB · diunggah 5 Sep 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Dokumen</td>
+                                <td>K1, K3</td>
+                                <td><span class="pill green">5 butir</span></td>
+                                <td>Tidak berbatas</td>
+                                <td><span class="pill green">Berlaku</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--blue-soft);color:var(--blue)">JPG</div>
+                                        <div><div class="t-title">Foto Kegiatan Pembelajaran Diferensiasi</div><div class="t-sub">18 foto · diunggah 2 Okt 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Foto</td>
+                                <td>K3</td>
+                                <td><span class="pill amber">Belum dipetakan</span></td>
+                                <td>—</td>
+                                <td><span class="pill green">Berlaku</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--red-soft);color:var(--red)">PDF</div>
+                                        <div><div class="t-title">Laporan Evaluasi Kinerja GTK 2025</div><div class="t-sub">2,1 MB · diunggah 20 Jul 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Dokumen</td>
+                                <td>K4</td>
+                                <td><span class="pill green">2 butir</span></td>
+                                <td>31 Des 2026</td>
+                                <td><span class="pill amber">Segera berakhir</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:#F1F3F5;color:var(--gray)">XLS</div>
+                                        <div><div class="t-title">Rekap Prestasi Siswa 2024–2026</div><div class="t-sub">340 KB · diunggah 15 Sep 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Data</td>
+                                <td>K2</td>
+                                <td><span class="pill green">4 butir</span></td>
+                                <td>Tidak berbatas</td>
+                                <td><span class="pill green">Berlaku</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--red-soft);color:var(--red)">PDF</div>
+                                        <div><div class="t-title">Sertifikat Akreditasi Lama (2019)</div><div class="t-sub">680 KB · diunggah 10 Feb 2025</div></div>
+                                    </div>
+                                </td>
+                                <td>Dokumen</td>
+                                <td>K1</td>
+                                <td><span class="pill green">1 butir</span></td>
+                                <td>20 Jan 2027</td>
+                                <td><span class="pill amber">Segera berakhir</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="cell-flex">
+                                        <div class="avatar" style="border-radius:8px;background:var(--blue-soft);color:var(--blue)">MP4</div>
+                                        <div><div class="t-title">Rekaman Praktik Baik Pembelajaran</div><div class="t-sub">86 MB · diunggah 8 Okt 2026</div></div>
+                                    </div>
+                                </td>
+                                <td>Video</td>
+                                <td>K3</td>
+                                <td><span class="pill amber">Belum dipetakan</span></td>
+                                <td>—</td>
+                                <td><span class="pill green">Berlaku</span></td>
+                                <td><div class="row-actions">
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7L12.5 19"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                </div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <span class="tiny muted">Menampilkan 1–7 dari 148 bukti</span>
+                    <div class="spacer"></div>
+                    <a href="#">‹</a><a href="#" class="on">1</a><a href="#">2</a><a href="#">3</a><a href="#">…</a><a href="#">›</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal pemetaan bukti ke butir -->
+<div class="modal-overlay">
+    <div class="modal-mock">
+        <div class="head"><b>Petakan Bukti ke Butir</b><span class="x">×</span></div>
+        <div class="body">
+            <div style="background:var(--soft);border-radius:9px;padding:10px 12px;margin-bottom:14px">
+                <div style="font-size:12.5px;font-weight:800">SK Guru Honorer 2025/2026</div>
+                <div class="tiny muted">PDF · 1,2 MB · sudah dipakai di 3 butir</div>
+            </div>
+            <div class="field">
+                <label>Cari Butir</label>
+                <input type="text" placeholder="cth. 4.1 atau kata kunci">
+            </div>
+            <div class="field" style="margin-bottom:0">
+                <label>Pilih Butir</label>
+                <div class="pick-list">
+                    <div class="pick-row"><input type="checkbox" checked><div><b>1.3</b> <span>· Struktur organisasi &amp; uraian tugas</span></div></div>
+                    <div class="pick-row"><input type="checkbox" checked><div><b>4.1</b> <span>· Kualifikasi akademik GTK</span></div></div>
+                    <div class="pick-row"><input type="checkbox" checked><div><b>4.2</b> <span>· Pengembangan keprofesian berkelanjutan</span></div></div>
+                    <div class="pick-row"><input type="checkbox"><div><b>4.3</b> <span>· Beban kerja guru</span></div></div>
+                    <div class="pick-row"><input type="checkbox"><div><b>4.4</b> <span>· Penghargaan &amp; sanksi</span></div></div>
+                    <div class="pick-row"><input type="checkbox"><div><b>4.5</b> <span>· Evaluasi kinerja GTK berkala</span></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="foot">
+            <button class="btn btn-outline btn-sm">Batal</button>
+            <button class="btn btn-primary btn-sm">Simpan Pemetaan</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/mockup.js" data-active="akreditasi-bukti"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengaturan Situs — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+<style>
+    .tab-bar {
+        display: flex; gap: 4px; border-bottom: 1px solid var(--border);
+        padding: 0 18px; overflow-x: auto;
+    }
+    .tab-bar a {
+        padding: 13px 14px; font-size: 12.5px; font-weight: 700; color: var(--gray);
+        border-bottom: 2px solid transparent; white-space: nowrap;
+    }
+    .tab-bar a.on { color: var(--green-600); border-bottom-color: var(--green); }
+</style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Sistem / <b>Pengaturan Situs</b></div>
+                    <h1>Pengaturan Situs</h1>
+                    <p>Identitas madrasah, kontak, media sosial, SEO, dan notifikasi email</p>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline btn-sm" href="#">Lihat Situs ↗</a>
+                    <button class="btn btn-primary btn-sm">Simpan Semua</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tab-bar">
+                    <a href="#identitas" class="on">Identitas Madrasah</a>
+                    <a href="#kontak">Kontak &amp; Lokasi</a>
+                    <a href="#sosmed">Media Sosial</a>
+                    <a href="#seo">SEO</a>
+                    <a href="#email">Email &amp; Notifikasi</a>
+                    <a href="#keamanan">Keamanan</a>
+                </div>
+
+                <div class="card-pad" id="identitas">
+                    <div class="grid grid-2">
+                        <div>
+                            <div class="field">
+                                <label>Nama Madrasah <span class="req">*</span></label>
+                                <input type="text" value="MTs Al-Huda Gondang">
+                            </div>
+                            <div class="field">
+                                <label>NPSN</label>
+                                <input type="text" value="20512345">
+                            </div>
+                            <div class="field">
+                                <label>Nama Yayasan / Penyelenggara</label>
+                                <input type="text" value="Yayasan Pendidikan Al-Huda Gondang">
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Akreditasi</label>
+                                <div class="field-row">
+                                    <input type="text" value="A">
+                                    <input type="text" value="2027 (target perpanjangan)">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="field">
+                                <label>Alamat Lengkap</label>
+                                <textarea style="min-height:74px">Jl. Raya Gondang No. 12, Kec. Gondang, Kab. Nganjuk, Jawa Timur 64451</textarea>
+                            </div>
+                            <div class="field">
+                                <label>Logo Madrasah</label>
+                                <div style="display:flex;align-items:center;gap:12px">
+                                    <div style="width:66px;height:66px;border:1px solid var(--border);border-radius:12px;display:grid;place-items:center;background:var(--soft)">
+                                        <img src="../../public/assets/images/LOGO_MTS 1.png" alt="Logo" style="width:48px;height:48px;object-fit:contain">
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline btn-sm">Ganti Logo</button>
+                                        <div class="hint tiny muted" style="margin-top:6px">PNG transparan, min. 512×512 px.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Visi Singkat (tampil di beranda)</label>
+                                <input type="text" value="Membentuk generasi Qur'ani, berakhlak mulia, dan berprestasi">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="card-head"><h3>Kontak &amp; Lokasi</h3></div>
+                <div class="card-pad">
+                    <div class="grid grid-3">
+                        <div class="field" style="margin-bottom:0">
+                            <label>Telepon</label>
+                            <input type="text" value="(0358) 123456">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>WhatsApp</label>
+                            <input type="text" value="0812-3456-7890">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>Email Resmi</label>
+                            <input type="email" value="info@mtsalhuda.sch.id">
+                        </div>
+                    </div>
+                    <div class="field" style="margin-top:16px">
+                        <label>Jam Operasional</label>
+                        <input type="text" value="Senin – Sabtu, 07.00 – 15.10 WIB">
+                    </div>
+                    <div class="field" style="margin-bottom:0">
+                        <label>Titik Peta</label>
+                        <div style="border:1px solid var(--border);border-radius:11px;overflow:hidden">
+                            <div style="height:150px;background:
+                                repeating-linear-gradient(45deg,#EDF5F0,#EDF5F0 12px,#E4EFE8 12px,#E4EFE8 24px);
+                                display:grid;place-items:center;position:relative">
+                                <div style="text-align:center">
+                                    <div style="width:26px;height:26px;border-radius:50%;background:var(--green);border:3px solid #fff;box-shadow:var(--shadow);margin:0 auto 6px"></div>
+                                    <span class="tiny" style="font-weight:800;color:var(--dark-green)">MTs Al-Huda Gondang</span>
+                                    <div class="tiny muted">-7.6123, 111.9012</div>
+                                </div>
+                            </div>
+                            <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center">
+                                <input type="text" value="-7.6123, 111.9012" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:12px">
+                                <button class="btn btn-outline btn-sm">Ambil dari Peta</button>
+                            </div>
+                        </div>
+                        <div class="hint">Koordinat dipakai untuk tombol "Buka di Google Maps" pada halaman kontak.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="split" style="margin-top:16px">
+                <div class="card">
+                    <div class="card-head"><h3>Media Sosial</h3></div>
+                    <div class="card-pad">
+                        <div class="field">
+                            <label>Facebook</label>
+                            <input type="text" value="https://facebook.com/mtsalhudagondang">
+                        </div>
+                        <div class="field">
+                            <label>Instagram</label>
+                            <input type="text" value="https://instagram.com/mtsalhuda_gondang">
+                        </div>
+                        <div class="field">
+                            <label>YouTube</label>
+                            <input type="text" value="https://youtube.com/@mtsalhudagondang">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>TikTok</label>
+                            <input type="text" value="">
+                            <div class="hint">Kosongkan jika tidak dipakai — ikon otomatis disembunyikan.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-head"><h3>SEO</h3></div>
+                        <div class="card-pad">
+                            <div class="field">
+                                <label>Meta Title Beranda</label>
+                                <input type="text" value="MTs Al-Huda Gondang — Madrasah Qur'ani &amp; Berprestasi">
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Meta Description</label>
+                                <textarea style="min-height:70px">MTs Al-Huda Gondang, Nganjuk. Madrasah tsanawiyah dengan program tahfidz, pembinaan akhlak, dan prestasi akademik maupun non-akademik.</textarea>
+                                <div class="hint">138 / 160 karakter</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-head"><h3>Pengumuman Beranda</h3></div>
+                        <div class="card-pad">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+                                <div>
+                                    <div style="font-size:12.5px;font-weight:800">Tampilkan bar pengumuman</div>
+                                    <div class="tiny muted">Muncul di paling atas halaman publik.</div>
+                                </div>
+                                <span class="switch on"><span class="track"></span></span>
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Isi Pengumuman</label>
+                                <input type="text" value="PPDB 2027/2028 gelombang 1 dibuka 1 November 2026">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="card-head"><h3>Email &amp; Notifikasi</h3></div>
+                <div class="card-pad">
+                    <div class="notice info" style="margin-bottom:16px">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                        <div><b>Email hanya untuk notifikasi transaksional.</b> Sistem tidak memakai penyedia identitas
+                        eksternal maupun layanan push pihak ketiga. SMTP adalah satu-satunya layanan luar, dan tidak
+                        menyimpan identitas pengguna.</div>
+                    </div>
+                    <div class="grid grid-3">
+                        <div class="field" style="margin-bottom:0">
+                            <label>SMTP Host</label>
+                            <input type="text" value="smtp.mtsalhuda.sch.id">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>Port</label>
+                            <input type="text" value="587">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>Enkripsi</label>
+                            <select><option selected>TLS (STARTTLS)</option><option>SSL</option><option>Tanpa enkripsi</option></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-2" style="margin-top:16px">
+                        <div class="field" style="margin-bottom:0">
+                            <label>Username SMTP</label>
+                            <input type="text" value="noreply@mtsalhuda.sch.id">
+                        </div>
+                        <div class="field" style="margin-bottom:0">
+                            <label>Password SMTP</label>
+                            <input type="password" value="••••••••••••">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:9px;margin-top:16px;align-items:center;flex-wrap:wrap">
+                        <button class="btn btn-outline btn-sm">Kirim Email Uji</button>
+                        <span class="pill green">Terakhir berhasil: hari ini, 08.14</span>
+                    </div>
+
+                    <h2 class="section">Jenis Email yang Dikirim</h2>
+                    <div class="grid grid-3">
+                        <div class="card" style="box-shadow:none">
+                            <div class="card-pad" style="padding:14px 16px">
+                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                                    <div>
+                                        <div style="font-size:12.5px;font-weight:800">Reset Kata Sandi</div>
+                                        <div class="tiny muted">Tautan berlaku 60 menit</div>
+                                    </div>
+                                    <span class="switch on"><span class="track"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="box-shadow:none">
+                            <div class="card-pad" style="padding:14px 16px">
+                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                                    <div>
+                                        <div style="font-size:12.5px;font-weight:800">Akun Baru Dibuat</div>
+                                        <div class="tiny muted">Kata sandi sementara</div>
+                                    </div>
+                                    <span class="switch on"><span class="track"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="box-shadow:none">
+                            <div class="card-pad" style="padding:14px 16px">
+                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                                    <div>
+                                        <div style="font-size:12.5px;font-weight:800">Tugas Baru</div>
+                                        <div class="tiny muted">Ke siswa, opsional</div>
+                                    </div>
+                                    <span class="switch"><span class="track"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="card-head"><h3>Keamanan</h3></div>
+                <div class="card-pad">
+                    <div class="grid grid-2">
+                        <div>
+                            <div class="field">
+                                <label>Batas Percobaan Login Gagal</label>
+                                <input type="text" value="5 kali">
+                            </div>
+                            <div class="field">
+                                <label>Durasi Kunci Akun</label>
+                                <input type="text" value="15 menit">
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Sesi Web Berakhir Otomatis</label>
+                                <input type="text" value="120 menit tanpa aktivitas">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="field">
+                                <label>Masa Aktif Token Aplikasi</label>
+                                <input type="text" value="Access 30 menit · Refresh 30 hari">
+                                <div class="hint">Refresh token selalu diganti setiap kali dipakai.</div>
+                            </div>
+                            <div class="field">
+                                <label>Wajib Ganti Kata Sandi Saat Login Pertama</label>
+                                <div style="padding-top:4px"><span class="switch on"><span class="track"></span></span></div>
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label>Log Audit</label>
+                                <div style="padding-top:4px"><span class="switch on"><span class="track"></span></span>
+                                <span class="tiny muted" style="margin-left:8px">Mencatat perubahan data &amp; koreksi presensi</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <button class="btn btn-outline">Kembalikan Default</button>
+                    <button class="btn btn-primary">Simpan Pengaturan</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="assets/mockup.js" data-active="pengaturan"></script>
+</body>
+</html>

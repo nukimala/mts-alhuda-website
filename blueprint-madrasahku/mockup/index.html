@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dummy UI — MTs Al-Huda &amp; MADRASAHKU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+<style>
+    .banner {
+        background: linear-gradient(140deg, #15803D, #0B3D1E);
+        color: #fff; border-radius: 18px; padding: 26px 28px; margin-bottom: 8px;
+        box-shadow: 0 18px 40px rgba(11, 61, 30, .22);
+    }
+    .banner h1 { font-size: 25px; font-weight: 800; letter-spacing: -.5px; }
+    .banner p { color: rgba(255, 255, 255, .8); font-size: 13.5px; margin-top: 7px; max-width: 720px; }
+    .banner .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 15px; }
+    .banner .meta span {
+        background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22);
+        padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700;
+    }
+</style>
+</head>
+<body>
+<div class="mock-index">
+
+    <div class="banner">
+        <h1>Dummy UI — Website MTs Al-Huda &amp; Aplikasi MADRASAHKU</h1>
+        <p>Semua layar ini adalah <b>tampilan contoh (dummy)</b> untuk review mitra. Data di dalamnya fiktif dan
+           belum tersambung ke database. Tujuannya agar bentuk akhir sistem bisa dilihat dan disetujui sebelum
+           masuk tahap coding.</p>
+        <div class="meta">
+            <span>Design token: hijau #15803D</span>
+            <span>Font: Plus Jakarta Sans</span>
+            <span>Radius 16px</span>
+            <span>23 layar</span>
+        </div>
+    </div>
+
+    <h2><span class="tag">A</span> Panel Admin Web — 12 layar</h2>
+    <div class="screen-grid">
+        <a class="screen-card" href="admin-login.html">
+            <div class="no">A-1</div><b>Login Admin</b>
+            <span>Halaman masuk pengelola dengan pesan error &amp; catatan reset password.</span>
+        </a>
+        <a class="screen-card" href="admin-dashboard.html">
+            <div class="no">A-2</div><b>Dashboard Admin</b>
+            <span>4 kartu statistik, konten terbaru, dan daftar "perlu perhatian".</span>
+        </a>
+        <a class="screen-card" href="admin-berita.html">
+            <div class="no">A-3</div><b>Kelola Berita (pola tabel)</b>
+            <span>Pola tabel list: pencarian, filter status, pagination. Dipakai ulang untuk galeri, fasilitas, halaman.</span>
+        </a>
+        <a class="screen-card" href="admin-berita-form.html">
+            <div class="no">A-4</div><b>Form Berita (pola form)</b>
+            <span>Form 2 kolom + upload cover + validasi. Pola sama untuk galeri, fasilitas, dokumen PPDB.</span>
+        </a>
+        <a class="screen-card" href="admin-pengguna.html">
+            <div class="no">A-5</div><b>Pengguna &amp; Role</b>
+            <span>Tabel akun, filter role, dan modal "Buat Pengguna Baru".</span>
+        </a>
+        <a class="screen-card" href="admin-ppdb.html">
+            <div class="no">A-6</div><b>Info &amp; Dokumen PPDB</b>
+            <span>Kelola info PPDB + katalog dokumen unduhan. Tanpa formulir pendaftaran.</span>
+        </a>
+        <a class="screen-card" href="admin-jadwal.html">
+            <div class="no">A-7</div><b>Jadwal Pelajaran</b>
+            <span>Grid jadwal per kelas, warna per mata pelajaran, cegah bentrok.</span>
+        </a>
+        <a class="screen-card" href="admin-presensi.html">
+            <div class="no">A-8</div><b>Presensi Guru (rekap)</b>
+            <span>Rekap kehadiran guru harian, koreksi izin/sakit, catatan. Hanya guru.</span>
+        </a>
+        <a class="screen-card" href="admin-akreditasi-dashboard.html">
+            <div class="no">A-9</div><b>Akreditasi — Dashboard Kesiapan</b>
+            <span>Progress 4 komponen, gap analysis per butir, bukti menjelang kadaluarsa.</span>
+        </a>
+        <a class="screen-card" href="admin-akreditasi-bukti.html">
+            <div class="no">A-10</div><b>Akreditasi — Bank Bukti</b>
+            <span>Daftar bukti, masa berlaku, jumlah butir terpetakan, modal mapping.</span>
+        </a>
+        <a class="screen-card" href="admin-akreditasi-dka.html">
+            <div class="no">A-11</div><b>Akreditasi — Editor DKA</b>
+            <span>Editor teks dengan batas 1.000 karakter + panel bukti + approval Kepala.</span>
+        </a>
+        <a class="screen-card" href="admin-pengaturan.html">
+            <div class="no">A-12</div><b>Pengaturan Situs</b>
+            <span>Identitas madrasah, sosial media, SEO, peta, dan toggle pengumuman.</span>
+        </a>
+    </div>
+
+    <h2><span class="tag">C</span> Aplikasi Mobile MADRASAHKU — 11 layar</h2>
+    <div class="screen-grid">
+        <a class="screen-card" href="mobile.html#login">
+            <div class="no">C-1</div><b>Login Mobile</b>
+            <span>Satu akun untuk web dan aplikasi.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#dashboard-guru">
+            <div class="no">C-2</div><b>Dashboard Guru</b>
+            <span>Kartu presensi hari ini, aksi cepat, tugas menunggu dinilai.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#checkin">
+            <div class="no">C-3</div><b>Presensi / Check-in</b>
+            <span>Layar inti: check-in harian &amp; per jam mengajar.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#riwayat">
+            <div class="no">C-4</div><b>Riwayat Presensi</b>
+            <span>Ringkasan bulan, kalender status, detail per sesi.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#jadwal">
+            <div class="no">C-5</div><b>Jadwal Pelajaran</b>
+            <span>Tab hari, kartu sesi, empty state.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#materi">
+            <div class="no">C-6</div><b>Materi</b>
+            <span>Daftar materi + unduh berkas.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#tugas">
+            <div class="no">C-7</div><b>Tugas Siswa</b>
+            <span>Kumpulkan tugas, tenggat, status terkumpul.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#nilai-guru">
+            <div class="no">C-8</div><b>Penilaian (Guru)</b>
+            <span>Beri nilai 0–100 dan feedback per siswa.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#nilai">
+            <div class="no">C-9</div><b>Nilai &amp; Feedback (Siswa)</b>
+            <span>Nilai tugas + catatan guru.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#notifikasi">
+            <div class="no">C-10</div><b>Notifikasi In-App</b>
+            <span>Pusat notifikasi, badge belum dibaca.</span>
+        </a>
+        <a class="screen-card" href="mobile.html#profil">
+            <div class="no">C-11</div><b>Profil &amp; Menu</b>
+            <span>Menu per role, ganti password, keluar.</span>
+        </a>
+    </div>
+
+    <h2><span class="tag">Info</span> Catatan untuk reviewer</h2>
+    <div class="card card-pad">
+        <div class="notice info" style="margin-bottom:14px">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            <div><b>Ini dummy, bukan aplikasi jadi.</b> Tombol dan tautan hanya untuk berpindah layar.
+            Data (nama guru, siswa, nilai, dokumen) adalah contoh.</div>
+        </div>
+        <div class="notice ok" style="margin-bottom:0">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+            <div><b>Yang perlu Bapak/Ibu periksa:</b> apakah susunan menu sudah pas, istilah sudah familiar,
+            alur presensi guru sudah sesuai kebiasaan madrasah, dan warna/tampilan sudah mewakili identitas madrasah.</div>
+        </div>
+    </div>
+
+    <p class="tiny muted" style="margin-top:26px">
+        Mockup statis · mengikuti <code>PRD.md</code> v1.2 dan <code>10-perombakan-web.md</code> ·
+        MTs Al-Huda Gondang · 22 Oktober 2026
+    </p>
+</div>
+</body>
+</html>

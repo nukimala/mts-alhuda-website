@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kesiapan Akreditasi — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Akreditasi IA2024 / <b>Dashboard Kesiapan</b></div>
+                    <h1>Dashboard Kesiapan Akreditasi</h1>
+                    <p>Instrumen Akreditasi 2024 · 4 komponen · 33 butir · target visitasi Maret 2027</p>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline btn-sm" href="admin-akreditasi-bukti.html">Bank Bukti</a>
+                    <a class="btn btn-primary btn-sm" href="admin-akreditasi-dka.html">Lanjut Isi DKA</a>
+                </div>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="card stat">
+                    <div class="ico amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="m8.5 13.5-1.5 7 5-2.6 5 2.6-1.5-7"/></svg></div>
+                    <div><small>Progres Keseluruhan</small><b>64%</b><span class="trend down">21 dari 33 butir</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                    <div><small>Butir Lengkap</small><b>21</b><span class="trend">DKA + bukti terisi</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico blue"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg></div>
+                    <div><small>Bukti Terunggah</small><b>148</b><span class="trend">+12 minggu ini</span></div>
+                </div>
+                <div class="card stat">
+                    <div class="ico red"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+                    <div><small>Butir Kosong</small><b>3</b><span class="trend down">perlu tindakan</span></div>
+                </div>
+            </div>
+
+            <div class="notice warn" style="margin-top:16px">
+                <svg viewBox="0 0 24 24"><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                <div><b>3 butir belum punya bukti</b> di Komponen 3 (Proses Pembelajaran) dan Komponen 4 (Mutu GTK).
+                Buka <b>Bank Bukti</b> untuk menautkan dokumen yang sudah ada.</div>
+            </div>
+
+            <div class="grid grid-2" style="margin-top:4px">
+                <div class="card comp-card">
+                    <div class="ring" style="--p:82;--size:78px"><b>82<small>%</small></b></div>
+                    <div style="flex:1">
+                        <b>Komponen 1 — Karakteristik Satuan Pendidikan</b>
+                        <span>8 butir · 7 terisi · 1 kosong</span>
+                        <div class="progress" style="margin-top:9px"><span style="width:82%"></span></div>
+                        <div class="meta"><span>Bukti: 46</span><span>DKA: 7/8</span></div>
+                    </div>
+                </div>
+                <div class="card comp-card">
+                    <div class="ring" style="--p:75;--size:78px"><b>75<small>%</small></b></div>
+                    <div style="flex:1">
+                        <b>Komponen 2 — Mutu Lulusan</b>
+                        <span>8 butir · 6 terisi · 2 kosong</span>
+                        <div class="progress" style="margin-top:9px"><span style="width:75%"></span></div>
+                        <div class="meta"><span>Bukti: 38</span><span>DKA: 6/8</span></div>
+                    </div>
+                </div>
+                <div class="card comp-card">
+                    <div class="ring" style="--p:55;--size:78px"><b>55<small>%</small></b></div>
+                    <div style="flex:1">
+                        <b>Komponen 3 — Proses Pembelajaran</b>
+                        <span>9 butir · 5 terisi · 4 kosong</span>
+                        <div class="progress amber" style="margin-top:9px"><span style="width:55%"></span></div>
+                        <div class="meta"><span>Bukti: 34</span><span>DKA: 5/9</span></div>
+                    </div>
+                </div>
+                <div class="card comp-card">
+                    <div class="ring" style="--p:44;--size:78px"><b>44<small>%</small></b></div>
+                    <div style="flex:1">
+                        <b>Komponen 4 — Mutu Guru &amp; Tenaga Kependidikan</b>
+                        <span>8 butir · 3 terisi · 5 kosong</span>
+                        <div class="progress red" style="margin-top:9px"><span style="width:44%"></span></div>
+                        <div class="meta"><span>Bukti: 30</span><span>DKA: 3/8</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="split" style="margin-top:16px">
+                <div class="card">
+                    <div class="card-head">
+                        <h3>Gap Analysis — Butir Belum Selesai</h3>
+                        <div class="actions"><a class="btn btn-ghost btn-sm" href="admin-akreditasi-dka.html">Isi sekarang →</a></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data">
+                            <thead>
+                                <tr><th>Butir</th><th>Uraian Singkat</th><th>DKA</th><th>Bukti</th><th>Penanggung Jawab</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>3.4</b></td>
+                                    <td class="t-title">Pembelajaran berdiferensiasi terdokumentasi</td>
+                                    <td><span class="pill gray">Belum</span></td>
+                                    <td><span class="pill gray">0</span></td>
+                                    <td>Rina Wati</td>
+                                    <td><span class="pill red">Kosong</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>3.6</b></td>
+                                    <td class="t-title">Asesmen formatif &amp; umpan balik rutin</td>
+                                    <td><span class="pill amber">Draft</span></td>
+                                    <td><span class="pill gray">0</span></td>
+                                    <td>Rina Wati</td>
+                                    <td><span class="pill red">Bukti kosong</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>3.8</b></td>
+                                    <td class="t-title">Pemanfaatan sarana pembelajaran aktif</td>
+                                    <td><span class="pill gray">Belum</span></td>
+                                    <td><span class="pill gray">0</span></td>
+                                    <td>Hendra Pratama</td>
+                                    <td><span class="pill red">Kosong</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>4.2</b></td>
+                                    <td class="t-title">Pengembangan keprofesian berkelanjutan guru</td>
+                                    <td><span class="pill amber">Draft</span></td>
+                                    <td><span class="pill amber">1</span></td>
+                                    <td>Kepala Madrasah</td>
+                                    <td><span class="pill amber">Kurang</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>4.5</b></td>
+                                    <td class="t-title">Evaluasi kinerja GTK berkala</td>
+                                    <td><span class="pill gray">Belum</span></td>
+                                    <td><span class="pill gray">0</span></td>
+                                    <td>Kepala Madrasah</td>
+                                    <td><span class="pill red">Kosong</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>2.7</b></td>
+                                    <td class="t-title">Prestasi lulusan tingkat kabupaten/provinsi</td>
+                                    <td><span class="pill amber">Draft</span></td>
+                                    <td><span class="pill amber">2</span></td>
+                                    <td>Bagus Setiawan</td>
+                                    <td><span class="pill amber">Kurang</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span class="tiny muted">6 dari 12 butir belum selesai ditampilkan</span>
+                        <div class="spacer"></div>
+                        <a href="#" class="on">1</a><a href="#">2</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-head"><h3>Bukti Menjelang Kadaluarsa</h3></div>
+                        <div class="list-row">
+                            <div class="ico" style="background:var(--red-soft);color:var(--red)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+                            <div><b>SK Guru Honorer 2025/2026</b><span>Berakhir 30 hari lagi · 21 Nov 2026</span></div>
+                        </div>
+                        <div class="list-row">
+                            <div class="ico" style="background:var(--amber-soft);color:var(--amber)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+                            <div><b>Sertifikat Akreditasi Lama</b><span>Berakhir 3 bulan lagi · 20 Jan 2027</span></div>
+                        </div>
+                        <div class="list-row">
+                            <div class="ico" style="background:var(--amber-soft);color:var(--amber)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+                            <div><b>MoU Kerjasama Puskesmas</b><span>Berakhir 4 bulan lagi · 18 Feb 2027</span></div>
+                        </div>
+                        <div class="card-pad" style="padding-top:14px">
+                            <a class="btn btn-outline btn-sm btn-block" href="admin-akreditasi-bukti.html">Perbarui Bukti</a>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-head"><h3>Status Persetujuan DKA</h3></div>
+                        <div class="card-pad">
+                            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:7px">
+                                <span>Sudah disetujui Kepala</span><span>14 butir</span>
+                            </div>
+                            <div class="progress" style="margin-bottom:14px"><span style="width:64%"></span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:7px">
+                                <span>Menunggu persetujuan</span><span>7 butir</span>
+                            </div>
+                            <div class="progress amber" style="margin-bottom:14px"><span style="width:32%"></span></div>
+                            <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:7px">
+                                <span>Belum ditulis</span><span>12 butir</span>
+                            </div>
+                            <div class="progress red"><span style="width:36%"></span></div>
+                            <p class="tiny muted" style="margin-top:14px">Hanya Kepala Madrasah yang dapat menyetujui DKA.
+                            Setelah disetujui, DKA terkunci dan hanya bisa dibuka kembali oleh Kepala.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:16px">
+                <div class="card-head">
+                    <h3>Linimasa Menuju Visitasi</h3>
+                    <div class="actions"><span class="pill plain gray">Hari ini: 22 Okt 2026</span></div>
+                </div>
+                <div class="card-pad">
+                    <div class="timetable">
+                        <table style="min-width:720px">
+                            <thead>
+                                <tr><th>Nov 2026</th><th>Des 2026</th><th>Jan 2027</th><th>Feb 2027</th><th>Mar 2027</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><div class="slot"><b>Lengkapi DKA</b><span>Komponen 1–2</span></div></td>
+                                    <td><div class="slot mint"><b>Kumpulkan bukti</b><span>Komponen 3–4</span></div></td>
+                                    <td><div class="slot blue"><b>Review internal</b><span>Tim akreditasi</span></div></td>
+                                    <td><div class="slot amber"><b>Persetujuan Kepala</b><span>Finalisasi dokumen</span></div></td>
+                                    <td><div class="slot"><b>Visitasi</b><span>Target</span></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="assets/mockup.js" data-active="akreditasi-dashboard"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Kredensial & konfigurasi lokal
+config/database.local.php
+.env
+.env.*
+
+# Backup database
+backup/
+*.sql.gz
+*.dump
+
+# Log & cache
+*.log
+storage/logs/
+storage/cache/
+storage/sessions/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Dependency
+/vendor/
+node_modules/
+
+# Unggahan pengguna (jangan masuk repo)
+public/uploads/
+
+# Berkas besar di root (data mentah, bukan bagian kode)
+*.drawio

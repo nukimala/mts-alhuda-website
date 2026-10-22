@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Berita — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Konten Website / <b>Berita</b></div>
+                    <h1>Kelola Berita</h1>
+                    <p>28 berita terpublikasi · 4 draft · terakhir diperbarui hari ini</p>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-primary btn-sm" href="admin-berita-form.html">+ Tambah Berita</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="toolbar">
+                    <div class="field-inline" style="min-width:230px">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                        <input type="text" placeholder="Cari judul berita...">
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Semua Status</option><option>Terbit</option><option>Draft</option></select>
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Semua Kategori</option><option>Kegiatan</option><option>Prestasi</option><option>Pengumuman</option></select>
+                    </div>
+                    <div class="right">
+                        <select class="btn btn-outline btn-sm" style="padding:7px 10px"><option>Terbaru</option><option>Terlama</option><option>Judul A–Z</option></select>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th style="width:34px"><input type="checkbox"></th>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th>Penulis</th>
+                                <th>Status</th>
+                                <th>Tanggal Terbit</th>
+                                <th style="width:96px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Senam Bersama.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Peringatan Hari Santri Nasional 2026</div>
+                                            <div class="t-sub">/berita/peringatan-hari-santri-2026</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Kegiatan</td>
+                                <td>Operator</td>
+                                <td><span class="pill green">Terbit</span></td>
+                                <td>21 Okt 2026</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn" title="Lihat"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn" title="Edit"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn" title="Hapus"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Drumband.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Juara 2 Lomba Drumband Tingkat Kabupaten</div>
+                                            <div class="t-sub">/berita/juara-2-drumband-kabupaten</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Prestasi</td>
+                                <td>Operator</td>
+                                <td><span class="pill green">Terbit</span></td>
+                                <td>18 Okt 2026</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Belajar di Perpustakaan.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Jadwal Penilaian Tengah Semester Ganjil</div>
+                                            <div class="t-sub">/berita/jadwal-pts-ganjil-2026</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Pengumuman</td>
+                                <td>Operator</td>
+                                <td><span class="pill green">Terbit</span></td>
+                                <td>20 Okt 2026</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Pertemuan Wali Santri.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Pertemuan Wali Santri Kelas 9: Persiapan Ujian</div>
+                                            <div class="t-sub">/berita/pertemuan-wali-santri-kelas-9</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Kegiatan</td>
+                                <td>Operator</td>
+                                <td><span class="pill green">Terbit</span></td>
+                                <td>15 Okt 2026</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Mengikuti Upacara Pembukaan Jambore Cabang.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Jambore Cabang 2026: Regu Al-Huda Berangkat</div>
+                                            <div class="t-sub">/berita/jambore-cabang-2026</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Kegiatan</td>
+                                <td>Operator</td>
+                                <td><span class="pill gray">Draft</span></td>
+                                <td>—</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="cell-flex">
+                                        <img class="thumb" src="../../public/assets/images/Grup Sholawat  MTS Al-Huda.jpg" alt="">
+                                        <div>
+                                            <div class="t-title">Grup Sholawat Al-Huda Tampil di Peringatan Maulid</div>
+                                            <div class="t-sub">/berita/sholawat-maulid-2026</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Kegiatan</td>
+                                <td>Operator</td>
+                                <td><span class="pill green">Terbit</span></td>
+                                <td>10 Okt 2026</td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"/><circle cx="12" cy="12" r="2.6"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                                        <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <span class="tiny muted">Menampilkan 1–6 dari 32 berita</span>
+                    <div class="spacer"></div>
+                    <a href="#">‹</a>
+                    <a href="#" class="on">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">4</a>
+                    <a href="#">›</a>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-top:16px">
+                <div class="card card-pad">
+                    <h2 class="section" style="margin-top:0">Pola ini dipakai ulang</h2>
+                    <p class="tiny muted">Halaman <b>Galeri</b>, <b>Fasilitas</b>, <b>Halaman Statis</b>, <b>Menu Navigasi</b>,
+                    dan <b>Dokumen PPDB</b> memakai pola tabel yang sama: pencarian, filter, aksi baris, pagination.
+                    Yang berbeda hanya kolomnya.</p>
+                </div>
+                <div class="card card-pad">
+                    <h2 class="section" style="margin-top:0">Aksi massal</h2>
+                    <p class="tiny muted">Jika ada baris dipilih, toolbar berubah menampilkan:
+                    <span class="pill green" style="margin-left:4px">Terbitkan</span>
+                    <span class="pill gray" style="margin-left:4px">Jadikan Draft</span>
+                    <span class="pill red" style="margin-left:4px">Hapus</span></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="assets/mockup.js" data-active="berita"></script>
+</body>
+</html>

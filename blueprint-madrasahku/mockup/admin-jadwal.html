@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jadwal Pelajaran — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Akademik / <b>Jadwal Pelajaran</b></div>
+                    <h1>Jadwal Pelajaran</h1>
+                    <p>Tahun Ajaran 2026/2027 · Semester Ganjil · Kelas 7A</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-outline btn-sm">Cetak Jadwal</button>
+                    <button class="btn btn-primary btn-sm">+ Tambah Jadwal</button>
+                </div>
+            </div>
+
+            <div class="notice ok">
+                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                <div><b>Tidak ada bentrok jadwal.</b> Sistem memeriksa bentrok guru dan ruang secara otomatis
+                sebelum jadwal disimpan.</div>
+            </div>
+
+            <div class="card">
+                <div class="toolbar">
+                    <div class="field-inline">
+                        <select><option>Tahun Ajaran 2026/2027</option><option>2025/2026</option></select>
+                    </div>
+                    <div class="field-inline">
+                        <select><option>Kelas 7A</option><option>Kelas 7B</option><option>Kelas 8A</option><option>Kelas 8B</option><option>Kelas 9A</option></select>
+                    </div>
+                    <div class="right">
+                        <span class="pill plain gray">6 hari · 32 sesi</span>
+                    </div>
+                </div>
+
+                <div class="card-pad timetable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:78px">Hari</th>
+                                <th>07.00 – 08.20</th>
+                                <th>08.20 – 09.40</th>
+                                <th>09.55 – 11.15</th>
+                                <th>11.15 – 12.30</th>
+                                <th>12.30 – 13.50</th>
+                                <th>13.50 – 15.10</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="day">Senin</td>
+                                <td><div class="slot"><b>Al-Qur'an Hadis</b><span>Ust. Ahmad Fauzi · R-01</span></div></td>
+                                <td><div class="slot mint"><b>Matematika</b><span>Ust. Siti Aminah · R-04</span></div></td>
+                                <td><div class="slot blue"><b>Bahasa Indonesia</b><span>Ust. Rina Wati · R-02</span></div></td>
+                                <td><div class="slot amber"><b>Istirahat</b><span>—</span></div></td>
+                                <td><div class="slot"><b>IPA Terpadu</b><span>Ust. Hendra P. · Lab IPA</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                            </tr>
+                            <tr>
+                                <td class="day">Selasa</td>
+                                <td><div class="slot mint"><b>Fikih</b><span>Ust. Ahmad Fauzi · R-01</span></div></td>
+                                <td><div class="slot blue"><b>Bahasa Inggris</b><span>Ust. Dewi L. · R-03</span></div></td>
+                                <td><div class="slot"><b>Matematika</b><span>Ust. Siti Aminah · R-04</span></div></td>
+                                <td><div class="slot amber"><b>Istirahat</b><span>—</span></div></td>
+                                <td><div class="slot"><b>IPS Terpadu</b><span>Ust. Bagus S. · R-05</span></div></td>
+                                <td><div class="slot mint"><b>PJOK</b><span>Ust. Hendra P. · Lapangan</span></div></td>
+                            </tr>
+                            <tr>
+                                <td class="day">Rabu</td>
+                                <td><div class="slot blue"><b>Bahasa Arab</b><span>Ust. Nur H. · R-06</span></div></td>
+                                <td><div class="slot"><b>Al-Qur'an Hadis</b><span>Ust. Ahmad Fauzi · R-01</span></div></td>
+                                <td><div class="slot mint"><b>Seni Budaya</b><span>Ust. Rina Wati · R-02</span></div></td>
+                                <td><div class="slot amber"><b>Istirahat</b><span>—</span></div></td>
+                                <td><div class="slot"><b>IPA Terpadu</b><span>Ust. Hendra P. · Lab IPA</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                            </tr>
+                            <tr>
+                                <td class="day">Kamis</td>
+                                <td><div class="slot"><b>Al-Qur'an Hadis</b><span>Ust. Ahmad Fauzi · R-01</span></div></td>
+                                <td><div class="slot blue"><b>Bahasa Indonesia</b><span>Ust. Rina Wati · R-02</span></div></td>
+                                <td><div class="slot mint"><b>Matematika</b><span>Ust. Siti Aminah · R-04</span></div></td>
+                                <td><div class="slot amber"><b>Istirahat</b><span>—</span></div></td>
+                                <td><div class="slot"><b>Fikih</b><span>Ust. Ahmad Fauzi · R-01</span></div></td>
+                                <td><div class="slot mint"><b>Prakarya</b><span>Ust. Dewi L. · R-03</span></div></td>
+                            </tr>
+                            <tr>
+                                <td class="day">Jumat</td>
+                                <td><div class="slot blue"><b>Bahasa Inggris</b><span>Ust. Dewi L. · R-03</span></div></td>
+                                <td><div class="slot"><b>IPS Terpadu</b><span>Ust. Bagus S. · R-05</span></div></td>
+                                <td><div class="slot amber"><b>Jumat Bersih</b><span>—</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                            </tr>
+                            <tr>
+                                <td class="day">Sabtu</td>
+                                <td><div class="slot mint"><b>Bahasa Arab</b><span>Ust. Nur H. · R-06</span></div></td>
+                                <td><div class="slot"><b>Matematika</b><span>Ust. Siti Aminah · R-04</span></div></td>
+                                <td><div class="slot blue"><b>Bahasa Indonesia</b><span>Ust. Rina Wati · R-02</span></div></td>
+                                <td><div class="slot amber"><b>Istirahat</b><span>—</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                                <td><div class="slot empty"><span>—</span></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-top:16px">
+                <div class="card">
+                    <div class="card-head"><h3>Modal Tambah Jadwal</h3></div>
+                    <div class="card-pad">
+                        <div class="field-row">
+                            <div class="field"><label>Kelas</label><select><option>7A</option><option>7B</option></select></div>
+                            <div class="field"><label>Hari</label><select><option>Senin</option><option>Selasa</option><option>Rabu</option></select></div>
+                        </div>
+                        <div class="field"><label>Mata Pelajaran</label><select><option>Matematika</option><option>IPA Terpadu</option><option>Bahasa Indonesia</option></select></div>
+                        <div class="field"><label>Guru Pengampu</label><select><option>Ust. Siti Aminah</option><option>Ust. Ahmad Fauzi</option></select></div>
+                        <div class="field-row">
+                            <div class="field"><label>Jam Mulai</label><input type="text" value="07:00"></div>
+                            <div class="field"><label>Jam Selesai</label><input type="text" value="08:20"></div>
+                        </div>
+                        <div class="field" style="margin-bottom:0"><label>Ruang</label><input type="text" value="R-04"></div>
+                    </div>
+                    <div class="form-footer">
+                        <button class="btn btn-outline btn-sm">Batal</button>
+                        <button class="btn btn-primary btn-sm">Simpan Jadwal</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><h3>Contoh Bentrok Terdeteksi</h3></div>
+                    <div class="card-pad">
+                        <div class="notice warn" style="margin-bottom:12px">
+                            <svg viewBox="0 0 24 24"><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                            <div><b>Jadwal bentrok.</b> Ust. Siti Aminah sudah mengajar Matematika di kelas 8B
+                            pada Senin 07.00–08.20.</div>
+                        </div>
+                        <p class="tiny muted">Sistem menolak penyimpanan dan menampilkan jadwal yang bertabrakan,
+                        sehingga guru tidak mungkin dijadwalkan ganda pada jam yang sama.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="assets/mockup.js" data-active="jadwal"></script>
+</body>
+</html>

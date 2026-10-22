@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Berita — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main">
+        <header class="topbar" id="topbar"></header>
+        <div class="content">
+
+            <div class="page-head">
+                <div>
+                    <div class="breadcrumb">Konten Website / <a href="admin-berita.html">Berita</a> / <b>Edit</b></div>
+                    <h1>Edit Berita</h1>
+                    <p>Terakhir diubah 21 Okt 2026, 14.32 oleh Operator</p>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline btn-sm" href="admin-berita.html">Batal</a>
+                    <button class="btn btn-primary btn-sm">Simpan Perubahan</button>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="card">
+                    <div class="card-head"><h3>Isi Berita</h3></div>
+                    <div class="card-pad">
+                        <div class="field invalid">
+                            <label for="judul">Judul Berita <span class="req">*</span></label>
+                            <input id="judul" type="text" value="Peringatan Hari Santri Nasional 2026">
+                            <div class="err">Judul maksimal 120 karakter.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="slug">Slug URL</label>
+                            <input id="slug" type="text" value="peringatan-hari-santri-2026">
+                            <div class="hint">Alamat halaman: <b>/berita/peringatan-hari-santri-2026</b></div>
+                        </div>
+
+                        <div class="field">
+                            <label for="ringkas">Ringkasan</label>
+                            <textarea id="ringkas" style="min-height:76px">MTs Al-Huda Gondang memperingati Hari Santri Nasional dengan rangkaian kegiatan upacara, khataman, dan pentas seni santri.</textarea>
+                            <div class="hint">86 / 200 karakter</div>
+                        </div>
+
+                        <div class="field" style="margin-bottom:0">
+                            <label>Isi Berita <span class="req">*</span></label>
+                            <div class="editor-mock">
+                                <div class="bar">
+                                    <span><b>B</b></span><span><i>I</i></span><span>U</span>
+                                    <span>H1</span><span>“</span><span>•</span><span>1.</span>
+                                    <span style="width:auto;padding:0 8px;font-size:10px">Link</span>
+                                    <span style="width:auto;padding:0 8px;font-size:10px">Gambar</span>
+                                </div>
+                                <div class="body">
+                                    <p><b>GONDANG</b> — Seluruh siswa, guru, dan tenaga kependidikan MTs Al-Huda Gondang
+                                    mengikuti upacara peringatan Hari Santri Nasional 2026 di halaman madrasah, Rabu (22/10).</p>
+                                    <p style="margin-top:10px">Kegiatan dilanjutkan dengan khataman Al-Qur'an, lomba kaligrafi
+                                    antar kelas, serta pentas seni santri yang diikuti perwakilan setiap kelas.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <a class="btn btn-outline" href="admin-berita.html">Batal</a>
+                        <button class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="card-head"><h3>Publikasi</h3></div>
+                        <div class="card-pad">
+                            <div class="field">
+                                <label for="status">Status</label>
+                                <select id="status">
+                                    <option selected>Terbit</option>
+                                    <option>Draft</option>
+                                    <option>Arsip</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="tgl">Tanggal Terbit</label>
+                                <input id="tgl" type="date" value="2026-10-21">
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label for="kat">Kategori</label>
+                                <select id="kat">
+                                    <option selected>Kegiatan</option>
+                                    <option>Prestasi</option>
+                                    <option>Pengumuman</option>
+                                    <option>Akademik</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-head"><h3>Gambar Cover</h3></div>
+                        <div class="card-pad">
+                            <div class="preview">
+                                <img src="../../public/assets/images/Senam Bersama.jpg" alt="Cover berita">
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:10px">
+                                <button class="btn btn-outline btn-sm" style="flex:1">Ganti Gambar</button>
+                                <button class="btn btn-danger btn-sm">Hapus</button>
+                            </div>
+                            <div class="hint tiny muted" style="margin-top:9px">JPG/PNG, maks. 2 MB, disarankan 1200×675 px.</div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:16px">
+                        <div class="card-head"><h3>SEO</h3></div>
+                        <div class="card-pad">
+                            <div class="field">
+                                <label for="mt">Meta Title</label>
+                                <input id="mt" type="text" value="Peringatan Hari Santri Nasional 2026 — MTs Al-Huda">
+                            </div>
+                            <div class="field" style="margin-bottom:0">
+                                <label for="md">Meta Description</label>
+                                <textarea id="md" style="min-height:64px">Rangkaian kegiatan Hari Santri Nasional 2026 di MTs Al-Huda Gondang.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="assets/mockup.js" data-active="berita"></script>
+</body>
+</html>

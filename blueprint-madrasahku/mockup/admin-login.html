@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Admin — MTs Al-Huda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+<style>
+    body {
+        min-height: 100vh; display: flex; flex-direction: column;
+        background: radial-gradient(1100px 480px at 50% -10%, #E9F9EF 0%, #F9FAFB 62%);
+    }
+    .login-shell { flex: 1; display: grid; place-items: center; padding: 40px 20px; }
+    .login-card { width: 100%; max-width: 404px; }
+    .login-card .card-pad { padding: 30px 28px 26px; }
+    .login-logo { width: 62px; height: 62px; object-fit: contain; margin: 0 auto 14px; }
+    .login-card h1 { font-size: 19px; font-weight: 800; text-align: center; letter-spacing: -.3px; }
+    .login-card .sub { font-size: 12.5px; color: var(--gray); text-align: center; margin: 4px 0 22px; }
+    .pw-wrap { position: relative; }
+    .pw-wrap .toggle {
+        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+        font-size: 11px; font-weight: 800; color: var(--green); cursor: pointer;
+    }
+    .remember { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 18px; font-size: 12.5px; }
+    .remember label { display: flex; align-items: center; gap: 7px; font-weight: 600; color: var(--gray); }
+    .remember a { color: var(--green); font-weight: 700; }
+    .foot-strip {
+        background: var(--dark-green); color: rgba(255, 255, 255, .55);
+        text-align: center; font-size: 11px; padding: 12px;
+    }
+    .mock-tag {
+        position: fixed; top: 14px; left: 14px; font-size: 10.5px; font-weight: 800;
+        background: var(--dark-green); color: #fff; padding: 5px 11px; border-radius: 20px;
+        letter-spacing: .04em;
+    }
+</style>
+</head>
+<body>
+<div class="mock-tag">DUMMY · A-1</div>
+
+<div class="login-shell">
+    <div class="login-card">
+        <div class="card">
+            <div class="card-pad">
+                <img class="login-logo" src="../../public/assets/images/LOGO_MTS 1.png" alt="Logo MTs Al-Huda">
+                <h1>Masuk Panel Admin</h1>
+                <p class="sub">Website MTs Al-Huda Gondang</p>
+
+                <div class="notice warn" style="margin-bottom:16px">
+                    <svg viewBox="0 0 24 24"><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                    <div><b>Nama pengguna atau kata sandi salah.</b><br>Sisa 2 percobaan sebelum akun dikunci sementara.</div>
+                </div>
+
+                <div class="field invalid">
+                    <label for="u">Nama Pengguna / Email <span class="req">*</span></label>
+                    <input id="u" type="text" value="operator@mtsalhuda.sch.id">
+                </div>
+
+                <div class="field">
+                    <label for="p">Kata Sandi <span class="req">*</span></label>
+                    <div class="pw-wrap">
+                        <input id="p" type="password" value="password123">
+                        <span class="toggle">Lihat</span>
+                    </div>
+                    <div class="err">Kata sandi minimal 8 karakter.</div>
+                </div>
+
+                <div class="remember">
+                    <label><input type="checkbox" checked> Ingat saya</label>
+                    <a href="#">Lupa kata sandi?</a>
+                </div>
+
+                <button class="btn btn-primary btn-block">Masuk</button>
+
+                <p class="tiny muted" style="text-align:center;margin-top:16px">
+                    Lupa kata sandi? Hubungi Operator Madrasah untuk reset instan,
+                    atau gunakan tautan email resmi.
+                </p>
+            </div>
+        </div>
+
+        <p class="tiny muted" style="text-align:center;margin-top:16px">
+            <a href="index.html">← Kembali ke daftar layar</a>
+        </p>
+    </div>
+</div>
+
+<div class="foot-strip">MTs Al-Huda Gondang · Panel Admin v1.0</div>
+</body>
+</html>

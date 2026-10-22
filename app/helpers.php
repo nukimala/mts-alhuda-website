@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Zona waktu aplikasi.
+ *
+ * PHP di mesin ini default ke Europe/Berlin, sementara MySQL menyimpan WIB.
+ * Tanpa ini, nilai waktu yang dibuat PHP (mis. locked_until) akan meleset
+ * 7 jam dari nilai yang dibuat MySQL (mis. NOW()), dan perbandingan di SQL
+ * jadi salah tanpa terlihat.
+ *
+ * Semua waktu di sistem ini WIB. Tidak ada pengecualian.
+ */
+date_default_timezone_set(getenv('APP_TIMEZONE') ?: 'Asia/Jakarta');
+
 if (!function_exists('base_path')) {
     function base_path(): string
     {

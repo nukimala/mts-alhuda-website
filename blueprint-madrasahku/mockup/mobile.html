@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi MADRASAHKU — Dummy UI Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/mockup.css">
+<style>
+    body { background: #F1F5F3; }
+    .mob-page { max-width: 1240px; margin: 0 auto; padding: 34px 24px 70px; }
+    .mob-head {
+        background: linear-gradient(140deg, #15803D, #0B3D1E);
+        color: #fff; border-radius: 18px; padding: 24px 26px;
+        box-shadow: 0 18px 40px rgba(11, 61, 30, .2); margin-bottom: 26px;
+    }
+    .mob-head h1 { font-size: 23px; font-weight: 800; letter-spacing: -.4px; }
+    .mob-head p { color: rgba(255, 255, 255, .8); font-size: 13px; margin-top: 6px; max-width: 760px; }
+    .mob-head .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .mob-head .meta span {
+        background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .22);
+        padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700;
+    }
+    .mob-head .back {
+        display: inline-block; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.85);
+        margin-bottom: 12px;
+    }
+    .phone-row { align-items: flex-start; }
+    .screen-note {
+        background: #fff; border: 1px solid var(--border); border-radius: 12px;
+        padding: 11px 13px; font-size: 11.5px; color: var(--gray); line-height: 1.55;
+        margin-top: 11px;
+    }
+    .screen-note b { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="mob-page">
+
+    <div class="mob-head">
+        <a class="back" href="index.html">← Kembali ke daftar layar</a>
+        <h1>Aplikasi MADRASAHKU — 11 Layar</h1>
+        <p>Aplikasi pendamping untuk guru dan siswa. Satu akun yang sama dipakai untuk web dan aplikasi.
+           Layar di bawah adalah tampilan contoh; data di dalamnya fiktif.</p>
+        <div class="meta">
+            <span>Android &amp; iOS</span>
+            <span>Bahasa Indonesia</span>
+            <span>Presensi guru saja</span>
+            <span>Nilai tugas, bukan rapor</span>
+        </div>
+    </div>
+
+    <div class="phone-row">
+
+        <!-- ============================================================ C-1 -->
+        <div class="phone-wrap" id="login">
+            <div class="cap">C-1 · Login
+                <span>Satu akun untuk web dan aplikasi</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="login-wrap">
+                        <img class="logo" src="../../public/assets/images/LOGO_MTS 1.png" alt="Logo MTs Al-Huda">
+                        <h2>MADRASAHKU</h2>
+                        <p>MTs Al-Huda Gondang</p>
+                        <div class="form">
+                            <div class="m-field">
+                                <label>Email atau NIP</label>
+                                <input type="text" value="ahmad.fauzi@mtsalhuda.sch.id">
+                            </div>
+                            <div class="m-field">
+                                <label>Kata Sandi</label>
+                                <input type="password" value="password123">
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0 16px;font-size:11.5px">
+                                <label style="display:flex;gap:6px;align-items:center;color:var(--gray);font-weight:600">
+                                    <input type="checkbox" checked> Ingat saya
+                                </label>
+                                <a href="#" style="color:var(--green);font-weight:700">Lupa sandi?</a>
+                            </div>
+                            <a class="btn-app" href="#dashboard-guru">Masuk</a>
+                            <p style="font-size:10.5px;color:var(--gray);text-align:center;margin-top:16px;line-height:1.6">
+                                Akun dibuat oleh Operator Madrasah.<br>Tidak ada pendaftaran mandiri.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> tidak ada tombol daftar, tidak ada login Google/Facebook.
+                Akun hanya dibuat operator madrasah.</div>
+        </div>
+
+        <!-- ============================================================ C-2 -->
+        <div class="phone-wrap" id="dashboard-guru">
+            <div class="cap">C-2 · Dashboard Guru
+                <span>Ringkasan hari ini + aksi cepat</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <div class="avatar">AF</div>
+                            <div>
+                                <div class="hi">Assalamu'alaikum,</div>
+                                <h3>Ahmad Fauzi</h3>
+                            </div>
+                            <a class="bell" href="#notifikasi">
+                                <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg>
+                                <span class="dot"></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="app-body">
+
+                        <div class="m-card hero-checkin">
+                            <div class="m-title"><span class="dot"></span>Presensi Hari Ini</div>
+                            <div class="m-sub">Kamis, 22 Oktober 2026 · jam masuk 07.00</div>
+                            <div class="status-chip">
+                                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                                Sudah check-in 06.58
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:13px">
+                                <a class="btn-app light" href="#checkin" style="flex:1;padding:10px;font-size:12px">Detail Presensi</a>
+                            </div>
+                        </div>
+
+                        <div class="quick-grid">
+                            <a href="#checkin">
+                                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                                <span>Presensi</span>
+                            </a>
+                            <a href="#jadwal">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+                                <span>Jadwal</span>
+                            </a>
+                            <a href="#tugas">
+                                <svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m8 13 2 2 4-4"/></svg>
+                                <span>Tugas</span>
+                            </a>
+                            <a href="#materi">
+                                <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/></svg>
+                                <span>Materi</span>
+                            </a>
+                        </div>
+
+                        <div class="m-card" style="margin-top:14px">
+                            <div class="m-title"><span class="dot"></span>Jadwal Berikutnya</div>
+                            <div class="session-card" style="margin-top:10px">
+                                <div class="time">07.00<span>08.20</span></div>
+                                <div class="info">
+                                    <b>Al-Qur'an Hadis</b>
+                                    <span>Kelas 7A · R-01</span>
+                                </div>
+                                <div class="act"><span class="mini-pill green">Hadir</span></div>
+                            </div>
+                            <div class="session-card" style="margin-top:10px">
+                                <div class="time">12.30<span>13.50</span></div>
+                                <div class="info">
+                                    <b>Fikih</b>
+                                    <span>Kelas 7B · R-01</span>
+                                </div>
+                                <div class="act"><span class="mini-pill gray">Belum</span></div>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Perlu Dikerjakan</div>
+                            <div class="m-sub">2 tugas menunggu dinilai</div>
+                            <a class="btn-app" href="#nilai-guru" style="margin-top:11px;padding:11px;font-size:12.5px">Nilai Sekarang</a>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru" class="on"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> kartu teratas adalah presensi harian. Aksi cepat hanya 4
+                supaya tidak penuh di layar kecil.</div>
+        </div>
+
+        <!-- ============================================================ C-3 -->
+        <div class="phone-wrap" id="checkin">
+            <div class="cap">C-3 · Presensi / Check-in
+                <span>Layar inti — harian &amp; per jam mengajar</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#dashboard-guru" style="display:flex;align-items:center">
+                                <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg>
+                            </a>
+                            <h3 style="font-size:15px">Presensi</h3>
+                        </div>
+                    </div>
+                    <div class="app-body">
+
+                        <div class="m-card hero-checkin" style="text-align:center">
+                            <div class="m-title" style="justify-content:center"><span class="dot"></span>Presensi Harian</div>
+                            <div class="m-sub">Kamis, 22 Oktober 2026</div>
+                            <div style="font-size:34px;font-weight:800;letter-spacing:-1.5px;margin:10px 0 2px">06.58</div>
+                            <div class="m-sub" style="font-size:11px">Jam server madrasah</div>
+                            <div class="status-chip" style="margin-top:12px">
+                                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                                Hadir — tepat waktu
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Presensi Jam Mengajar</div>
+                            <div class="m-sub">Pilih sesi, lalu check-in saat jam pelajaran dimulai</div>
+
+                            <div class="session-card" style="margin-top:12px">
+                                <div class="time">07.00<span>08.20</span></div>
+                                <div class="info">
+                                    <b>Al-Qur'an Hadis · 7A</b>
+                                    <span>R-01 · sudah check-in 06.57</span>
+                                </div>
+                                <div class="act"><span class="mini-pill green">Hadir</span></div>
+                            </div>
+
+                            <div class="session-card" style="margin-top:10px">
+                                <div class="time">12.30<span>13.50</span></div>
+                                <div class="info">
+                                    <b>Fikih · 7B</b>
+                                    <span>R-01 · belum check-in</span>
+                                </div>
+                                <div class="act"><span class="mini-pill gray">Menunggu</span></div>
+                            </div>
+
+                            <div class="session-card" style="margin-top:10px;opacity:.55">
+                                <div class="time">14.00<span>15.10</span></div>
+                                <div class="info">
+                                    <b>Bimbingan Tahfidz · 9A</b>
+                                    <span>Masjid · belum bisa check-in</span>
+                                </div>
+                                <div class="act"><span class="mini-pill gray">Terkunci</span></div>
+                            </div>
+
+                            <p style="font-size:10.5px;color:var(--gray);margin-top:12px;line-height:1.6">
+                                Tombol check-in sesi aktif hanya 10 menit sebelum jam mulai sampai 20 menit setelahnya.
+                            </p>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Catatan</div>
+                            <div class="m-sub">Tambahkan keterangan jika perlu</div>
+                            <div class="m-field" style="margin-top:10px;margin-bottom:0">
+                                <input type="text" placeholder="cth. menggantikan guru lain">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> tidak ada scan QR. Waktu memakai jam server, bukan jam HP,
+                supaya tidak bisa dimanipulasi.</div>
+        </div>
+
+        <!-- ============================================================ C-4 -->
+        <div class="phone-wrap" id="riwayat">
+            <div class="cap">C-4 · Riwayat Presensi
+                <span>Ringkasan bulanan + detail per hari</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#checkin"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg></a>
+                            <h3 style="font-size:15px">Riwayat Presensi</h3>
+                        </div>
+                    </div>
+                    <div class="app-body">
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Oktober 2026</div>
+                            <div class="m-sub">22 hari kerja · 21 hari tercatat</div>
+                            <div style="display:flex;gap:16px;margin-top:12px;text-align:center">
+                                <div style="flex:1">
+                                    <div style="font-size:19px;font-weight:800;color:var(--green-600)">18</div>
+                                    <div style="font-size:10px;color:var(--gray);font-weight:700">Hadir</div>
+                                </div>
+                                <div style="flex:1">
+                                    <div style="font-size:19px;font-weight:800;color:var(--amber)">2</div>
+                                    <div style="font-size:10px;color:var(--gray);font-weight:700">Terlambat</div>
+                                </div>
+                                <div style="flex:1">
+                                    <div style="font-size:19px;font-weight:800;color:var(--blue)">1</div>
+                                    <div style="font-size:10px;color:var(--gray);font-weight:700">Izin</div>
+                                </div>
+                                <div style="flex:1">
+                                    <div style="font-size:19px;font-weight:800;color:var(--red)">0</div>
+                                    <div style="font-size:10px;color:var(--gray);font-weight:700">Alpa</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Kalender Kehadiran</div>
+                            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:11px;font-size:10px;text-align:center">
+                                <span style="color:var(--slate);font-weight:800">S</span>
+                                <span style="color:var(--slate);font-weight:800">S</span>
+                                <span style="color:var(--slate);font-weight:800">R</span>
+                                <span style="color:var(--slate);font-weight:800">K</span>
+                                <span style="color:var(--slate);font-weight:800">J</span>
+                                <span style="color:var(--slate);font-weight:800">S</span>
+                                <span style="color:var(--slate);font-weight:800">A</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">1</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">2</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">3</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">4</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">5</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">6</span>
+                                <span style="padding:6px 0;color:var(--slate)">7</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">8</span>
+                                <span style="padding:6px 0;border-radius:6px;background:var(--amber-soft);color:var(--amber);font-weight:800">9</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">10</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">11</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">12</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">13</span>
+                                <span style="padding:6px 0;color:var(--slate)">14</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">15</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">16</span>
+                                <span style="padding:6px 0;border-radius:6px;background:var(--blue-soft);color:var(--blue);font-weight:800">17</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">18</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">19</span>
+                                <span style="padding:6px 0;border-radius:6px;background:#E9F9EF;color:var(--green-600);font-weight:800">20</span>
+                                <span style="padding:6px 0;border-radius:6px;background:var(--amber-soft);color:var(--amber);font-weight:800">21</span>
+                                <span style="padding:6px 0;border-radius:6px;background:var(--green);color:#fff;font-weight:800">22</span>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Detail Hari Ini</div>
+                            <div class="session-card" style="margin-top:10px">
+                                <div class="time">06.58<span>datang</span></div>
+                                <div class="info"><b>Check-in harian</b><span>Hadir — tepat waktu</span></div>
+                            </div>
+                            <div class="session-card" style="margin-top:9px">
+                                <div class="time">06.57<span>sesi 1</span></div>
+                                <div class="info"><b>Al-Qur'an Hadis · 7A</b><span>Check-in jam mengajar</span></div>
+                            </div>
+                            <div class="session-card" style="margin-top:9px">
+                                <div class="time">15.05<span>pulang</span></div>
+                                <div class="info"><b>Check-out</b><span>Belum dilakukan</span></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> warna kalender langsung menunjukkan status — hijau hadir,
+                kuning terlambat, biru izin, merah alpa.</div>
+        </div>
+
+        <!-- ============================================================ C-5 -->
+        <div class="phone-wrap" id="jadwal">
+            <div class="cap">C-5 · Jadwal Pelajaran
+                <span>Tab per hari + kartu sesi</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <div>
+                                <div class="hi">Semester Ganjil 2026/2027</div>
+                                <h3>Jadwal Mengajar</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:6px">
+                        <div class="tab-row">
+                            <span class="tab">Sen</span>
+                            <span class="tab">Sel</span>
+                            <span class="tab">Rab</span>
+                            <span class="tab on">Kam</span>
+                            <span class="tab">Jum</span>
+                            <span class="tab">Sab</span>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="session-card">
+                                <div class="time">07.00<span>08.20</span></div>
+                                <div class="info">
+                                    <b>Al-Qur'an Hadis</b>
+                                    <span>Kelas 7A · R-01 · 24 siswa</span>
+                                </div>
+                                <div class="act"><span class="mini-pill green">Aktif</span></div>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="session-card">
+                                <div class="time">08.20<span>09.40</span></div>
+                                <div class="info">
+                                    <b>Fikih</b>
+                                    <span>Kelas 8A · R-02 · 26 siswa</span>
+                                </div>
+                                <div class="act"><span class="mini-pill gray">Nanti</span></div>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="session-card">
+                                <div class="time">12.30<span>13.50</span></div>
+                                <div class="info">
+                                    <b>Fikih</b>
+                                    <span>Kelas 7B · R-01 · 23 siswa</span>
+                                </div>
+                                <div class="act"><span class="mini-pill gray">Nanti</span></div>
+                            </div>
+                        </div>
+
+                        <div class="m-card" style="background:#FBFDFC;border-style:dashed">
+                            <div class="m-title" style="color:var(--gray)"><span class="dot" style="background:var(--slate)"></span>Jumat</div>
+                            <div class="m-sub">Tidak ada jadwal mengajar</div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> hari tanpa jadwal tetap ditampilkan dengan gaya berbeda,
+                supaya guru tidak bingung apakah aplikasi gagal memuat.</div>
+        </div>
+
+        <!-- ============================================================ C-6 -->
+        <div class="phone-wrap" id="materi">
+            <div class="cap">C-6 · Materi
+                <span>Daftar materi + unduh berkas</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#dashboard-guru"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg></a>
+                            <div>
+                                <div class="hi">Al-Qur'an Hadis · 7A</div>
+                                <h3>Materi</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:6px">
+                        <div class="tab-row">
+                            <span class="tab on">Semua</span>
+                            <span class="tab">Bab 1</span>
+                            <span class="tab">Bab 2</span>
+                            <span class="tab">Bab 3</span>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Hukum Bacaan Mad Thabi'i</div>
+                            <div class="m-sub">Bab 2 · diunggah 18 Okt 2026</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill green">PDF · 1,4 MB</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Unduh</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Video: Praktik Bacaan Mad</div>
+                            <div class="m-sub">Bab 2 · diunggah 18 Okt 2026</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill gray">Tautan YouTube</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Buka</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Ringkasan Tajwid Bab 1–2</div>
+                            <div class="m-sub">Bab 1 · diunggah 5 Okt 2026</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill green">PDF · 820 KB</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Unduh</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Lembar Kerja Tajwid</div>
+                            <div class="m-sub">Bab 1 · diunggah 28 Sep 2026</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill green">PDF · 460 KB</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Unduh</a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> materi bisa berupa berkas atau tautan. Ukuran berkas
+                ditampilkan supaya guru tahu sebelum mengunduh.</div>
+        </div>
+
+        <!-- ============================================================ C-7 -->
+        <div class="phone-wrap" id="tugas">
+            <div class="cap">C-7 · Tugas Siswa
+                <span>Kumpulkan tugas + tenggat</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <div>
+                                <div class="hi">Siswa · Kelas 7A</div>
+                                <h3>Tugas Saya</h3>
+                            </div>
+                            <a class="bell" href="#notifikasi">
+                                <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:6px">
+                        <div class="tab-row">
+                            <span class="tab on">Belum dikumpulkan</span>
+                            <span class="tab">Sudah dikumpulkan</span>
+                            <span class="tab">Terlambat</span>
+                        </div>
+
+                        <div class="m-card" style="border-left:3px solid var(--amber)">
+                            <div class="m-title"><span class="dot"></span>Latihan Tajwid Bab 2</div>
+                            <div class="m-sub">Al-Qur'an Hadis · Ust. Ahmad Fauzi</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill amber">Tenggat besok, 23.59</span>
+                                <a href="#nilai" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Kumpulkan</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Hafalan Surah Al-Mulk 1–10</div>
+                            <div class="m-sub">Al-Qur'an Hadis · Ust. Ahmad Fauzi</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill green">Tenggat 27 Okt</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Kumpulkan</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Laporan Pengamatan IPA</div>
+                            <div class="m-sub">IPA Terpadu · Ust. Hendra Pratama</div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill green">Tenggat 30 Okt</span>
+                                <a href="#" style="margin-left:auto;font-size:11.5px;font-weight:800;color:var(--green)">Kumpulkan</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card" style="background:#FBFDFC;border-style:dashed">
+                            <div class="m-title" style="color:var(--gray)"><span class="dot" style="background:var(--slate)"></span>Sudah dikumpulkan</div>
+                            <div class="m-sub">3 tugas · menunggu dinilai</div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas" class="on"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> tenggat yang mendesak diberi garis kuning di sisi kiri
+                agar langsung terlihat.</div>
+        </div>
+
+        <!-- ============================================================ C-8 -->
+        <div class="phone-wrap" id="nilai-guru">
+            <div class="cap">C-8 · Penilaian (Guru)
+                <span>Beri nilai 0–100 + feedback</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#dashboard-guru"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg></a>
+                            <div>
+                                <div class="hi">Latihan Tajwid Bab 2 · 7A</div>
+                                <h3>Penilaian Tugas</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:6px">
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Progres Penilaian</div>
+                            <div style="display:flex;align-items:center;gap:14px;margin-top:11px">
+                                <div class="ring" style="--p:58;--size:66px"><b>14<small>/24</small></b></div>
+                                <div style="flex:1">
+                                    <div class="m-sub" style="margin-top:0">10 siswa belum dinilai</div>
+                                    <div class="progress" style="margin-top:8px"><span style="width:58%"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Aisyah Nur Fadilah</div>
+                            <div class="m-sub">Dikumpulkan 21 Okt 2026, 20.14</div>
+                            <div style="margin-top:11px">
+                                <div class="m-field" style="margin-bottom:9px">
+                                    <label>Nilai (0–100)</label>
+                                    <input type="text" value="88">
+                                </div>
+                                <div class="m-field" style="margin-bottom:9px">
+                                    <label>Feedback</label>
+                                    <input type="text" value="Bacaan mad sudah tepat, perhatikan panjang harakat.">
+                                </div>
+                                <a class="btn-app" href="#" style="padding:11px;font-size:12.5px">Simpan &amp; Lanjut</a>
+                            </div>
+                        </div>
+
+                        <div class="m-card" style="padding:11px 13px">
+                            <div style="display:flex;align-items:center;gap:9px">
+                                <span class="mini-pill green">Sudah</span>
+                                <span style="font-size:12px;font-weight:700">Muhammad Rizky</span>
+                                <span style="margin-left:auto;font-size:12px;font-weight:800;color:var(--green-600)">92</span>
+                            </div>
+                        </div>
+                        <div class="m-card" style="padding:11px 13px">
+                            <div style="display:flex;align-items:center;gap:9px">
+                                <span class="mini-pill green">Sudah</span>
+                                <span style="font-size:12px;font-weight:700">Fatimah Zahra</span>
+                                <span style="margin-left:auto;font-size:12px;font-weight:800;color:var(--green-600)">85</span>
+                            </div>
+                        </div>
+                        <div class="m-card" style="padding:11px 13px">
+                            <div style="display:flex;align-items:center;gap:9px">
+                                <span class="mini-pill gray">Belum</span>
+                                <span style="font-size:12px;font-weight:700">Abdullah Hakim</span>
+                                <span style="margin-left:auto;font-size:11px;color:var(--gray)">—</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas" class="on"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> nilai hanya untuk tugas dan feedback, bukan rapor lengkap.
+                Guru bisa langsung lanjut ke siswa berikutnya.</div>
+        </div>
+
+        <!-- ============================================================ C-9 -->
+        <div class="phone-wrap" id="nilai">
+            <div class="cap">C-9 · Nilai &amp; Feedback (Siswa)
+                <span>Nilai tugas + catatan guru</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#tugas"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg></a>
+                            <div>
+                                <div class="hi">Aisyah Nur Fadilah · 7A</div>
+                                <h3>Nilai Saya</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:6px">
+
+                        <div class="m-card hero-checkin" style="text-align:center">
+                            <div class="m-sub">Latihan Tajwid Bab 2</div>
+                            <div style="font-size:40px;font-weight:800;letter-spacing:-2px;margin:6px 0 0">88</div>
+                            <div class="m-sub" style="font-size:11px">dinilai 21 Okt 2026</div>
+                            <div class="status-chip" style="margin-top:10px">
+                                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                                Baik sekali
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Catatan Guru</div>
+                            <div class="m-sub" style="margin-top:7px;line-height:1.6;font-size:11.5px">
+                                Bacaan mad sudah tepat, perhatikan panjang harakat pada kata "as-samaa'i".
+                                Latihan lagi pada bagian waqaf di akhir ayat.
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                                <span class="mini-pill gray">Ust. Ahmad Fauzi</span>
+                            </div>
+                        </div>
+
+                        <div class="m-card">
+                            <div class="m-title"><span class="dot"></span>Nilai Tugas Lain</div>
+                            <div style="display:flex;align-items:center;gap:9px;margin-top:11px">
+                                <span style="font-size:12px;font-weight:700;flex:1">Hafalan Surah Al-Mulk</span>
+                                <span class="mini-pill green">90</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:9px;margin-top:10px">
+                                <span style="font-size:12px;font-weight:700;flex:1">Lembar Kerja Tajwid</span>
+                                <span class="mini-pill green">84</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:9px;margin-top:10px">
+                                <span style="font-size:12px;font-weight:700;flex:1">Laporan Pengamatan IPA</span>
+                                <span class="mini-pill gray">Belum dinilai</span>
+                            </div>
+                        </div>
+
+                        <div class="m-card" style="background:#FBFDFC">
+                            <p style="font-size:10.5px;color:var(--gray);line-height:1.6">
+                                Nilai ini hanya untuk tugas dan feedback. Rapor resmi tetap dikeluarkan madrasah.
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas" class="on"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> siswa hanya melihat nilai tugas dan catatan guru.
+                Tidak ada peringkat kelas dan tidak ada rapor.</div>
+        </div>
+
+        <!-- ============================================================ C-10 -->
+        <div class="phone-wrap" id="notifikasi">
+            <div class="cap">C-10 · Notifikasi In-App
+                <span>Pusat notifikasi + badge</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="app-head">
+                        <div class="row">
+                            <a href="#dashboard-guru"><svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dark-green);fill:none;stroke-width:2"><path d="m15 18-6-6 6-6"/></svg></a>
+                            <div>
+                                <div class="hi">3 belum dibaca</div>
+                                <h3>Notifikasi</h3>
+                            </div>
+                            <a href="#" style="margin-left:auto;font-size:11px;font-weight:800;color:var(--green)">Tandai semua</a>
+                        </div>
+                    </div>
+                    <div class="app-body" style="padding-top:8px">
+
+                        <div class="notif-row unread">
+                            <div class="ico"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+                            <div style="flex:1">
+                                <b>Tugas baru: Latihan Tajwid Bab 2</b>
+                                <p>Ust. Ahmad Fauzi menambahkan tugas untuk kelas 7A.</p>
+                                <time>10 menit lalu</time>
+                            </div>
+                            <span class="undot"></span>
+                        </div>
+
+                        <div class="notif-row unread" style="margin-top:9px">
+                            <div class="ico" style="background:var(--amber-soft);color:var(--amber)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+                            <div style="flex:1">
+                                <b>Tenggat besok</b>
+                                <p>Latihan Tajwid Bab 2 dikumpulkan paling lambat 23.59 besok.</p>
+                                <time>2 jam lalu</time>
+                            </div>
+                            <span class="undot"></span>
+                        </div>
+
+                        <div class="notif-row unread" style="margin-top:9px">
+                            <div class="ico" style="background:var(--blue-soft);color:var(--blue)"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+                            <div style="flex:1">
+                                <b>Nilai sudah keluar</b>
+                                <p>Hafalan Surah Al-Mulk: 90. Ada catatan dari guru.</p>
+                                <time>Kemarin, 16.20</time>
+                            </div>
+                            <span class="undot"></span>
+                        </div>
+
+                        <div class="notif-row" style="margin-top:9px">
+                            <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h7M7 12h10"/></svg></div>
+                            <div style="flex:1">
+                                <b>Pengumuman madrasah</b>
+                                <p>Peringatan Hari Santri Nasional 2026 digelar Rabu, 22 Oktober.</p>
+                                <time>2 hari lalu</time>
+                            </div>
+                        </div>
+
+                        <div class="notif-row" style="margin-top:9px">
+                            <div class="ico" style="background:var(--red-soft);color:var(--red)"><svg viewBox="0 0 24 24"><path d="M18.4 5.6a9 9 0 1 1-12.8 12.8"/><path d="M3 3l18 18"/></svg></div>
+                            <div style="flex:1">
+                                <b>Presensi sesi terlewat</b>
+                                <p>Anda belum check-in sesi Fikih 7B pada 21 Oktober.</p>
+                                <time>2 hari lalu</time>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> notifikasi diambil saat aplikasi dibuka (polling ringan).
+                Tidak memakai layanan push pihak ketiga. Email hanya untuk hal penting.</div>
+        </div>
+
+        <!-- ============================================================ C-11 -->
+        <div class="phone-wrap" id="profil">
+            <div class="cap">C-11 · Profil &amp; Menu
+                <span>Menu per role + keamanan akun</span>
+            </div>
+            <div class="phone">
+                <div class="phone-screen">
+                    <div class="status-bar"><span>07.42</span><div class="sig"><i></i><i></i><i></i></div><div class="batt"></div></div>
+                    <div class="profile-head">
+                        <div class="avatar">AF</div>
+                        <h3>Ahmad Fauzi</h3>
+                        <div class="role">Guru</div>
+                        <div class="meta">NIP 1985xxxx 201001 1 004<br>Al-Qur'an Hadis</div>
+                    </div>
+                    <div class="app-body" style="padding-top:14px">
+
+                        <div class="menu-list">
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
+                                Data Pribadi <span class="chev">›</span>
+                            </div>
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                                Ganti Kata Sandi <span class="chev">›</span>
+                            </div>
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg>
+                                Pengaturan Notifikasi <span class="chev">›</span>
+                            </div>
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                                Riwayat Presensi <span class="chev">›</span>
+                            </div>
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+                                Bantuan <span class="chev">›</span>
+                            </div>
+                        </div>
+
+                        <div class="menu-list" style="margin-top:11px">
+                            <div class="menu-item">
+                                <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+                                Kebijakan Privasi <span class="chev">›</span>
+                            </div>
+                            <div class="menu-item danger">
+                                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+                                Keluar
+                            </div>
+                        </div>
+
+                        <p style="text-align:center;font-size:10px;color:var(--slate);margin-top:16px;line-height:1.6">
+                            MADRASAHKU v1.0.0<br>MTs Al-Huda Gondang
+                        </p>
+
+                    </div>
+                    <div class="bottom-nav">
+                        <a href="#dashboard-guru"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg>Beranda</a>
+                        <a href="#jadwal"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>Jadwal</a>
+                        <a href="#tugas"><svg viewBox="0 0 24 24"><path d="M9 5H5v16h14V5h-4"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Tugas</a>
+                        <a href="#profil" class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>Profil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="screen-note"><b>Catatan:</b> menu menyesuaikan role. Guru melihat presensi, siswa
+                melihat nilai. Yang tidak berhak tidak ditampilkan sama sekali.</div>
+        </div>
+
+    </div>
+
+    <div class="card card-pad" style="margin-top:30px">
+        <h2 class="section" style="margin-top:0">Yang perlu Bapak/Ibu periksa di aplikasi</h2>
+        <ul class="tiny muted" style="padding-left:18px;line-height:2">
+            <li>Apakah alur presensi guru sudah sesuai kebiasaan madrasah — check-in harian lalu check-in per jam mengajar?</li>
+            <li>Apakah istilah di aplikasi sudah familiar (check-in, sesi, materi, feedback)?</li>
+            <li>Apakah siswa cukup melihat nilai tugas saja, tanpa peringkat kelas?</li>
+            <li>Apakah notifikasi seperti ini sudah cukup, tanpa notifikasi push?</li>
+        </ul>
+    </div>
+
+    <p class="tiny muted" style="margin-top:22px">
+        <a href="index.html">← Kembali ke daftar layar</a> ·
+        Mockup statis · mengikuti <code>PRD.md</code> v1.2 · MTs Al-Huda Gondang · 22 Oktober 2026
+    </p>
+
+</div>
+</body>
+</html>
