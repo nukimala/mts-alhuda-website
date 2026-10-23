@@ -59,6 +59,11 @@ Perintah itu mengerjakan semuanya:
 6. membuat akun admin pertama
 7. menampilkan alamat yang harus dibuka
 
+> **Tanpa PHP CLI?** Seluruh skema bisa diimpor dari satu berkas —
+> `database/mts_alhuda.sql` — lewat HeidiSQL/phpMyAdmin/TablePlus. Isinya sama:
+> 42 tabel + data contoh + akun admin. Langkahnya ada di
+> [`database/README.md`](database/README.md).
+
 ### 4. Buka
 
 ```

@@ -1,6 +1,7 @@
 # Database — MTs Al-Huda Gondang
 
-Sumber kebenaran tunggal: **MariaDB 10.4.32**, database `mts_alhuda`, `utf8mb4_unicode_ci`.
+Sumber kebenaran tunggal: **MySQL 8.4.3**, database `mts_alhuda`, `utf8mb4_unicode_ci`.
+(Skema tetap kompatibel dengan MariaDB 10.4 — lihat catatan di bagian 6.)
 Tanpa ORM. Semua query memakai PDO prepared statement.
 
 ---
@@ -99,6 +100,7 @@ database/
   migrations/               # struktur, bernomor, punya @UP dan @DOWN
   seeders/                  # data awal, idempoten (ikut `seed`)
     demo/                   # data contoh, hanya ikut `seed --demo`
+  mts_alhuda.sql            # satu berkas siap impor: 42 tabel + data contoh
   README.md                 # dokumen ini
 
 tools/
@@ -107,7 +109,7 @@ tools/
   schema-test.php           # 67 uji integritas skema (dalam transaksi, rollback)
   db-check.php              # verifikasi integritas otomatis (30 pemeriksaan)
   db-share.php              # buat/hapus/uji akun database untuk tim
-  api-test.php              # uji end-to-end API v1 (51 pemeriksaan)
+  api-test.php              # uji end-to-end API v1 (80 pemeriksaan)
 ```
 
 ---
@@ -166,6 +168,57 @@ php tools/db-check.php --verbose        # 30 pemeriksaan integritas
 ```
 
 `fresh` menolak berjalan kalau `APP_ENV=production`, kecuali diberi `--force`.
+
+### Impor satu berkas (tanpa menjalankan migrasi)
+
+Untuk rekan tim yang ingin langsung jalan — atau mesin yang tidak punya PHP CLI —
+seluruh skema dan data sudah dibungkus jadi satu berkas:
+
+```
+database/mts_alhuda.sql
+```
+
+Isinya 42 tabel (hasil 14 migrasi) + pengaturan awal + data contoh, sudah termasuk
+akun admin. Berkas ini **membuat** database `mts_alhuda` lalu mengisi tabelnya.
+
+**Lewat HeidiSQL / phpMyAdmin / TablePlus**
+
+1. Sambung ke server (host `127.0.0.1`, port `3306`, user `root`).
+2. HeidiSQL: *File → Run SQL file*. phpMyAdmin: tab *Import*.
+3. Pilih `database/mts_alhuda.sql`, jalankan.
+
+**Lewat terminal**
+
+```bash
+mysql -u root -p < database/mts_alhuda.sql
+```
+
+PowerShell tidak mendukung `<`, jadi pakai:
+
+```bash
+cmd /c "mysql -u root -p < database/mts_alhuda.sql"
+```
+
+**Akun setelah impor**
+
+| Akun | Username | Sandi |
+|---|---|---|
+| Admin | `admin` | `Admin#AlHuda2026` — wajib diganti saat login pertama |
+| Operator | `operator` | `Contoh#AlHuda2026` |
+| Guru | `guru` | `Contoh#AlHuda2026` |
+| Siswa | `siswa` | `Contoh#AlHuda2026` |
+
+Kalau `config/database.php` Anda memakai nama database lain, ubah baris `USE`
+di berkas itu sebelum impor.
+
+**Yang perlu diketahui**
+
+- Impor ulang **menimpa tabel** (`DROP TABLE IF EXISTS` per tabel). Data lama di
+  database `mts_alhuda` hilang; database lain tidak tersentuh.
+- Berkas ini tidak menggantikan migrasi. Perubahan skema berikutnya tetap dibuat
+  sebagai migrasi baru (`015_...sql`), bukan dengan mengedit berkas ini.
+- Setelah impor, `php tools/migrate.php status` harus menunjukkan semua 14 migrasi
+  sudah terpakai — itu tanda isinya sinkron.
 
 ### Data contoh dipisah
 
