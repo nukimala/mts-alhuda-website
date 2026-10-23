@@ -24,6 +24,12 @@ untuk autentikasi (tidak ada Firebase, Auth0, Supabase, FCM, atau OneSignal).
 ### 1. Clone
 
 ```bash
+# Laragon
+cd C:\laragon\www
+git clone <url-repo> mts-alhuda-website
+cd mts-alhuda-website
+
+# XAMPP
 cd C:\xampp\htdocs
 git clone <url-repo> mts-alhuda-website
 cd mts-alhuda-website
@@ -31,11 +37,15 @@ cd mts-alhuda-website
 
 ### 2. Nyalakan Apache dan MySQL
 
-Lewat XAMPP Control Panel: tombol **Start** pada **Apache** dan **MySQL**.
+Laragon: tombol **Start All**. XAMPP: tombol **Start** pada **Apache** dan **MySQL**.
 
 ### 3. Satu perintah
 
 ```bash
+# Laragon
+C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64\php.exe tools\setup.php
+
+# XAMPP
 C:\xampp\php\php.exe tools\setup.php
 ```
 

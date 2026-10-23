@@ -77,3 +77,16 @@ if (!function_exists('asset')) {
         return base_url($path);
     }
 }
+
+if (!function_exists('e')) {
+    /**
+     * Escape nilai sebelum dicetak di HTML.
+     *
+     * Semua data dari database atau input pengguna wajib lewat sini.
+     * Tanpa ini, judul berita berisi <script> akan ikut dijalankan browser.
+     */
+    function e(?string $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+}
