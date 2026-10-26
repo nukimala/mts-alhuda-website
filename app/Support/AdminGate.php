@@ -135,6 +135,18 @@ class AdminGate
         $_SESSION['_flash_success'] = $message;
     }
 
+    /**
+     * Simpan nilai sekali pakai di kunci bebas.
+     *
+     * Dipakai untuk hal yang tidak boleh masuk pesan sukses biasa — misalnya
+     * sandi sementara yang harus terlihat jelas tapi hanya sekali.
+     */
+    public static function flashValue(string $key, string $value): void
+    {
+        Auth::start();
+        $_SESSION[$key] = $value;
+    }
+
     public static function flashError(string $message): void
     {
         Auth::start();

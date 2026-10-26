@@ -69,7 +69,7 @@ $menuItem = static function (string $key, string $label, string $icon, bool $ena
             <div class="side-group">Layanan</div>
             <?= $menuItem('ppdb', 'Info &amp; Dokumen PPDB', 'folder_shared') ?>
             <?= $menuItem('pesan', 'Pesan Masuk', 'mark_email_unread') ?>
-            <?= $menuItem('pengguna', 'Pengguna &amp; Role', 'group') ?>
+            <?= $menuItem('pengguna', 'Pengguna &amp; Role', 'group', true) ?>
 
             <div class="side-group">Akademik</div>
             <?= $menuItem('jadwal', 'Jadwal Pelajaran', 'calendar_month') ?>

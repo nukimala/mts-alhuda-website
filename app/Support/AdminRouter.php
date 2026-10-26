@@ -25,10 +25,24 @@ class AdminRouter
     /**
      * Modul konten yang memakai pola URL seragam di atas.
      *
-     * @var array<string,array{controller:string,label:string}>
+     * `actions` mendaftar aksi tambahan khusus modul: nama segmen URL =>
+     * nama method controller. Semuanya hanya menerima POST — aksi yang
+     * mengubah data tidak boleh bisa dipicu dari tautan atau prefetch browser.
+     *
+     * @var array<string,array{controller:string,label:string,actions?:array<string,string>}>
      */
     private const CRUD_MODULES = [
-        'berita' => ['controller' => 'AdminBeritaController', 'label' => 'Berita'],
+        'berita'   => ['controller' => 'AdminBeritaController', 'label' => 'Berita'],
+        'pengguna' => [
+            'controller' => 'AdminPenggunaController',
+            'label'      => 'Pengguna',
+            'actions'    => [
+                'aktifkan'    => 'activate',
+                'nonaktifkan' => 'deactivate',
+                'reset'       => 'resetPassword',
+                'buka-kunci'  => 'unlock',
+            ],
+        ],
     ];
 
     /** @var list<string> */
@@ -136,11 +150,33 @@ class AdminRouter
         }
 
         if ($tail === 'status') {
-            if ($this->method === 'POST') {
+            // Tidak semua modul punya konsep status; tanpa pemeriksaan ini
+            // URL /admin/<modul>/<id>/status akan memanggil method yang tidak ada.
+            if ($this->method === 'POST' && method_exists($controller, 'setStatus')) {
                 $controller->setStatus($this->segments);
             } else {
                 header('Location: ' . $base);
             }
+            return;
+        }
+
+        // Aksi tambahan khusus modul (aktifkan, reset sandi, buka kunci, ...).
+        $actions = self::CRUD_MODULES[$module]['actions'] ?? [];
+
+        if (isset($actions[$tail])) {
+            if ($this->method !== 'POST') {
+                header('Location: ' . $base);
+                return;
+            }
+
+            $method = $actions[$tail];
+
+            if (!method_exists($controller, $method)) {
+                $this->notFound();
+                return;
+            }
+
+            $controller->$method($this->segments);
             return;
         }
 
