@@ -1,0 +1,92 @@
+/* ============================================================================
+   tokens.css — satu-satunya tempat nilai mentah (warna, radius, jarak).
+   Rujukan: blueprint-madrasahku/DESIGN.md §4, §6, §7.
+   Aturan: di berkas lain jangan menulis #15803D — pakai var(--green).
+   ============================================================================ */
+
+:root {
+    /* --- warna inti (DESIGN.md §4.1) ------------------------------------ */
+    --green:        #15803D;
+    --dark-green:   #0B3D1E;
+    --light-green:  #4ADE80;
+    --mint:         #A7F3D0;
+    --pale-green:   #BBF7D0;
+
+    --text:         #111827;
+    --gray:         #6B7280;
+    --slate:        #94A3B8;   /* hanya placeholder/ikon/garis — gagal kontras untuk teks */
+    --border:       #E1ECE5;
+    --soft:         #F9FAFB;
+    --white:        #FFFFFF;
+
+    /* --- warna status (DESIGN.md §4.2) ---------------------------------- */
+    --amber:        #B45309;
+    --amber-bg:     #FFFBEB;
+    --red:          #DC2626;
+    --red-bg:       #FEF2F2;
+    --blue:         #1D4ED8;
+    --blue-bg:      #EFF6FF;
+    --green-bg:     #E9F9EF;
+    --gray-bg:      #F1F3F5;
+    --amber-line:   #FDE68A;
+    --red-line:     #FECACA;
+    --blue-line:    #BFDBFE;
+
+    /* --- kanal RGB untuk rgba(var(--x-rgb), alpha) ---------------------- */
+    --dark-green-rgb: 11, 61, 30;
+    --green-rgb:      21, 128, 61;
+    --white-rgb:      255, 255, 255;
+
+    /* --- radius (DESIGN.md §7) — hanya 5 nilai -------------------------- */
+    --r-sm:   7px;
+    --r-md:   10px;
+    --r-lg:   16px;
+    --r-xl:   22px;
+    --r-full: 999px;
+
+    /* --- jarak, skala 4px (DESIGN.md §6) -------------------------------- */
+    --sp-1:  4px;
+    --sp-2:  8px;
+    --sp-3:  12px;
+    --sp-4:  16px;
+    --sp-5:  20px;
+    --sp-6:  24px;
+    --sp-8:  32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+
+    /* --- bayangan (DESIGN.md §7) ---------------------------------------- */
+    --shadow-sm: 0 2px 8px rgba(15, 61, 30, .06);
+    --shadow:    0 12px 30px rgba(15, 61, 30, .10);
+    --shadow-btn: 0 4px 12px rgba(21, 128, 61, .22);
+
+    /* --- tipografi (DESIGN.md §5) --------------------------------------- */
+    --font: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    --fs-hero:  clamp(38px, 4.3vw, 54px);
+    --fs-page:  21px;
+    --fs-sec:   25px;
+    --fs-card:  14px;
+    --fs-body:  14px;
+    --fs-sm:    13px;
+    --fs-label: 12px;
+    --fs-help:  11.5px;
+
+    /* --- tata letak ----------------------------------------------------- */
+    --container: min(1100px, 100% - 40px);
+    --header-h:  62px;
+
+    /* --- transisi (DESIGN.md §17) --------------------------------------- */
+    --t-fast: 150ms ease;
+    --t-base: 200ms ease;
+    --t-modal: 180ms ease-out;
+}
+
+/* Hormati preferensi pengguna: matikan semua animasi. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

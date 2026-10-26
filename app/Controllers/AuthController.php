@@ -91,6 +91,9 @@ class AuthController
 
         $data = [
             'title' => 'Ganti Kata Sandi | MTs Al-Huda Gondang',
+            'heading' => 'Ganti Kata Sandi',
+            'user' => $user,
+            'role' => Auth::displayRole(),
             'error' => $_SESSION['_flash_error'] ?? null,
             'forced' => $wajib,
         ];

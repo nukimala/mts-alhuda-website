@@ -4,168 +4,145 @@
  * Isi halaman ditangkap ke $data['content'], lalu dirender di dalam layout admin.
  */
 
+$stats = $data['stats'] ?? [];
+$migrasi = $data['migrasi'] ?? [];
+$pengaturan = $data['pengaturan'] ?? [];
+
 ob_start();
 ?>
 
 <div class="breadcrumb">
-    <a href="<?= base_url('admin') ?>">Panel Admin</a> / Beranda
+    <a href="<?= base_url('admin') ?>">Panel Admin</a>
+    <span class="sep">/</span>
+    <span class="current">Beranda</span>
 </div>
 
 <div class="page-head">
     <div>
-        <h1>Selamat datang, <?= htmlspecialchars((string) ($data['user']['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h1>
-        <p class="desc"><?= date('l, j F Y') ?> &middot; Tahun Ajaran 2026/2027 &middot; Semester Ganjil</p>
+        <h1>Selamat datang, <?= e((string) ($data['user']['name'] ?? 'Administrator')) ?></h1>
+        <p>
+            <?= e(date('j F Y')) ?> &middot; Sistem informasi madrasah
+        </p>
     </div>
-    <div class="actions">
-        <a class="btn btn-outline" href="<?= base_url() ?>">Lihat Website</a>
-        <a class="btn btn-primary" href="<?= base_url('admin/ganti-sandi') ?>">Ganti Kata Sandi</a>
-    </div>
-</div>
-
-<div class="grid-4" style="margin-bottom:18px">
-    <div class="card">
-        <div class="stat">
-            <div class="stat-icon">
-                <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 11h5M19.5 8.5v5"/></svg>
-            </div>
-            <div>
-                <small>Total Pengguna</small>
-                <strong><?= number_format((int) $data['stats']['pengguna'], 0, ',', '.') ?></strong>
-                <div class="hint"><?= (int) $data['stats']['guru'] ?> guru &middot; <?= (int) $data['stats']['siswa'] ?> siswa</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="stat">
-            <div class="stat-icon blue">
-                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M7 9h7M7 13h10M7 17h5"/></svg>
-            </div>
-            <div>
-                <small>Berita Terpublikasi</small>
-                <strong><?= number_format((int) $data['stats']['berita'], 0, ',', '.') ?></strong>
-                <div class="hint">Tabel <code>posts</code></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="stat">
-            <div class="stat-icon amber">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            </div>
-            <div>
-                <small>Presensi Guru Hari Ini</small>
-                <strong><?= number_format((int) $data['stats']['presensi'], 0, ',', '.') ?></strong>
-                <div class="hint">Acuan jam server</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="stat">
-            <div class="stat-icon red">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 14-1.5 7 5-2.5 5 2.5-1.5-7"/></svg>
-            </div>
-            <div>
-                <small>Bukti Akreditasi</small>
-                <strong><?= number_format((int) $data['stats']['bukti'], 0, ',', '.') ?></strong>
-                <div class="hint">Tabel <code>evidence</code></div>
-            </div>
-        </div>
+    <div class="page-actions">
+        <a class="btn btn-secondary" href="<?= base_url('') ?>" target="_blank" rel="noopener">
+            <span class="mi mi-sm">open_in_new</span> Lihat Website
+        </a>
+        <a class="btn btn-primary" href="<?= base_url('admin/ganti-sandi') ?>">
+            <span class="mi mi-sm">lock_reset</span> Ganti Sandi
+        </a>
     </div>
 </div>
 
-<div class="notice info" style="margin-bottom:18px">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-    <div>
-        <b>Koneksi database aktif.</b>
-        Angka di atas dibaca langsung dari MariaDB <span class="mono">mts_alhuda</span>.
-        Nilai <b>0</b> berarti tabelnya sudah ada tapi masih kosong — bukan error.
+<div class="stat-grid" style="margin-bottom:var(--sp-5)">
+    <div class="stat">
+        <p class="stat-label">Total Pengguna</p>
+        <p class="stat-value"><?= number_format((int) ($stats['pengguna'] ?? 0), 0, ',', '.') ?></p>
+        <p class="stat-note">
+            <?= (int) ($stats['guru'] ?? 0) ?> guru &middot; <?= (int) ($stats['siswa'] ?? 0) ?> siswa
+        </p>
+    </div>
+
+    <div class="stat">
+        <p class="stat-label">Berita Terbit</p>
+        <p class="stat-value"><?= number_format((int) ($stats['berita'] ?? 0), 0, ',', '.') ?></p>
+        <p class="stat-note">Tabel <code>posts</code></p>
+    </div>
+
+    <div class="stat">
+        <p class="stat-label">Presensi Guru Hari Ini</p>
+        <p class="stat-value"><?= number_format((int) ($stats['presensi'] ?? 0), 0, ',', '.') ?></p>
+        <p class="stat-note">Acuan jam server</p>
+    </div>
+
+    <div class="stat">
+        <p class="stat-label">Bukti Akreditasi</p>
+        <p class="stat-value"><?= number_format((int) ($stats['bukti'] ?? 0), 0, ',', '.') ?></p>
+        <p class="stat-note">Tabel <code>evidence</code></p>
     </div>
 </div>
 
-<div class="card" style="margin-bottom:18px">
-    <div class="card-head">
-        <h3>Status Migrasi Database</h3>
-        <div class="actions">
-            <span class="pill green plain"><?= count($data['migrasi']) ?> migrasi diterapkan</span>
+<div class="notice notice-info">
+    <span class="mi mi-sm">info</span>
+    <span>
+        <strong>Koneksi database aktif.</strong>
+        Angka di atas dibaca langsung dari database. Nilai <strong>0</strong> berarti tabelnya
+        sudah ada tetapi masih kosong — bukan error.
+    </span>
+</div>
+
+<div class="dash-grid">
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h2 class="card-title">Status Migrasi Database</h2>
+                <p class="card-sub"><?= count($migrasi) ?> migrasi diterapkan</p>
+            </div>
+            <span class="pill pill-green"><?= count($migrasi) ?></span>
         </div>
-    </div>
-    <div class="table-wrap">
-        <table class="data">
-            <thead>
-                <tr>
-                    <th style="width:90px">Versi</th>
-                    <th>Nama Migrasi</th>
-                    <th style="width:100px">Batch</th>
-                    <th style="width:190px">Dijalankan</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php if (empty($data['migrasi'])): ?>
-                <tr>
-                    <td colspan="4" style="padding:28px 16px;text-align:center;color:#6B7280">
-                        Belum ada migrasi yang dijalankan.
-                        Jalankan <span class="mono">php tools/migrate.php up</span>.
-                    </td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($data['migrasi'] as $m): ?>
+
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
                     <tr>
-                        <td class="mono"><?= htmlspecialchars((string) $m['version'], ENT_QUOTES, 'UTF-8') ?></td>
-                        <td><b><?= htmlspecialchars((string) $m['name'], ENT_QUOTES, 'UTF-8') ?></b></td>
-                        <td><span class="pill gray plain">batch <?= (int) $m['batch'] ?></span></td>
-                        <td class="muted"><?= htmlspecialchars((string) $m['executed_at'], ENT_QUOTES, 'UTF-8') ?></td>
+                        <th style="width:80px">Versi</th>
+                        <th>Nama Migrasi</th>
+                        <th style="width:90px">Batch</th>
+                        <th style="width:170px">Dijalankan</th>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-head">
-        <h3>Pengaturan Publik</h3>
-        <div class="actions">
-            <span class="pill gray plain"><?= count($data['pengaturan']) ?> baris</span>
-        </div>
-    </div>
-    <div class="table-wrap">
-        <table class="data">
-            <thead>
-                <tr>
-                    <th style="width:240px">Kunci</th>
-                    <th>Nilai</th>
-                    <th style="width:140px">Grup</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php if (empty($data['pengaturan'])): ?>
-                <tr>
-                    <td colspan="3" style="padding:28px 16px;text-align:center;color:#6B7280">
-                        Belum ada pengaturan. Jalankan <span class="mono">php tools/migrate.php seed</span>.
-                    </td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($data['pengaturan'] as $s): ?>
+                </thead>
+                <tbody>
+                <?php if ($migrasi === []): ?>
                     <tr>
-                        <td class="mono"><?= htmlspecialchars((string) $s['setting_key'], ENT_QUOTES, 'UTF-8') ?></td>
-                        <td>
-                            <?php
-                            $value = (string) ($s['setting_value'] ?? '');
-                            echo $value === ''
-                                ? '<span class="muted">(kosong)</span>'
-                                : htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-                            ?>
+                        <td colspan="4" class="muted" style="text-align:center;padding:var(--sp-6)">
+                            Belum ada migrasi. Jalankan <code>php tools/migrate.php up</code>.
                         </td>
-                        <td><span class="pill blue plain"><?= htmlspecialchars((string) $s['group_name'], ENT_QUOTES, 'UTF-8') ?></span></td>
                     </tr>
+                <?php else: ?>
+                    <?php foreach ($migrasi as $m): ?>
+                        <tr>
+                            <td class="mono"><?= e((string) $m['version']) ?></td>
+                            <td><b><?= e((string) $m['name']) ?></b></td>
+                            <td><span class="pill">batch <?= (int) $m['batch'] ?></span></td>
+                            <td class="muted"><?= e((string) $m['executed_at']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h2 class="card-title">Pengaturan Publik</h2>
+                <p class="card-sub"><?= count($pengaturan) ?> baris tampil</p>
+            </div>
+            <span class="pill"><?= count($pengaturan) ?></span>
+        </div>
+
+        <div class="dash-list">
+            <?php if ($pengaturan === []): ?>
+                <p class="muted" style="font-size:var(--fs-sm)">
+                    Belum ada pengaturan. Jalankan <code>php tools/migrate.php seed</code>.
+                </p>
+            <?php else: ?>
+                <?php foreach ($pengaturan as $s): ?>
+                    <div class="dash-row">
+                        <div style="min-width:0">
+                            <b class="mono" style="font-size:var(--fs-label)"><?= e((string) $s['setting_key']) ?></b>
+                            <small style="word-break:break-word">
+                                <?= $s['setting_value'] === '' || $s['setting_value'] === null
+                                    ? '<span class="muted">(kosong)</span>'
+                                    : e((string) $s['setting_value']) ?>
+                            </small>
+                        </div>
+                        <span class="pill pill-blue" style="margin-left:auto"><?= e((string) $s['group_name']) ?></span>
+                    </div>
                 <?php endforeach; ?>
             <?php endif; ?>
-            </tbody>
-        </table>
+        </div>
     </div>
 </div>
 

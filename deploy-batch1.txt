@@ -1,0 +1,46 @@
+# ============================================================================
+# deploy-batch1.txt — daftar berkas yang diunggah ke hosting (SFTP batch).
+# Jalankan dari akar repo:
+#   sftp -b deploy-batch1.txt -i ~/.ssh/mts_alhuda_deploy shulkhim@103.74.5.137
+# ============================================================================
+
+put "C:/xampp/htdocs/mts-alhuda-website/app/Support/Content.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Support/Content.php
+
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/AdminController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/AdminController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/AkademikController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/AkademikController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/AuthController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/AuthController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/BeritaController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/BeritaController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/ErrorController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/ErrorController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/FasilitasController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/FasilitasController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/GaleriController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/GaleriController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/HomeController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/HomeController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/KontakController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/KontakController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/PpdbController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/PpdbController.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Controllers/ProfilController.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Controllers/ProfilController.php
+
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/layouts/header.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/layouts/header.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/layouts/navbar.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/layouts/navbar.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/layouts/footer.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/layouts/footer.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/layouts/admin.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/layouts/admin.php
+
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/home/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/home/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/profil/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/profil/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/akademik/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/akademik/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/fasilitas/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/fasilitas/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/galeri/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/galeri/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/berita/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/berita/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/berita/detail.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/berita/detail.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/kontak/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/kontak/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/ppdb/index.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/ppdb/index.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/errors/404.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/errors/404.php
+
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/admin/login.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/admin/login.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/admin/dashboard.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/admin/dashboard.php
+put "C:/xampp/htdocs/mts-alhuda-website/app/Views/admin/ganti-sandi.php" public_html/mts-alhuda.shulkhimaulana.my.id/app/Views/admin/ganti-sandi.php
+
+put "C:/xampp/htdocs/mts-alhuda-website/public/css/tokens.css" public_html/mts-alhuda.shulkhimaulana.my.id/public/css/tokens.css
+put "C:/xampp/htdocs/mts-alhuda-website/public/css/base.css" public_html/mts-alhuda.shulkhimaulana.my.id/public/css/base.css
+put "C:/xampp/htdocs/mts-alhuda-website/public/css/components.css" public_html/mts-alhuda.shulkhimaulana.my.id/public/css/components.css
+put "C:/xampp/htdocs/mts-alhuda-website/public/css/public.css" public_html/mts-alhuda.shulkhimaulana.my.id/public/css/public.css
+put "C:/xampp/htdocs/mts-alhuda-website/public/css/admin.css" public_html/mts-alhuda.shulkhimaulana.my.id/public/css/admin.css
+put "C:/xampp/htdocs/mts-alhuda-website/public/js/script.js" public_html/mts-alhuda.shulkhimaulana.my.id/public/js/script.js

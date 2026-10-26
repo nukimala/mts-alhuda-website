@@ -1,0 +1,403 @@
+﻿/* ============================================================================
+   components.css â€” komponen yang dipakai bersama oleh web publik & panel admin.
+   Bergantung pada tokens.css + base.css. Tanpa nilai warna mentah.
+   ============================================================================ */
+
+/* --- tombol (DESIGN.md Â§8.1) --------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: 1;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--t-base), color var(--t-base),
+                border-color var(--t-base), box-shadow var(--t-base), transform var(--t-fast);
+}
+.btn:active { transform: translateY(1px); }
+.btn[disabled], .btn.is-disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+.btn-primary { background: var(--green); color: var(--white); box-shadow: var(--shadow-btn); }
+.btn-primary:hover { background: var(--dark-green); color: var(--white); }
+
+.btn-secondary { background: var(--white); color: var(--dark-green); border-color: var(--border); }
+.btn-secondary:hover { background: var(--soft); border-color: var(--mint); color: var(--dark-green); }
+
+.btn-ghost { background: transparent; color: var(--gray); }
+.btn-ghost:hover { background: var(--gray-bg); color: var(--text); }
+
+.btn-danger { background: var(--red-bg); color: var(--red); border-color: transparent; }
+.btn-danger:hover { background: var(--red); color: var(--white); }
+
+.btn-sm { padding: 8px 13px; font-size: var(--fs-label); border-radius: var(--r-sm); }
+.btn-lg { padding: 14px 24px; font-size: var(--fs-body); border-radius: var(--r-lg); }
+.btn-block { width: 100%; }
+
+/* --- kartu (DESIGN.md Â§8.2) ---------------------------------------------- */
+.card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+    transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base);
+}
+.card-pad-lg { padding: var(--sp-6); }
+.card-flat { box-shadow: none; }
+.card-hover:hover {
+    border-color: var(--mint);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
+}
+.card-title { font-size: var(--fs-card); font-weight: 800; margin: 0; }
+.card-sub { font-size: var(--fs-label); color: var(--gray); margin: 2px 0 0; }
+
+/* --- stat card (DESIGN.md Â§8.3) ------------------------------------------ */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--sp-4);
+}
+.stat {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+}
+.stat-label {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin: 0 0 var(--sp-2);
+}
+.stat-value {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--dark-green);
+    letter-spacing: -.03em;
+    margin: 0;
+}
+.stat-note { font-size: var(--fs-help); color: var(--gray); margin: var(--sp-2) 0 0; }
+
+/* --- pill / badge status (DESIGN.md Â§8.4) -------------------------------- */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    line-height: 1;
+    padding: 5px 10px;
+    border-radius: var(--r-full);
+    background: var(--gray-bg);
+    color: var(--gray);
+    white-space: nowrap;
+}
+.pill-green { background: var(--green-bg); color: var(--green); }
+.pill-amber { background: var(--amber-bg); color: var(--amber); }
+.pill-red   { background: var(--red-bg);   color: var(--red); }
+.pill-blue  { background: var(--blue-bg);  color: var(--blue); }
+.pill-dot::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: var(--r-full);
+    background: currentColor;
+}
+
+/* --- tabel (DESIGN.md Â§8.5) ---------------------------------------------- */
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    background: var(--white);
+}
+table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+}
+table.data th {
+    text-align: left;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    background: var(--soft);
+    padding: 11px var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+table.data td {
+    padding: 12px var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+table.data tbody tr:last-child td { border-bottom: 0; }
+table.data tbody tr:hover { background: var(--soft); }
+table.data .cell-actions {
+    display: flex;
+    gap: var(--sp-2);
+    justify-content: flex-end;
+}
+
+/* --- field form (DESIGN.md Â§8.6) ----------------------------------------- */
+.field { margin-bottom: var(--sp-4); }
+.field-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--sp-4);
+}
+.field-hint { font-size: var(--fs-help); color: var(--gray); margin: 6px 0 0; }
+.field-error {
+    font-size: var(--fs-help);
+    font-weight: 600;
+    color: var(--red);
+    margin: 6px 0 0;
+}
+.field.has-error input,
+.field.has-error select,
+.field.has-error textarea { border-color: var(--red); }
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    margin-bottom: var(--sp-2);
+}
+.check-row label { margin: 0; font-size: var(--fs-sm); font-weight: 600; }
+
+/* --- notice / alert (DESIGN.md Â§8.7) ------------------------------------- */
+.notice {
+    display: flex;
+    gap: var(--sp-3);
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--r-md);
+    border: 1px solid transparent;
+    margin-bottom: var(--sp-4);
+}
+.notice strong { font-weight: 800; }
+.notice-success { background: var(--green-bg); color: var(--dark-green); border-color: var(--pale-green); }
+.notice-warning { background: var(--amber-bg); color: var(--amber);     border-color: var(--amber-line); }
+.notice-danger  { background: var(--red-bg);   color: var(--red);       border-color: var(--red-line); }
+.notice-info    { background: var(--blue-bg);  color: var(--blue);      border-color: var(--blue-line); }
+
+/* --- empty state (DESIGN.md Â§8.8) ---------------------------------------- */
+.empty {
+    text-align: center;
+    padding: var(--sp-10) var(--sp-5);
+    border: 1px dashed var(--border);
+    border-radius: var(--r-lg);
+    background: var(--soft);
+}
+.empty-title { font-size: var(--fs-card); font-weight: 800; margin: 0 0 var(--sp-1); }
+.empty-text { font-size: var(--fs-sm); color: var(--gray); margin: 0; }
+
+/* --- dropzone upload (DESIGN.md Â§8.9) ------------------------------------ */
+.dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    text-align: center;
+    padding: var(--sp-8) var(--sp-5);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--r-lg);
+    background: var(--soft);
+    cursor: pointer;
+    transition: border-color var(--t-base), background var(--t-base);
+}
+.dropzone:hover, .dropzone.is-over {
+    border-color: var(--green);
+    background: var(--green-bg);
+}
+.dropzone-title { font-size: var(--fs-sm); font-weight: 700; margin: 0; }
+.dropzone-hint { font-size: var(--fs-help); color: var(--gray); margin: 0; }
+.dropzone input[type="file"] { display: none; }
+
+/* --- modal (DESIGN.md Â§8.10) --------------------------------------------- */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-4);
+    background: rgba(11, 61, 30, .45);
+}
+.modal-backdrop.is-open { display: flex; }
+.modal {
+    width: min(520px, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: var(--r-xl);
+    padding: var(--sp-6);
+    box-shadow: var(--shadow);
+    animation: modal-in var(--t-modal) both;
+}
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(8px) scale(.99); }
+    to   { opacity: 1; transform: none; }
+}
+.modal-title { font-size: var(--fs-sec); margin: 0 0 var(--sp-2); }
+.modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--sp-2);
+    margin-top: var(--sp-6);
+}
+
+/* --- tabs (DESIGN.md Â§8.11) ---------------------------------------------- */
+.tabs {
+    display: flex;
+    gap: var(--sp-1);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--sp-5);
+    overflow-x: auto;
+}
+.tab {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--gray);
+    padding: 10px var(--sp-4);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--t-base), border-color var(--t-base);
+}
+.tab:hover { color: var(--dark-green); }
+.tab.is-active { color: var(--green); border-bottom-color: var(--green); }
+
+/* --- breadcrumb (DESIGN.md Â§8.12) ---------------------------------------- */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-label);
+    color: var(--gray);
+    margin: 0 0 var(--sp-4);
+}
+.breadcrumb a { color: var(--gray); }
+.breadcrumb a:hover { color: var(--green); }
+.breadcrumb .sep { color: var(--slate); }
+.breadcrumb .current { color: var(--text); font-weight: 700; }
+
+/* --- progress (DESIGN.md Â§8.13) ------------------------------------------ */
+.progress {
+    height: 8px;
+    border-radius: var(--r-full);
+    background: var(--gray-bg);
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    border-radius: var(--r-full);
+    background: var(--green);
+    transition: width var(--t-base);
+}
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--gray);
+    margin-bottom: 6px;
+}
+
+/* --- pagination (DESIGN.md Â§8.14) ---------------------------------------- */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    justify-content: center;
+    margin-top: var(--sp-8);
+}
+.pagination a, .pagination span {
+    min-width: 36px;
+    padding: 8px 11px;
+    text-align: center;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--gray);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+}
+.pagination a:hover { border-color: var(--green); color: var(--green); }
+.pagination .is-active {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--white);
+}
+.pagination .is-disabled { opacity: .45; pointer-events: none; }
+
+/* --- label bagian (DESIGN.md Â§5.4) --------------------------------------- */
+.eyebrow {
+    display: inline-block;
+    font-size: var(--fs-label);
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: var(--sp-2);
+}
+
+/* --- ikon material ------------------------------------------------------- */
+.mi {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    vertical-align: -4px;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+}
+.mi-fill { font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24; }
+.mi-sm { font-size: 17px; vertical-align: -3px; }
+.mi-lg { font-size: 26px; vertical-align: -6px; }
+
+/* --- avatar -------------------------------------------------------------- */
+.avatar {
+    width: 38px; height: 38px;
+    flex: 0 0 38px;
+    border-radius: var(--r-full);
+    background: var(--pale-green);
+    color: var(--dark-green);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-sm);
+    font-weight: 800;
+    overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }

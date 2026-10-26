@@ -26,6 +26,7 @@ class AdminController
 
         $data = [
             'title' => 'Beranda Panel Admin | MTs Al-Huda Gondang',
+            'heading' => 'Beranda',
             'user'  => $user,
             'role'  => Auth::displayRole(),
             'stats' => $this->stats($pdo),

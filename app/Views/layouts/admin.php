@@ -1,125 +1,153 @@
-<?php require_once __DIR__ . '/../../helpers.php'; ?>
+<?php
+require_once __DIR__ . '/../../helpers.php';
+require_once __DIR__ . '/../../Support/Content.php';
+
+$userName = (string) ($data['user']['name'] ?? 'Administrator');
+$roleLabel = (string) ($data['role'] ?? 'Admin');
+$initial = strtoupper(mb_substr($userName !== '' ? $userName : 'A', 0, 2));
+$current = current_route();
+$activeRoot = $current === '' ? '' : explode('/', $current)[1] ?? '';
+
+/**
+ * Satu item menu sidebar. $enabled=false berarti modulnya belum dibangun:
+ * ditampilkan redup dan tidak bisa diklik, supaya tidak jadi tautan mati.
+ */
+$menuItem = static function (string $key, string $label, string $icon, bool $enabled = false) use ($activeRoot): string {
+    $isActive = $enabled && $activeRoot === $key;
+    $class = 'side-link' . ($isActive ? ' on' : '') . ($enabled ? '' : ' is-locked');
+    $href = $enabled ? base_url('admin/' . $key) : '#';
+    $attrs = $enabled ? '' : ' aria-disabled="true" tabindex="-1"';
+
+    return '<a class="' . $class . '" href="' . $href . '"' . $attrs . '>'
+        . '<span class="mi">' . $icon . '</span>'
+        . '<span>' . e($label) . '</span>'
+        . ($enabled ? '' : '<span class="count">Soon</span>')
+        . '</a>';
+};
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= htmlspecialchars($data['title'] ?? 'Panel Admin | MTs Al-Huda Gondang') ?></title>
+    <title><?= e($data['title'] ?? 'Panel Admin | MTs Al-Huda Gondang') ?></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+
+    <link rel="stylesheet" href="<?= base_url('css/tokens.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/base.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/components.css') ?>">
     <link rel="stylesheet" href="<?= base_url('css/admin.css') ?>">
 </head>
-<body>
-<div class="shell">
+<body class="admin-body">
+<div class="admin-shell">
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="side-brand">
             <img src="<?= base_url('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTs Al-Huda">
             <div>
-                <b>MTs Al-Huda</b>
+                <b><?= e(Content::setting('site_name', 'MTs Al-Huda')) ?></b>
                 <span>Panel Admin</span>
             </div>
         </div>
 
         <nav class="side-nav">
             <div class="side-group">Utama</div>
-            <a class="side-link on" href="<?= base_url('admin') ?>">
-                <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
-                Beranda
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5M13 16V8M18 16v-3"/></svg>
-                Laporan
-            </a>
+            <?= $menuItem('', 'Beranda', 'dashboard', true) ?>
 
             <div class="side-group">Konten Website</div>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M7 9h7M7 13h10M7 17h5"/></svg>
-                Berita
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg>
-                Galeri
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M6 21V8l6-4 6 4v13"/><path d="M10 21v-5h4v5"/></svg>
-                Fasilitas
-            </a>
+            <?= $menuItem('berita', 'Berita', 'article') ?>
+            <?= $menuItem('galeri', 'Galeri', 'photo_library') ?>
+            <?= $menuItem('fasilitas', 'Fasilitas', 'apartment') ?>
+            <?= $menuItem('halaman', 'Halaman Statis', 'description') ?>
+            <?= $menuItem('menu', 'Menu Navigasi', 'menu_open') ?>
 
             <div class="side-group">Layanan</div>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 11h5M19.5 8.5v5"/></svg>
-                Pengguna &amp; Role
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
-                Info &amp; Dokumen PPDB
-            </a>
+            <?= $menuItem('ppdb', 'Info &amp; Dokumen PPDB', 'folder_shared') ?>
+            <?= $menuItem('pesan', 'Pesan Masuk', 'mark_email_unread') ?>
+            <?= $menuItem('pengguna', 'Pengguna &amp; Role', 'group') ?>
 
             <div class="side-group">Akademik</div>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-                Jadwal Pelajaran
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                Presensi Guru
-            </a>
+            <?= $menuItem('jadwal', 'Jadwal Pelajaran', 'calendar_month') ?>
+            <?= $menuItem('presensi', 'Presensi Guru', 'fact_check') ?>
+            <?= $menuItem('siswa', 'Data Santri', 'school') ?>
 
             <div class="side-group">Akreditasi</div>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 14-1.5 7 5-2.5 5 2.5-1.5-7"/></svg>
-                Dashboard Kesiapan
-            </a>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h5l2 2h5a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>
-                Bank Bukti
-            </a>
+            <?= $menuItem('akreditasi', 'Kesiapan Akreditasi', 'verified') ?>
+            <?= $menuItem('bukti', 'Bank Bukti', 'folder_copy') ?>
 
             <div class="side-group">Sistem</div>
-            <a class="side-link disabled" href="#" aria-disabled="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-                Pengaturan Situs
-            </a>
+            <?= $menuItem('pengaturan', 'Pengaturan Situs', 'settings') ?>
         </nav>
 
-        <div class="side-foot">Panel Admin v1.0</div>
+        <div class="side-foot">
+            <a class="side-link" href="<?= base_url('') ?>" target="_blank" rel="noopener">
+                <span class="mi">open_in_new</span>
+                <span>Lihat Website</span>
+            </a>
+        </div>
     </aside>
 
-    <div class="main">
+    <div class="admin-main">
         <header class="topbar">
-            <div class="top-user">
-                <div class="avatar"><?= htmlspecialchars(strtoupper(mb_substr((string) ($data['user']['name'] ?? 'A'), 0, 2)), ENT_QUOTES, 'UTF-8') ?></div>
-                <div>
-                    <b><?= htmlspecialchars((string) ($data['user']['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?></b>
-                    <span><?= htmlspecialchars((string) ($data['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
-                </div>
+            <button class="sidebar-toggle" type="button" aria-label="Buka menu" data-sidebar-toggle>
+                <span class="mi">menu</span>
+            </button>
+
+            <div>
+                <h1 class="topbar-title"><?= e($data['heading'] ?? 'Panel Admin') ?></h1>
+                <p class="topbar-sub"><?= e(Content::setting('site_full_name', 'Madrasah Tsanawiyah Al-Huda Gondang')) ?></p>
             </div>
 
-            <div class="spacer"></div>
+            <div class="topbar-actions">
+                <a class="btn btn-ghost btn-sm" href="<?= base_url('admin/ganti-sandi') ?>">
+                    <span class="mi mi-sm">lock_reset</span> Ganti Sandi
+                </a>
 
-            <a class="btn btn-ghost" href="<?= base_url('admin/ganti-sandi') ?>">Ganti Sandi</a>
+                <div class="topbar-user">
+                    <div class="avatar"><?= e($initial) ?></div>
+                    <div>
+                        <b><?= e($userName) ?></b>
+                        <small><?= e($roleLabel) ?></small>
+                    </div>
+                </div>
 
-            <form method="post" action="<?= base_url('admin/logout') ?>" style="margin:0">
-                <?= Csrf::field() ?>
-                <button type="submit" class="btn btn-outline">Keluar</button>
-            </form>
+                <form method="post" action="<?= base_url('admin/logout') ?>" style="margin:0">
+                    <?= Csrf::field() ?>
+                    <button type="submit" class="btn btn-secondary btn-sm">
+                        <span class="mi mi-sm">logout</span> Keluar
+                    </button>
+                </form>
+            </div>
         </header>
 
         <div class="content">
             <?php if (!empty($data['flash'])): ?>
-                <div class="notice ok" style="margin-bottom:16px">
-                    <svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg>
-                    <div><?= htmlspecialchars((string) $data['flash'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="notice notice-success">
+                    <span class="mi mi-sm">check_circle</span>
+                    <span><?= e((string) $data['flash']) ?></span>
                 </div>
             <?php endif; ?>
 
-            <?= $data['content'] ?>
+            <?= $data['content'] ?? '' ?>
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        var toggle = document.querySelector('[data-sidebar-toggle]');
+        var sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function () {
+                sidebar.classList.toggle('is-open');
+            });
+        }
+    })();
+</script>
 </body>
 </html>
