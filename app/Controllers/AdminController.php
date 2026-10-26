@@ -10,32 +10,22 @@ class AdminController
 {
     public function dashboard(): void
     {
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            return;
-        }
-
-        // Kata sandi sementara belum diganti — kunci akses ke halaman lain.
-        $user = Auth::user();
-        if ($user !== null && (int) $user['must_change_password'] === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
+        $user = AdminGate::requireLogin();
+        if ($user === null) {
             return;
         }
 
         $pdo = Database::connection();
 
-        $data = [
-            'title' => 'Beranda Panel Admin | MTs Al-Huda Gondang',
-            'heading' => 'Beranda',
-            'user'  => $user,
-            'role'  => Auth::displayRole(),
-            'stats' => $this->stats($pdo),
-            'migrasi' => $this->migrationState($pdo),
-            'pengaturan' => $this->settingsPreview($pdo),
-            'flash' => $_SESSION['_flash_success'] ?? null,
-        ];
+        $data = AdminGate::shell(
+            $user,
+            'Beranda Panel Admin | MTs Al-Huda Gondang',
+            'Beranda'
+        );
 
-        unset($_SESSION['_flash_success']);
+        $data['stats'] = $this->stats($pdo);
+        $data['migrasi'] = $this->migrationState($pdo);
+        $data['pengaturan'] = $this->settingsPreview($pdo);
 
         require_once __DIR__ . '/../Views/admin/dashboard.php';
     }

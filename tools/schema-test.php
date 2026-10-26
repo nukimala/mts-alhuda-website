@@ -13,7 +13,7 @@
  * baris pun yang tertinggal, jadi aman dijalankan pada database berisi data.
  *
  * Yang diuji:
- *   1.  Kelengkapan — 42 tabel, 14 migrasi, semua kolom wajib
+ *   1.  Kelengkapan - 42 tabel, semua migrasi di disk, semua kolom wajib
  *   2.  K-3  — hanya satu tahun ajaran aktif
  *   3.  K-4  — presensi harian tidak bisa dobel (jebakan NULL)
  *   4.  K-5  — hanya satu draft DKA per butir
@@ -164,8 +164,17 @@ check('Jumlah tabel sesuai rencana', count($expectedTables) === 42, count($expec
 check('Tidak ada tabel yang hilang', $missing === [], $missing === [] ? '' : 'hilang: ' . implode(', ', $missing));
 check('Tidak ada tabel tak terduga', $extra === [], $extra === [] ? '' : 'tak terduga: ' . implode(', ', $extra));
 
+// Jumlah migrasi dihitung dari berkas di disk, bukan ditulis tangan: setiap
+// kali migrasi baru ditambahkan, uji ini tidak boleh ikut diedit manual —
+// kalau harus diedit, cepat atau lambat ada yang lupa dan uji jadi bohong.
+$migrationFiles = glob(dirname(__DIR__) . '/database/migrations/*.sql') ?: [];
+$migrationExpected = count($migrationFiles);
 $migrationCount = (int) $pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn();
-check('14 migrasi tercatat', $migrationCount === 14, (string) $migrationCount . ' tercatat');
+check(
+    $migrationExpected . ' migrasi tercatat',
+    $migrationCount === $migrationExpected,
+    $migrationCount . ' tercatat di database'
+);
 
 // Semua tabel harus InnoDB + utf8mb4_unicode_ci
 $wrongEngine = $pdo->query(

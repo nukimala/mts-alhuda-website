@@ -60,7 +60,7 @@ $menuItem = static function (string $key, string $label, string $icon, bool $ena
             <?= $menuItem('', 'Beranda', 'dashboard', true) ?>
 
             <div class="side-group">Konten Website</div>
-            <?= $menuItem('berita', 'Berita', 'article') ?>
+            <?= $menuItem('berita', 'Berita', 'article', true) ?>
             <?= $menuItem('galeri', 'Galeri', 'photo_library') ?>
             <?= $menuItem('fasilitas', 'Fasilitas', 'apartment') ?>
             <?= $menuItem('halaman', 'Halaman Statis', 'description') ?>
@@ -130,6 +130,13 @@ $menuItem = static function (string $key, string $label, string $icon, bool $ena
                 <div class="notice notice-success">
                     <span class="mi mi-sm">check_circle</span>
                     <span><?= e((string) $data['flash']) ?></span>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($data['flashError'])): ?>
+                <div class="notice notice-danger">
+                    <span class="mi mi-sm">error</span>
+                    <span><?= e((string) $data['flashError']) ?></span>
                 </div>
             <?php endif; ?>
 

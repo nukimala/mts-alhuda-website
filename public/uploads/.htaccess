@@ -1,0 +1,31 @@
+# Folder ini menerima berkas dari pengguna. Tidak boleh ada yang dieksekusi.
+
+# Matikan semua handler PHP/CGI di folder ini dan turunannya.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Apache 2.4: tolak akses ke berkas yang bisa dijalankan.
+<FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp|shtml|htaccess)$">
+    Require all denied
+</FilesMatch>
+
+# Apache 2.2 (beberapa cPanel lama masih memakainya).
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(php|php3|php4|php5|php7|php8|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp|shtml|htaccess)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Jangan pernah menebak jenis berkas: browser wajib mengikuti Content-Type
+# yang dikirim server, bukan menebak dari isi.
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

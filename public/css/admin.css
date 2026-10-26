@@ -272,10 +272,338 @@ body.login-body {
 .media-preview img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
 
 /* ============================================================================
+   TABEL DATA PANEL ADMIN
+   Pola seragam untuk semua modul konten: pencarian + filter + paginasi.
+   ============================================================================ */
+
+.table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+}
+
+.search-box {
+    position: relative;
+    flex: 1 1 240px;
+    min-width: 200px;
+    max-width: 320px;
+}
+.search-box .mi {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate);
+    pointer-events: none;
+}
+.search-box input {
+    padding-left: 34px;
+}
+
+.table-toolbar select {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 132px;
+}
+.table-toolbar .toolbar-sort { margin-left: auto; }
+
+.table-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-top: 1px solid var(--border);
+    background: var(--soft);
+    font-size: var(--fs-sm);
+}
+
+.pagination-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 32px;
+    padding: 6px 10px;
+    text-align: center;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--gray);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    transition: border-color var(--t-base), color var(--t-base), background var(--t-base);
+}
+.page-btn:hover { border-color: var(--green); color: var(--green); }
+.page-btn.is-active {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--white);
+}
+.page-btn.is-disabled { opacity: .45; pointer-events: none; }
+.page-gap { color: var(--slate); padding: 0 2px; }
+
+/* --- sel tabel ----------------------------------------------------------- */
+.cell-title {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-width: 0;
+    max-width: 420px;
+}
+.cell-thumb {
+    width: 46px;
+    height: 32px;
+    flex: 0 0 46px;
+    border-radius: var(--r-sm);
+    object-fit: cover;
+    background: var(--gray-bg);
+    border: 1px solid var(--border);
+}
+.cell-thumb.is-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--slate);
+}
+.cell-title-text { min-width: 0; }
+.cell-title-text a,
+.cell-title-static {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cell-title-text a:hover { color: var(--green); }
+.cell-title-text small {
+    display: block;
+    font-size: var(--fs-help);
+    color: var(--slate);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.icon-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    transition: background var(--t-base), color var(--t-base);
+}
+.icon-btn:hover { background: var(--gray-bg); color: var(--dark-green); }
+.icon-btn.is-danger:hover { background: var(--red-bg); color: var(--red); }
+
+/* ============================================================================
+   FORMULIR DUA KOLOM (berita, galeri, fasilitas, halaman)
+   ============================================================================ */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--sp-5);
+    align-items: start;
+}
+.form-grid-main,
+.form-grid-side {
+    display: grid;
+    gap: var(--sp-4);
+    min-width: 0;
+}
+
+.field-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-bottom: 6px;
+}
+.field-label-row label { margin-bottom: 0; }
+.req { color: var(--red); font-weight: 800; }
+
+.field-counter {
+    font-size: var(--fs-help);
+    font-weight: 600;
+    color: var(--gray);
+    font-variant-numeric: tabular-nums;
+}
+.field-counter.is-over { color: var(--red); font-weight: 800; }
+
+/* --- slug ---------------------------------------------------------------- */
+.slug-input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--white);
+    overflow: hidden;
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+.slug-input:focus-within {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, .12);
+}
+.slug-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: var(--fs-help);
+    font-weight: 600;
+    color: var(--gray);
+    background: var(--soft);
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+}
+.slug-input input {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+.slug-input input:focus { box-shadow: none; }
+
+/* --- editor -------------------------------------------------------------- */
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 5px;
+    background: var(--soft);
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-radius: var(--r-md) var(--r-md) 0 0;
+}
+.editor-toolbar button {
+    min-width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    font-family: inherit;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background var(--t-base), color var(--t-base);
+}
+.editor-toolbar button:hover { background: var(--white); color: var(--green); }
+.toolbar-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--border);
+    margin: 0 4px;
+}
+.editor-area {
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: var(--fs-sm);
+    line-height: 1.7;
+    border-radius: 0 0 var(--r-md) var(--r-md);
+    min-height: 280px;
+    resize: vertical;
+}
+.editor-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: 7px 12px;
+    font-size: var(--fs-help);
+    color: var(--gray);
+    background: var(--soft);
+    border: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 var(--r-md) var(--r-md);
+    margin-top: -1px;
+}
+
+/* --- cover --------------------------------------------------------------- */
+.cover-preview {
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--gray-bg);
+}
+.cover-preview img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+.dropzone { margin-bottom: 0; }
+
+/* --- pratinjau SEO ------------------------------------------------------- */
+.seo-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: var(--sp-3);
+    background: var(--soft);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+}
+.seo-preview-label {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 4px;
+}
+.seo-preview-url {
+    font-size: var(--fs-help);
+    color: var(--green);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.seo-preview-title {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--blue);
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.seo-preview-desc {
+    font-size: var(--fs-help);
+    color: var(--gray);
+    line-height: 1.45;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ============================================================================
    RESPONSIF panel admin
    ============================================================================ */
 @media (max-width: 1100px) {
     .dash-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid-side { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 }
 
 @media (max-width: 900px) {

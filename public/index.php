@@ -37,45 +37,8 @@ if ($page === 'api') {
 // ---------------------------------------------------------------------------
 
 if ($page === 'admin') {
-    $action = $segments[1] ?? '';
-    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-
-    $auth = new AuthController();
-
-    switch ($action) {
-        case '':
-            (new AdminController())->dashboard();
-            return;
-
-        case 'login':
-            if ($method === 'POST') {
-                $auth->login();
-            } else {
-                $auth->loginForm();
-            }
-            return;
-
-        case 'logout':
-            if ($method === 'POST') {
-                $auth->logout();
-            } else {
-                header('Location: ' . base_url('admin'));
-            }
-            return;
-
-        case 'ganti-sandi':
-            if ($method === 'POST') {
-                $auth->changePassword();
-            } else {
-                $auth->changePasswordForm();
-            }
-            return;
-
-        default:
-            http_response_code(404);
-            (new ErrorController())->notFound();
-            return;
-    }
+    (new AdminRouter($segments))->dispatch();
+    return;
 }
 
 // ---------------------------------------------------------------------------

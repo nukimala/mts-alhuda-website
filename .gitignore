@@ -26,7 +26,14 @@ Thumbs.db
 node_modules/
 
 # Unggahan pengguna (jangan masuk repo)
-public/uploads/
+public/uploads/*
+# Kecuali: pelindung folder dan penanda folder kosong. Tanpa dua ini,
+# folder unggahan di server baru tidak punya .htaccess dan berkas PHP
+# yang lolos ke sana akan dieksekusi.
+!public/uploads/.htaccess
+!public/uploads/berita/
+public/uploads/berita/*
+!public/uploads/berita/.gitkeep
 
 # Berkas besar di root (data mentah, bukan bagian kode)
 *.drawio
