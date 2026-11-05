@@ -30,3 +30,6 @@ public/uploads/
 
 # Berkas besar di root (data mentah, bukan bagian kode)
 *.drawio
+deploy_cpanel_mts_alhuda.zip
+*.zip
+.postman/

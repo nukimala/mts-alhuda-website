@@ -30,9 +30,19 @@ body {
 a {
     color: inherit;
     text-decoration: none;
+    cursor: pointer;
 }
-button {
+button, summary, select, [role="button"] {
     font: inherit;
+    cursor: pointer;
+}
+button:disabled, [aria-disabled="true"] {
+    cursor: not-allowed;
+}
+:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+    border-radius: 4px;
 }
 .container {
     width: min(var(--container), calc(100% - 40px));
@@ -88,10 +98,12 @@ button {
     margin-left: auto;
 }
 .nav-menu a {
-    font-size: 11px;
+    font-size: 13.5px;
+    font-weight: 600;
     color: var(--gray);
-    padding: 22px 0 18px;
+    padding: 18px 0;
     border-bottom: 2px solid transparent;
+    transition: color .15s ease;
 }
 .nav-menu a:hover, .nav-menu a.active {
     color: var(--green);
@@ -103,9 +115,9 @@ button {
     color: var(--white);
 }
 .nav-cta {
-    padding: 8px 17px;
-    border-radius: 7px;
-    font-size: 10px;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 12.5px;
     font-weight: 700;
     white-space: nowrap;
 }
@@ -136,9 +148,9 @@ button {
     background: #ECFDF5;
     border: 1px solid var(--mint);
     border-radius: 999px;
-    padding: 6px 11px;
-    font-size: 9px;
-    font-weight: 600;
+    padding: 6px 14px;
+    font-size: 11.5px;
+    font-weight: 700;
 }
 .hero h1 {
     margin: 16px 0 12px;
@@ -166,9 +178,9 @@ button {
     align-items: center;
     justify-content: center;
     gap: 7px;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-size: 10px;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13.5px;
     font-weight: 700;
     transition: .2s ease;
 }
@@ -482,8 +494,15 @@ button {
     margin-top: 90px;
 }
 .program-cta .btn {
-    padding: 8px 14px;
-    font-size: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+    transition: .2s ease;
 }
 /* FOOTER */
 .site-footer {
@@ -533,7 +552,12 @@ button {
         gap: 12px;
     }
 .nav-menu a {
-    font-size: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--gray);
+    padding: 18px 0;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease;
 }
 .hero-grid {
     gap: 30px;
@@ -567,11 +591,19 @@ button {
     display: flex;
 }
 .nav-menu a {
-    padding: 8px 10px;
-    border-bottom: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--gray);
+    padding: 18px 0;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease;
 }
 .nav-cta {
-    margin-left: auto;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 .nav-toggle {
     display: block;
@@ -626,7 +658,11 @@ button {
         width: min(100% - 28px, var(--container));
     }
 .nav-cta {
-    display: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 .program-grid {
     grid-template-columns: 1fr;

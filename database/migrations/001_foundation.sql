@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS schema_seeders (
 
 -- Catatan K-6: kolom sengaja dinamai setting_key / setting_value,
 -- bukan `key` / `value`, supaya tidak bertabrakan dengan kata kunci SQL.
-CREATE TABLE IF NOT EXISTS settings (
+CREATE TABLE IF NOT EXISTS `pengaturan` (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     setting_key   VARCHAR(120)    NOT NULL,
     setting_value TEXT            NULL,
@@ -41,6 +41,6 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- @DOWN
 
-DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS `pengaturan`;
 DROP TABLE IF EXISTS schema_seeders;
 DROP TABLE IF EXISTS schema_migrations;

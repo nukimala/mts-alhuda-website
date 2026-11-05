@@ -73,7 +73,7 @@ class AuthController
             return;
         }
 
-        Auth::log('logout', 'users', Auth::id(), 'Keluar dari panel admin', $_SERVER['REMOTE_ADDR'] ?? null);
+        Auth::log('logout', 'pengguna', Auth::id(), 'Keluar dari panel admin', $_SERVER['REMOTE_ADDR'] ?? null);
         Auth::logout();
 
         header('Location: ' . base_url('admin/login'));
@@ -118,7 +118,7 @@ class AuthController
         $confirm = (string) ($_POST['confirm_password'] ?? '');
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('SELECT password_hash FROM users WHERE id = ? LIMIT 1');
+        $stmt = $pdo->prepare('SELECT password_hash FROM pengguna WHERE id = ? LIMIT 1');
         $stmt->execute([Auth::id()]);
         $hash = $stmt->fetchColumn();
 
@@ -147,15 +147,15 @@ class AuthController
         }
 
         $upd = $pdo->prepare(
-            'UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?'
+            'UPDATE pengguna SET password_hash = ?, must_change_password = 0 WHERE id = ?'
         );
         $upd->execute([password_hash($new, PASSWORD_DEFAULT), Auth::id()]);
 
         // Semua sesi lain diputus: token API dan sesi web lain tidak berlaku lagi.
-        $pdo->prepare('UPDATE api_tokens SET revoked_at = NOW() WHERE user_id = ? AND revoked_at IS NULL')
+        $pdo->prepare('UPDATE token_api SET revoked_at = NOW() WHERE user_id = ? AND revoked_at IS NULL')
             ->execute([Auth::id()]);
 
-        Auth::log('password.changed', 'users', Auth::id(), 'Mengganti kata sandi', $_SERVER['REMOTE_ADDR'] ?? null);
+        Auth::log('password.changed', 'pengguna', Auth::id(), 'Mengganti kata sandi', $_SERVER['REMOTE_ADDR'] ?? null);
 
         header('Location: ' . base_url('admin'));
     }

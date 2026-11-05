@@ -279,15 +279,15 @@ function expectRejected(PDO $pdo, string $sql, array $params, string $label): vo
 }
 
 // --- settings -------------------------------------------------------------
-if (tableExists($pdo, 'settings')) {
+if (tableExists($pdo, 'pengaturan')) {
     $probeKey = '__dbcheck_' . bin2hex(random_bytes(4));
 
     $pdo->prepare(
-        'INSERT INTO settings (setting_key, setting_value, value_type, group_name)
+        'INSERT INTO pengaturan (setting_key, setting_value, value_type, group_name)
          VALUES (?, ?, "string", "sistem")'
     )->execute([$probeKey, 'nilai-uji']);
 
-    $read = $pdo->prepare('SELECT setting_value FROM settings WHERE setting_key = ?');
+    $read = $pdo->prepare('SELECT setting_value FROM pengaturan WHERE setting_key = ?');
     $read->execute([$probeKey]);
     $value = $read->fetchColumn();
 
@@ -297,28 +297,28 @@ if (tableExists($pdo, 'settings')) {
 
     expectRejected(
         $pdo,
-        'INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)',
+        'INSERT INTO pengaturan (setting_key, setting_value) VALUES (?, ?)',
         [$probeKey, 'duplikat'],
         'settings: setting_key duplikat'
     );
 
-    $pdo->prepare('DELETE FROM settings WHERE setting_key = ?')->execute([$probeKey]);
+    $pdo->prepare('DELETE FROM pengaturan WHERE setting_key = ?')->execute([$probeKey]);
 } else {
     skipped('settings: tabel belum ada');
 }
 
 // --- users ----------------------------------------------------------------
-if (tableExists($pdo, 'users')) {
+if (tableExists($pdo, 'pengguna')) {
     $probeEmail = 'dbcheck_' . bin2hex(random_bytes(4)) . '@uji.local';
 
     $pdo->prepare(
-        'INSERT INTO users (name, email, username, password_hash, role)
+        'INSERT INTO pengguna (name, email, username, password_hash, role)
          VALUES (?, ?, ?, ?, "operator")'
     )->execute(['Uji DB Check', $probeEmail, 'dbcheck_' . bin2hex(random_bytes(3)), password_hash('uji', PASSWORD_DEFAULT)]);
 
     $probeId = (int) $pdo->lastInsertId();
 
-    $read = $pdo->prepare('SELECT name, role, is_active, must_change_password FROM users WHERE id = ?');
+    $read = $pdo->prepare('SELECT name, role, is_active, must_change_password FROM pengguna WHERE id = ?');
     $read->execute([$probeId]);
     $row = $read->fetch();
 
@@ -332,14 +332,14 @@ if (tableExists($pdo, 'users')) {
 
     expectRejected(
         $pdo,
-        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, "operator")',
+        'INSERT INTO pengguna (name, email, password_hash, role) VALUES (?, ?, ?, "operator")',
         ['Duplikat', $probeEmail, password_hash('uji2', PASSWORD_DEFAULT)],
         'users: email duplikat'
     );
 
     expectRejected(
         $pdo,
-        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, "raja")',
+        'INSERT INTO pengguna (name, email, password_hash, role) VALUES (?, ?, ?, "raja")',
         ['Role Salah', 'role_' . bin2hex(random_bytes(4)) . '@uji.local', password_hash('uji3', PASSWORD_DEFAULT)],
         'users: role di luar ENUM'
     );
@@ -405,7 +405,7 @@ if (tableExists($pdo, 'users')) {
         $pdo->prepare('DELETE FROM api_tokens WHERE user_id = ?')->execute([$probeId]);
     }
 
-    $pdo->prepare('DELETE FROM users WHERE id = ?')->execute([$probeId]);
+    $pdo->prepare('DELETE FROM pengguna WHERE id = ?')->execute([$probeId]);
     ok('users: data uji dibersihkan');
 } else {
     skipped('users: tabel belum ada');
@@ -474,20 +474,20 @@ function explainQuery(PDO $pdo, string $sql, array $params, string $label, bool 
     }
 }
 
-if (tableExists($pdo, 'users')) {
+if (tableExists($pdo, 'pengguna')) {
     // Tabel kosong membuat MariaDB memotong optimasi, sehingga EXPLAIN tidak
     // bisa dinilai. Isi data sementara di dalam transaksi, lalu batalkan.
     //
     // Komposisi role dibuat tidak merata: kalau semua baris cocok dengan
     // predikat, full scan memang pilihan yang benar dan bukan tanda index rusak.
     $seededForExplain = false;
-    $existing = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+    $existing = (int) $pdo->query('SELECT COUNT(*) FROM pengguna')->fetchColumn();
 
     if ($existing < 200) {
         $pdo->beginTransaction();
         $hash = password_hash('uji-explain', PASSWORD_DEFAULT);
         $insert = $pdo->prepare(
-            'INSERT INTO users (name, email, username, password_hash, role, is_active)
+            'INSERT INTO pengguna (name, email, username, password_hash, role, is_active)
              VALUES (?, ?, ?, ?, ?, ?)'
         );
 
@@ -513,7 +513,7 @@ if (tableExists($pdo, 'users')) {
 
     explainQuery(
         $pdo,
-        'SELECT id, name, role FROM users WHERE email = ? AND is_active = 1 LIMIT 1',
+        'SELECT id, name, role FROM pengguna WHERE email = ? AND is_active = 1 LIMIT 1',
         ['explain301@uji.local'],
         'users: login berdasarkan email',
         $verbose
@@ -521,7 +521,7 @@ if (tableExists($pdo, 'users')) {
 
     explainQuery(
         $pdo,
-        'SELECT id FROM users WHERE username = ? LIMIT 1',
+        'SELECT id FROM pengguna WHERE username = ? LIMIT 1',
         ['explain301'],
         'users: login berdasarkan username',
         $verbose
@@ -529,7 +529,7 @@ if (tableExists($pdo, 'users')) {
 
     explainQuery(
         $pdo,
-        'SELECT id, name FROM users WHERE role = ? AND is_active = 1',
+        'SELECT id, name FROM pengguna WHERE role = ? AND is_active = 1',
         ['guru'],
         'users: daftar pengguna per role',
         $verbose
@@ -543,10 +543,10 @@ if (tableExists($pdo, 'users')) {
     skipped('users: tabel belum ada');
 }
 
-if (tableExists($pdo, 'settings')) {
+if (tableExists($pdo, 'pengaturan')) {
     explainQuery(
         $pdo,
-        'SELECT setting_value FROM settings WHERE setting_key = ?',
+        'SELECT setting_value FROM pengaturan WHERE setting_key = ?',
         ['site_name'],
         'settings: baca satu pengaturan',
         $verbose
@@ -554,7 +554,7 @@ if (tableExists($pdo, 'settings')) {
 
     explainQuery(
         $pdo,
-        'SELECT setting_key, setting_value FROM settings WHERE group_name = ? AND is_public = 1',
+        'SELECT setting_key, setting_value FROM pengaturan WHERE group_name = ? AND is_public = 1',
         ['umum'],
         'settings: baca grup pengaturan publik',
         $verbose
@@ -563,18 +563,18 @@ if (tableExists($pdo, 'settings')) {
     skipped('settings: tabel belum ada');
 }
 
-if (tableExists($pdo, 'posts')) {
+if (tableExists($pdo, 'berita')) {
     // Sama seperti blok users: pada tabel kecil MariaDB memilih full scan
     // karena memang lebih murah, dan itu bukan tanda index rusak. Isi data
     // sementara di dalam transaksi, periksa, lalu batalkan.
     $seededPosts = false;
-    $existingPosts = (int) $pdo->query('SELECT COUNT(*) FROM posts')->fetchColumn();
+    $existingPosts = (int) $pdo->query('SELECT COUNT(*) FROM berita')->fetchColumn();
 
     if ($existingPosts < 200) {
         $pdo->beginTransaction();
 
         $insertPost = $pdo->prepare(
-            "INSERT INTO posts (title, slug, content, status, published_at)
+            "INSERT INTO berita (title, slug, content, status, published_at)
              VALUES (?, ?, 'isi uji', ?, ?)"
         );
 
@@ -599,7 +599,7 @@ if (tableExists($pdo, 'posts')) {
 
     explainQuery(
         $pdo,
-        'SELECT id, title, slug FROM posts WHERE status = ? ORDER BY published_at DESC LIMIT 5',
+        'SELECT id, title, slug FROM berita WHERE status = ? ORDER BY published_at DESC LIMIT 5',
         ['published'],
         'posts: berita terbit terbaru',
         $verbose

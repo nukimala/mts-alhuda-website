@@ -3,7 +3,7 @@
 -- menus, contact_messages, ppdb_documents, media
 --
 -- PPDB sengaja tanpa formulir: hanya dokumen unduhan dan informasi.
--- Karena itu tidak ada tabel pendaftar, dan `ppdb_documents` hanya menghitung
+-- Karena itu tidak ada tabel pendaftar, dan `dokumen_ppdb` hanya menghitung
 -- jumlah unduhan — tanpa menyimpan identitas pengunduh.
 -- ============================================================================
 
@@ -12,7 +12,7 @@
 -- Menu navigasi. parent_id menunjuk dirinya sendiri (submenu satu tingkat).
 -- ON DELETE CASCADE: hapus menu induk, submenunya ikut hilang. Menu yatim
 -- tidak ada gunanya dan hanya membingungkan halaman publik.
-CREATE TABLE IF NOT EXISTS menus (
+CREATE TABLE IF NOT EXISTS `menu` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     parent_id  BIGINT UNSIGNED NULL,
 
@@ -29,14 +29,14 @@ CREATE TABLE IF NOT EXISTS menus (
     PRIMARY KEY (id),
     KEY idx_menus_tree (location, parent_id, sort_order),
     KEY idx_menus_active (is_active, location),
-    CONSTRAINT fk_menus_parent FOREIGN KEY (parent_id) REFERENCES menus (id)
+    CONSTRAINT fk_menus_parent FOREIGN KEY (parent_id) REFERENCES `menu` (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Pesan dari formulir kontak di halaman publik.
 -- Ini satu-satunya tempat data pribadi masuk dari luar — hanya nama, email,
 -- telepon, dan isi pesan. Tidak ada pelacakan IP, tidak ada user agent.
-CREATE TABLE IF NOT EXISTS contact_messages (
+CREATE TABLE IF NOT EXISTS `pesan_kontak` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     name       VARCHAR(120)    NOT NULL,
@@ -55,13 +55,13 @@ CREATE TABLE IF NOT EXISTS contact_messages (
     PRIMARY KEY (id),
     KEY idx_contact_inbox (status, created_at),
     KEY idx_contact_email (email),
-    CONSTRAINT fk_contact_replied_by FOREIGN KEY (replied_by) REFERENCES users (id)
+    CONSTRAINT fk_contact_replied_by FOREIGN KEY (replied_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dokumen unduhan PPDB. download_count hanya angka — tidak ada tabel log
 -- per unduhan, karena itu akan menyimpan identitas pengunduh.
-CREATE TABLE IF NOT EXISTS ppdb_documents (
+CREATE TABLE IF NOT EXISTS `dokumen_ppdb` (
     id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     title          VARCHAR(200)    NOT NULL,
@@ -108,13 +108,13 @@ CREATE TABLE IF NOT EXISTS media (
     KEY idx_media_checksum (checksum),
     KEY idx_media_folder (folder, created_at),
     KEY idx_media_type (mime_type),
-    CONSTRAINT fk_media_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES users (id)
+    CONSTRAINT fk_media_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
 DROP TABLE IF EXISTS media;
-DROP TABLE IF EXISTS ppdb_documents;
-DROP TABLE IF EXISTS contact_messages;
-DROP TABLE IF EXISTS menus;
+DROP TABLE IF EXISTS `dokumen_ppdb`;
+DROP TABLE IF EXISTS `pesan_kontak`;
+DROP TABLE IF EXISTS `menu`;

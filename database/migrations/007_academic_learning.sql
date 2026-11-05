@@ -20,7 +20,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS schedules (
+CREATE TABLE IF NOT EXISTS `jadwal` (
     id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     class_subject_id BIGINT UNSIGNED NOT NULL,
@@ -40,17 +40,17 @@ CREATE TABLE IF NOT EXISTS schedules (
     UNIQUE KEY uq_schedules_teacher_slot (teacher_id, academic_year_id, day_of_week, start_time),
     KEY idx_schedules_class_day (class_subject_id, day_of_week, start_time),
     KEY idx_schedules_year_day (academic_year_id, day_of_week, start_time),
-    CONSTRAINT fk_schedules_class_subject FOREIGN KEY (class_subject_id) REFERENCES class_subjects (id)
+    CONSTRAINT fk_schedules_class_subject FOREIGN KEY (class_subject_id) REFERENCES `mata_pelajaran_kelas` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_schedules_teacher FOREIGN KEY (teacher_id) REFERENCES teachers (id)
+    CONSTRAINT fk_schedules_teacher FOREIGN KEY (teacher_id) REFERENCES `guru` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_schedules_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+    CONSTRAINT fk_schedules_year FOREIGN KEY (academic_year_id) REFERENCES `tahun_akademik` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_schedules_day CHECK (day_of_week BETWEEN 1 AND 7),
     CONSTRAINT chk_schedules_time CHECK (end_time > start_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS materials (
+CREATE TABLE IF NOT EXISTS `materi` (
     id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     class_subject_id BIGINT UNSIGNED NOT NULL,
@@ -69,16 +69,16 @@ CREATE TABLE IF NOT EXISTS materials (
     PRIMARY KEY (id),
     KEY idx_materials_class (class_subject_id, is_published, created_at),
     KEY idx_materials_author (created_by),
-    CONSTRAINT fk_materials_class_subject FOREIGN KEY (class_subject_id) REFERENCES class_subjects (id)
+    CONSTRAINT fk_materials_class_subject FOREIGN KEY (class_subject_id) REFERENCES `mata_pelajaran_kelas` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_materials_author FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT fk_materials_author FOREIGN KEY (created_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_materials_source CHECK (file_path IS NOT NULL OR external_url IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tugas. `max_score` dipakai sebagai batas atas penilaian.
 -- Sesuai lingkup: nilai hanya untuk tugas dan umpan balik, bukan rapor lengkap.
-CREATE TABLE IF NOT EXISTS assignments (
+CREATE TABLE IF NOT EXISTS `tugas` (
     id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     public_id        CHAR(36)        NULL,          -- K-7
 
@@ -100,16 +100,16 @@ CREATE TABLE IF NOT EXISTS assignments (
     KEY idx_assignments_class_due (class_subject_id, due_at),
     KEY idx_assignments_open (is_published, due_at),
     KEY idx_assignments_author (created_by),
-    CONSTRAINT fk_assignments_class_subject FOREIGN KEY (class_subject_id) REFERENCES class_subjects (id)
+    CONSTRAINT fk_assignments_class_subject FOREIGN KEY (class_subject_id) REFERENCES `mata_pelajaran_kelas` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_assignments_author FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT fk_assignments_author FOREIGN KEY (created_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_assignments_score CHECK (max_score > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Satu siswa hanya boleh mengumpulkan satu kali per tugas.
 -- UNIQUE (assignment_id, student_id) yang menjaminnya, bukan kode aplikasi.
-CREATE TABLE IF NOT EXISTS submissions (
+CREATE TABLE IF NOT EXISTS `pengumpulan_tugas` (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     public_id     CHAR(36)        NULL,             -- K-7
 
@@ -134,18 +134,18 @@ CREATE TABLE IF NOT EXISTS submissions (
     KEY idx_submissions_student (student_id, submitted_at),
     KEY idx_submissions_ungraded (assignment_id, graded_at),
     KEY idx_submissions_grader (graded_by),
-    CONSTRAINT fk_submissions_assignment FOREIGN KEY (assignment_id) REFERENCES assignments (id)
+    CONSTRAINT fk_submissions_assignment FOREIGN KEY (assignment_id) REFERENCES `tugas` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_submissions_student FOREIGN KEY (student_id) REFERENCES students (id)
+    CONSTRAINT fk_submissions_student FOREIGN KEY (student_id) REFERENCES `siswa` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_submissions_grader FOREIGN KEY (graded_by) REFERENCES users (id)
+    CONSTRAINT fk_submissions_grader FOREIGN KEY (graded_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_submissions_score CHECK (score IS NULL OR score >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS submissions;
-DROP TABLE IF EXISTS assignments;
-DROP TABLE IF EXISTS materials;
-DROP TABLE IF EXISTS schedules;
+DROP TABLE IF EXISTS `pengumpulan_tugas`;
+DROP TABLE IF EXISTS `tugas`;
+DROP TABLE IF EXISTS `materi`;
+DROP TABLE IF EXISTS `jadwal`;

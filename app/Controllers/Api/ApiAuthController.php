@@ -45,7 +45,7 @@ class ApiAuthController
         $stmt = $pdo->prepare(
             'SELECT id, name, email, username, password_hash, role, role_label,
                     is_active, must_change_password, failed_login_attempts, locked_until
-             FROM users
+             FROM pengguna
              WHERE (email = ? OR username = ?) AND deleted_at IS NULL
              LIMIT 1'
         );
@@ -55,7 +55,7 @@ class ApiAuthController
         if ($user === false) {
             // Waktu respons disamakan supaya tidak membocorkan apakah akun ada.
             password_verify($password, '$2y$10$usesomesillystringforsaltXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-            AuditLog::write(null, 'api.login.failed', 'users', null, 'Login API gagal — akun tidak dikenal', $ip);
+            AuditLog::write(null, 'api.login.failed', 'pengguna', null, 'Login API gagal — akun tidak dikenal', $ip);
             ApiResponse::error('INVALID_CREDENTIALS', 'Nama pengguna atau kata sandi salah.', 401);
             return;
         }
@@ -64,13 +64,13 @@ class ApiAuthController
 
         if ($user['locked_until'] !== null && strtotime((string) $user['locked_until']) > time()) {
             $sisa = (int) ceil((strtotime((string) $user['locked_until']) - time()) / 60);
-            AuditLog::write($userId, 'api.login.locked', 'users', $userId, 'Login API ditolak — akun terkunci', $ip);
+            AuditLog::write($userId, 'api.login.locked', 'pengguna', $userId, 'Login API ditolak — akun terkunci', $ip);
             ApiResponse::error('ACCOUNT_LOCKED', 'Akun dikunci sementara. Coba lagi dalam ' . $sisa . ' menit.', 423);
             return;
         }
 
         if ((int) $user['is_active'] !== 1) {
-            AuditLog::write($userId, 'api.login.inactive', 'users', $userId, 'Login API ditolak — akun nonaktif', $ip);
+            AuditLog::write($userId, 'api.login.inactive', 'pengguna', $userId, 'Login API ditolak — akun nonaktif', $ip);
             ApiResponse::error('ACCOUNT_INACTIVE', 'Akun ini dinonaktifkan. Hubungi Operator Madrasah.', 403);
             return;
         }
@@ -85,13 +85,13 @@ class ApiAuthController
                 $lockUntil = (new DateTimeImmutable('+' . $lockMinutes . ' minutes'))->format('Y-m-d H:i:s');
             }
 
-            $pdo->prepare('UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?')
+            $pdo->prepare('UPDATE pengguna SET failed_login_attempts = ?, locked_until = ? WHERE id = ?')
                 ->execute([$attempts, $lockUntil, $userId]);
 
             AuditLog::write(
                 $userId,
                 'api.login.failed',
-                'users',
+                'pengguna',
                 $userId,
                 'Login API gagal — percobaan ke-' . $attempts . ' dari ' . $maxAttempts,
                 $ip
@@ -113,13 +113,13 @@ class ApiAuthController
 
         // Berhasil.
         $pdo->prepare(
-            'UPDATE users SET failed_login_attempts = 0, locked_until = NULL,
+            'UPDATE pengguna SET failed_login_attempts = 0, locked_until = NULL,
                     last_login_at = NOW(), last_login_ip = ?
              WHERE id = ?'
         )->execute([$ip, $userId]);
 
         if (password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT)) {
-            $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
+            $pdo->prepare('UPDATE pengguna SET password_hash = ? WHERE id = ?')
                 ->execute([password_hash($password, PASSWORD_DEFAULT), $userId]);
         }
 
@@ -136,7 +136,7 @@ class ApiAuthController
         AuditLog::write(
             $userId,
             'api.login.success',
-            'users',
+            'pengguna',
             $userId,
             'Masuk lewat API (' . $platform . ': ' . ($deviceName !== '' ? $deviceName : 'tanpa nama') . ')',
             $ip
@@ -190,7 +190,7 @@ class ApiAuthController
 
         $stmt = Database::connection()->prepare(
             'SELECT id, name, email, username, role, role_label, must_change_password
-             FROM users WHERE id = ? LIMIT 1'
+             FROM pengguna WHERE id = ? LIMIT 1'
         );
         $stmt->execute([(int) $tokens['user_id']]);
         $user = $stmt->fetch();
@@ -198,7 +198,7 @@ class ApiAuthController
         AuditLog::write(
             (int) $tokens['user_id'],
             'api.token.refresh',
-            'users',
+            'pengguna',
             (int) $tokens['user_id'],
             'Refresh token dipakai, pasangan token berotasi',
             $ip
@@ -232,7 +232,7 @@ class ApiAuthController
         AuditLog::write(
             (int) $user['user_id'],
             'api.logout',
-            'users',
+            'pengguna',
             (int) $user['user_id'],
             'Keluar dari API — token dicabut',
             RateLimiter::clientIp()
@@ -267,7 +267,7 @@ class ApiAuthController
         try {
             $rows = Database::connection()->query(
                 "SELECT setting_key, setting_value
-                 FROM settings
+                 FROM pengaturan
                  WHERE is_public = 1
                  ORDER BY group_name, setting_key"
             )->fetchAll();
@@ -281,7 +281,7 @@ class ApiAuthController
             $settings[(string) $row['setting_key']] = $row['setting_value'];
         }
 
-        ApiResponse::ok(['settings' => $settings]);
+        ApiResponse::ok(['pengaturan' => $settings]);
     }
 
     /**

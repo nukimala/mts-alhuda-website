@@ -16,7 +16,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS notifications (
+CREATE TABLE IF NOT EXISTS `notifikasi` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     user_id    BIGINT UNSIGNED NOT NULL,
@@ -41,10 +41,10 @@ CREATE TABLE IF NOT EXISTS notifications (
     KEY idx_notifications_recent (user_id, created_at),
     KEY idx_notifications_type (type, created_at),
     UNIQUE KEY uq_notifications_dedupe (user_id, dedupe_key),
-    CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS `notifikasi`;

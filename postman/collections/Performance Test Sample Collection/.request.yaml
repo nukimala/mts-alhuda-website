@@ -1,0 +1,22 @@
+$kind: http-request
+name: ""
+url: http://localhost/webserver/Acara15/si-akademik/public/api/mahasiswa
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"nim\": \"2601001\",\r
+
+    \  \"nama\": \"Muhammad Nur Shulkhi\",\r
+
+    \  \"prodi_id\": 1,\r
+
+    \  \"status\": \"aktif\",\r
+
+    \  \"alamat\": \"Nganjuk\",\r
+
+    \  \"angkatan\": 2026\r
+
+    }"
+order: 1000

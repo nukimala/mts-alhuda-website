@@ -2,8 +2,7 @@
 /**
  * Dashboard panel admin.
  *
- * Angka diambil langsung dari database. Kalau sebuah tabel belum ada
- * (batch migrasi belum jalan), nilainya ditampilkan 0 — bukan error.
+ * Mengagregasi data dari database: CMS, Akreditasi, dan Ekosistem Mobile App MADRASAHKU.
  */
 
 class AdminController
@@ -45,12 +44,16 @@ class AdminController
     private function stats(PDO $pdo): array
     {
         return [
-            'pengguna'   => $this->count($pdo, 'users', 'deleted_at IS NULL'),
-            'guru'       => $this->count($pdo, 'users', "role = 'guru' AND deleted_at IS NULL"),
-            'siswa'      => $this->count($pdo, 'users', "role = 'siswa' AND deleted_at IS NULL"),
-            'berita'     => $this->count($pdo, 'posts', "status = 'published'"),
-            'presensi'   => $this->count($pdo, 'teacher_attendances', "attendance_date = CURDATE()"),
-            'bukti'      => $this->count($pdo, 'evidence', null),
+            'pengguna'        => $this->count($pdo, 'pengguna', 'deleted_at IS NULL'),
+            'guru'            => $this->count($pdo, 'pengguna', "role = 'guru' AND deleted_at IS NULL"),
+            'siswa'           => $this->count($pdo, 'pengguna', "role = 'siswa' AND deleted_at IS NULL"),
+            'berita'          => $this->count($pdo, 'berita', "status = 'published'"),
+            'presensi'        => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE()"),
+            'presensi_mobile' => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE() AND method = 'self'"),
+            'bukti'           => $this->count($pdo, 'bukti', null),
+            'jadwal'          => $this->count($pdo, 'jadwal', "is_active = 1"),
+            'tugas'           => $this->count($pdo, 'tugas', "is_published = 1"),
+            'tokens'          => $this->count($pdo, 'token_api', "revoked_at IS NULL"),
         ];
     }
 
@@ -92,7 +95,7 @@ class AdminController
         try {
             return $pdo->query(
                 "SELECT setting_key, setting_value, group_name
-                 FROM settings
+                 FROM pengaturan
                  WHERE is_public = 1
                  ORDER BY group_name, setting_key
                  LIMIT 12"

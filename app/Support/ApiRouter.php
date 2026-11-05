@@ -131,11 +131,19 @@ class ApiRouter
                 'assignments'            => ['ApiAcademicController', 'assignments'],
                 'assignments/{publicId}' => ['ApiAcademicController', 'assignmentDetail'],
                 'materials'              => ['ApiAcademicController', 'materials'],
+                'attendance/today'       => ['ApiAttendanceController', 'today'],
+                'attendance/history'     => ['ApiAttendanceController', 'history'],
+                'notifications'          => ['ApiNotificationController', 'index'],
             ],
             'POST' => [
                 'auth/login'   => ['ApiAuthController', 'login'],
                 'auth/refresh' => ['ApiAuthController', 'refresh'],
                 'auth/logout'  => ['ApiAuthController', 'logout'],
+                'attendance/check-in'           => ['ApiAttendanceController', 'checkIn'],
+                'attendance/check-out'          => ['ApiAttendanceController', 'checkOut'],
+                'notifications/{id}/read'       => ['ApiNotificationController', 'markRead'],
+                'notifications/read-all'        => ['ApiNotificationController', 'markAllRead'],
+                'assignments/{publicId}/submit' => ['ApiAcademicController', 'submitAssignment'],
             ],
         ];
 

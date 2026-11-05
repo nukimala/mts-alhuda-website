@@ -25,20 +25,20 @@
 
 -- @UP
 
-ALTER TABLE students
+ALTER TABLE `siswa`
     ADD COLUMN public_id CHAR(36) NULL AFTER id,
     ADD UNIQUE KEY uq_students_public (public_id);
 
-ALTER TABLE teachers
+ALTER TABLE `guru`
     ADD COLUMN public_id CHAR(36) NULL AFTER id,
     ADD UNIQUE KEY uq_teachers_public (public_id);
 
 -- @DOWN
 
-ALTER TABLE teachers
+ALTER TABLE `guru`
     DROP INDEX uq_teachers_public,
     DROP COLUMN public_id;
 
-ALTER TABLE students
+ALTER TABLE `siswa`
     DROP INDEX uq_students_public,
     DROP COLUMN public_id;

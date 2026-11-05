@@ -4,7 +4,7 @@
 --
 -- Ini inti fitur Bank Bukti.
 --
--- `evidence_butir` adalah tabel pivot: satu berkas bukti bisa dipakai untuk
+-- `bukti_butir` adalah tabel pivot: satu berkas bukti bisa dipakai untuk
 -- banyak butir sekaligus. Itu bukan kemewahan — banyak bukti memang relevan
 -- untuk lebih dari satu butir (mis. SK pembagian tugas menjawab butir
 -- pendidik sekaligus butir kurikulum). Menyalin berkasnya per butir akan
@@ -22,7 +22,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS evidence (
+CREATE TABLE IF NOT EXISTS `bukti` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     public_id    CHAR(36)        NULL,              -- K-7
 
@@ -54,16 +54,16 @@ CREATE TABLE IF NOT EXISTS evidence (
     KEY idx_evidence_expiry (valid_until, status),
     KEY idx_evidence_uploader (uploaded_by),
     KEY idx_evidence_deleted (deleted_at),
-    CONSTRAINT fk_evidence_period FOREIGN KEY (period_id) REFERENCES accreditation_periods (id)
+    CONSTRAINT fk_evidence_period FOREIGN KEY (period_id) REFERENCES `periode_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_evidence_uploader FOREIGN KEY (uploaded_by) REFERENCES users (id)
+    CONSTRAINT fk_evidence_uploader FOREIGN KEY (uploaded_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_evidence_source CHECK (file_path IS NOT NULL OR external_url IS NOT NULL)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Pivot bukti <-> butir. Keduanya CASCADE: melepas tautan tidak boleh
 -- menghapus bukti maupun butirnya, hanya baris pivot ini.
-CREATE TABLE IF NOT EXISTS evidence_butir (
+CREATE TABLE IF NOT EXISTS `bukti_butir` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     evidence_id BIGINT UNSIGNED NOT NULL,
     butir_id    BIGINT UNSIGNED NOT NULL,
@@ -75,15 +75,15 @@ CREATE TABLE IF NOT EXISTS evidence_butir (
     UNIQUE KEY uq_evidence_butir_pair (evidence_id, butir_id),
     -- Arah sebaliknya: "bukti apa saja untuk butir ini"
     KEY idx_evidence_butir_lookup (butir_id, evidence_id),
-    CONSTRAINT fk_evidence_butir_evidence FOREIGN KEY (evidence_id) REFERENCES evidence (id)
+    CONSTRAINT fk_evidence_butir_evidence FOREIGN KEY (evidence_id) REFERENCES `bukti` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_evidence_butir_butir FOREIGN KEY (butir_id) REFERENCES accreditation_butirs (id)
+    CONSTRAINT fk_evidence_butir_butir FOREIGN KEY (butir_id) REFERENCES `butir_akreditasi` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_evidence_butir_linked_by FOREIGN KEY (linked_by) REFERENCES users (id)
+    CONSTRAINT fk_evidence_butir_linked_by FOREIGN KEY (linked_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS dka_entries (
+CREATE TABLE IF NOT EXISTS `entri_dka` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     butir_id   BIGINT UNSIGNED NOT NULL,
 
@@ -103,9 +103,9 @@ CREATE TABLE IF NOT EXISTS dka_entries (
     UNIQUE KEY uq_dka_one_draft (butir_id, draft_flag),
     KEY idx_dka_butir_status (butir_id, status, version),
     KEY idx_dka_editor (updated_by),
-    CONSTRAINT fk_dka_butir FOREIGN KEY (butir_id) REFERENCES accreditation_butirs (id)
+    CONSTRAINT fk_dka_butir FOREIGN KEY (butir_id) REFERENCES `butir_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_dka_editor FOREIGN KEY (updated_by) REFERENCES users (id)
+    CONSTRAINT fk_dka_editor FOREIGN KEY (updated_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     -- Batas 1000 karakter ditegakkan database DAN aplikasi. Dua lapis,
     -- karena satu lapis selalu bisa dilewati.
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS dka_entries (
 
 -- Status per indikator dalam satu butir.
 -- UNIQUE (butir_id, indicator_id): satu indikator dinilai sekali per butir.
-CREATE TABLE IF NOT EXISTS indicator_checks (
+CREATE TABLE IF NOT EXISTS `pemeriksaan_indikator` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     butir_id     BIGINT UNSIGNED NOT NULL,
     indicator_id BIGINT UNSIGNED NOT NULL,
@@ -131,17 +131,17 @@ CREATE TABLE IF NOT EXISTS indicator_checks (
     UNIQUE KEY uq_indicator_checks_pair (butir_id, indicator_id),
     KEY idx_indicator_checks_status (butir_id, status),
     KEY idx_indicator_checks_indicator (indicator_id),
-    CONSTRAINT fk_indicator_checks_butir FOREIGN KEY (butir_id) REFERENCES accreditation_butirs (id)
+    CONSTRAINT fk_indicator_checks_butir FOREIGN KEY (butir_id) REFERENCES `butir_akreditasi` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_indicator_checks_indicator FOREIGN KEY (indicator_id) REFERENCES accreditation_indicators (id)
+    CONSTRAINT fk_indicator_checks_indicator FOREIGN KEY (indicator_id) REFERENCES `indikator_akreditasi` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_indicator_checks_by FOREIGN KEY (checked_by) REFERENCES users (id)
+    CONSTRAINT fk_indicator_checks_by FOREIGN KEY (checked_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS indicator_checks;
-DROP TABLE IF EXISTS dka_entries;
-DROP TABLE IF EXISTS evidence_butir;
-DROP TABLE IF EXISTS evidence;
+DROP TABLE IF EXISTS `pemeriksaan_indikator`;
+DROP TABLE IF EXISTS `entri_dka`;
+DROP TABLE IF EXISTS `bukti_butir`;
+DROP TABLE IF EXISTS `bukti`;

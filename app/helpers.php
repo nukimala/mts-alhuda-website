@@ -36,8 +36,13 @@ if (!function_exists('base_url')) {
     function base_url(string $path = ''): string
     {
         $path = ltrim($path, '/');
+        $base = base_path();
 
-        return base_path() . ($path !== '' ? '/' . $path : '');
+        if ($path === '') {
+            return $base === '' ? '/' : $base;
+        }
+
+        return ($base === '' ? '' : $base) . '/' . $path;
     }
 }
 

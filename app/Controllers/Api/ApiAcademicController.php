@@ -536,4 +536,131 @@ class ApiAcademicController
 
         return $payload;
     }
+
+    /**
+     * POST /api/v1/assignments/{publicId}/submit
+     */
+    public function submitAssignment(array $params): void
+    {
+        $user = $this->requireUser();
+        if ($user === null) {
+            return;
+        }
+
+        $scope = $this->resolveScope($user);
+        if ($scope === null) {
+            return;
+        }
+
+        if ($scope['type'] !== 'student') {
+            ApiResponse::forbidden('Hanya siswa yang dapat mengumpulkan tugas.');
+            return;
+        }
+
+        $studentId = (int) $scope['student_id'];
+        $key = trim((string) ($params['publicId'] ?? ''));
+
+        if ($key === '') {
+            ApiResponse::notFound('Tugas tidak ditemukan.');
+            return;
+        }
+
+        $pdo = Database::connection();
+        $column = ctype_digit($key) ? 'a.id' : 'a.public_id';
+
+        $stmt = $pdo->prepare(
+            "SELECT a.id, a.public_id, a.due_at, a.is_published, cs.class_id
+             FROM tugas a
+             JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
+             WHERE {$column} = ? AND a.is_published = 1 AND cs.is_active = 1
+             LIMIT 1"
+        );
+        $stmt->execute([$key]);
+        $assignment = $stmt->fetch();
+
+        if ($assignment === false) {
+            ApiResponse::notFound('Tugas tidak ditemukan.');
+            return;
+        }
+
+        if ($scope['class_id'] !== (int) $assignment['class_id']) {
+            ApiResponse::forbidden('Tugas ini bukan untuk kelas Anda.');
+            return;
+        }
+
+        $assignmentId = (int) $assignment['id'];
+        $input = ApiResponse::input();
+        $note = ApiResponse::str($input, 'note');
+
+        $filePath = null;
+        if (!empty($_FILES['file']['name']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            $allowedExts = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'];
+            $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+
+            if (!in_array($ext, $allowedExts, true)) {
+                ApiResponse::validation(['file' => 'Format file tidak diizinkan. Gunakan PDF, DOC, DOCX, JPG, PNG, atau ZIP.']);
+                return;
+            }
+
+            if ($_FILES['file']['size'] > 10 * 1024 * 1024) {
+                ApiResponse::validation(['file' => 'Ukuran berkas maksimal 10 MB.']);
+                return;
+            }
+
+            $uploadDir = __DIR__ . '/../public/uploads/assignments/submissions';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $fileName = 'sub_' . $studentId . '_' . $assignmentId . '_' . time() . '.' . $ext;
+            $dest = $uploadDir . '/' . $fileName;
+
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $dest)) {
+                $filePath = 'uploads/assignments/submissions/' . $fileName;
+            }
+        }
+
+        $publicId = sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+
+        $upsertStmt = $pdo->prepare(
+            "INSERT INTO pengumpulan_tugas (assignment_id, student_id, public_id, file_path, note, submitted_at, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, NOW(), NOW(), NOW())
+             ON DUPLICATE KEY UPDATE
+             file_path = IF(VALUES(file_path) IS NOT NULL, VALUES(file_path), file_path),
+             note = VALUES(note),
+             submitted_at = NOW(),
+             updated_at = NOW()"
+        );
+        $upsertStmt->execute([
+            $assignmentId,
+            $studentId,
+            $publicId,
+            $filePath,
+            $note !== '' ? $note : null,
+        ]);
+
+        AuditLog::write(
+            (int) $user['id'],
+            'assignment.submit',
+            'pengumpulan_tugas',
+            $assignmentId,
+            "Pengumpulan tugas ID {$assignmentId} oleh siswa ID {$studentId}",
+            RateLimiter::clientIp()
+        );
+
+        ApiResponse::ok([
+            'assignment_id' => $assignmentId,
+            'submitted_at'  => ApiFormat::iso(date('Y-m-d H:i:s')),
+            'note'          => $note !== '' ? $note : null,
+            'file_url'      => ApiFormat::mediaUrl($filePath),
+            'message'       => 'Tugas berhasil dikumpulkan!',
+        ]);
+    }
 }

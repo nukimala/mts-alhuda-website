@@ -14,7 +14,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS posts (
+CREATE TABLE IF NOT EXISTS `berita` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     public_id    CHAR(36)        NULL,               -- K-7, untuk API mobile
 
@@ -46,11 +46,11 @@ CREATE TABLE IF NOT EXISTS posts (
     KEY idx_posts_featured (is_featured, status, published_at),
     KEY idx_posts_author (author_id, created_at),
     KEY idx_posts_deleted (deleted_at),
-    CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES users (id)
+    CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS pages (
+CREATE TABLE IF NOT EXISTS `halaman` (
     id               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     slug             VARCHAR(120)    NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS pages (
 
 -- Satu baris = satu foto. Kolom `album` dipakai untuk mengelompokkan foto
 -- dalam satu kegiatan, tanpa perlu tabel album terpisah.
-CREATE TABLE IF NOT EXISTS galleries (
+CREATE TABLE IF NOT EXISTS `galeri` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     album      VARCHAR(120)    NULL,
     title      VARCHAR(200)    NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS galleries (
     KEY idx_galleries_deleted (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS facilities (
+CREATE TABLE IF NOT EXISTS `fasilitas` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name        VARCHAR(160)    NOT NULL,
     description TEXT            NULL,
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS facilities (
 
 -- Pengumuman resmi. Punya slug karena bisa dibuka sebagai halaman sendiri.
 -- Tidak memakai soft delete: pengumuman memakai status dan expires_at.
-CREATE TABLE IF NOT EXISTS announcements (
+CREATE TABLE IF NOT EXISTS `pengumuman` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     title        VARCHAR(200)    NOT NULL,
@@ -140,11 +140,11 @@ CREATE TABLE IF NOT EXISTS announcements (
     KEY idx_announcements_feed (status, is_pinned, published_at),
     KEY idx_announcements_expiry (expires_at),
     KEY idx_announcements_audience (audience, status),
-    CONSTRAINT fk_announcements_author FOREIGN KEY (author_id) REFERENCES users (id)
+    CONSTRAINT fk_announcements_author FOREIGN KEY (author_id) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS agendas (
+CREATE TABLE IF NOT EXISTS `agenda` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     title       VARCHAR(200)    NOT NULL,
@@ -164,16 +164,16 @@ CREATE TABLE IF NOT EXISTS agendas (
     PRIMARY KEY (id),
     KEY idx_agendas_upcoming (status, start_at),
     KEY idx_agendas_range (start_at, end_at),
-    CONSTRAINT fk_agendas_author FOREIGN KEY (author_id) REFERENCES users (id)
+    CONSTRAINT fk_agendas_author FOREIGN KEY (author_id) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_agendas_range CHECK (end_at IS NULL OR end_at >= start_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS agendas;
-DROP TABLE IF EXISTS announcements;
-DROP TABLE IF EXISTS facilities;
-DROP TABLE IF EXISTS galleries;
-DROP TABLE IF EXISTS pages;
-DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS `agenda`;
+DROP TABLE IF EXISTS `pengumuman`;
+DROP TABLE IF EXISTS `fasilitas`;
+DROP TABLE IF EXISTS `galeri`;
+DROP TABLE IF EXISTS `halaman`;
+DROP TABLE IF EXISTS `berita`;

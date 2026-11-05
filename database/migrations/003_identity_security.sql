@@ -13,7 +13,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS api_tokens (
+CREATE TABLE IF NOT EXISTS `token_api` (
     id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id            BIGINT UNSIGNED NOT NULL,
 
@@ -37,11 +37,11 @@ CREATE TABLE IF NOT EXISTS api_tokens (
     UNIQUE KEY uq_api_tokens_refresh (refresh_token_hash),
     KEY idx_api_tokens_user_live (user_id, revoked_at, refresh_expires_at),
     KEY idx_api_tokens_refresh_ttl (refresh_expires_at),
-    CONSTRAINT fk_api_tokens_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_api_tokens_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS password_resets (
+CREATE TABLE IF NOT EXISTS `reset_sandi` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id      BIGINT UNSIGNED NOT NULL,
     token_hash   CHAR(64)        NOT NULL,   -- sha256 hex
@@ -53,14 +53,14 @@ CREATE TABLE IF NOT EXISTS password_resets (
     UNIQUE KEY uq_password_resets_token (token_hash),
     KEY idx_password_resets_user (user_id, expires_at),
     KEY idx_password_resets_cleanup (expires_at, used_at),
-    CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_password_resets_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Log audit. user_id NULL kalau aksi dilakukan tanpa sesi (misal login gagal
 -- dengan email yang tidak terdaftar). ON DELETE SET NULL supaya log tidak
 -- hilang saat akun dihapus — jejaknya tetap perlu ada.
-CREATE TABLE IF NOT EXISTS activity_logs (
+CREATE TABLE IF NOT EXISTS `log_aktivitas` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id     BIGINT UNSIGNED NULL,
     action      VARCHAR(80)     NOT NULL,
@@ -75,12 +75,12 @@ CREATE TABLE IF NOT EXISTS activity_logs (
     KEY idx_activity_logs_user (user_id, created_at),
     KEY idx_activity_logs_entity (entity, entity_id, created_at),
     KEY idx_activity_logs_action (action, created_at),
-    CONSTRAINT fk_activity_logs_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_activity_logs_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS activity_logs;
-DROP TABLE IF EXISTS password_resets;
-DROP TABLE IF EXISTS api_tokens;
+DROP TABLE IF EXISTS `log_aktivitas`;
+DROP TABLE IF EXISTS `reset_sandi`;
+DROP TABLE IF EXISTS `token_api`;

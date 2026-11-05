@@ -9,7 +9,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS rate_limits (
+CREATE TABLE IF NOT EXISTS `batas_akses` (
     bucket     VARCHAR(191) NOT NULL,
     attempts   INT UNSIGNED NOT NULL DEFAULT 0,
     expires_at DATETIME     NOT NULL,
@@ -19,4 +19,4 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 
 -- @DOWN
 
-DROP TABLE IF EXISTS rate_limits;
+DROP TABLE IF EXISTS `batas_akses`;

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+<html lang="id"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-error-container": "#93000a",
+          "error": "#ba1a1a",
+          "primary-fixed": "#bcedd7",
+          "error-container": "#ffdad6",
+          "tertiary-container": "#003f1d",
+          "on-primary-fixed": "#002116",
+          "background": "#eefdf3",
+          "on-secondary-fixed": "#00210f",
+          "surface-bright": "#eefdf3",
+          "tertiary-fixed-dim": "#70dc91",
+          "on-surface-variant": "#414944",
+          "primary-fixed-dim": "#a0d1bc",
+          "tertiary": "#002710",
+          "on-secondary-container": "#1d7044",
+          "surface-container": "#e2f2e8",
+          "surface-container-lowest": "#ffffff",
+          "on-tertiary": "#ffffff",
+          "inverse-on-surface": "#e5f4eb",
+          "on-tertiary-fixed-variant": "#005228",
+          "outline-variant": "#c0c8c3",
+          "on-error": "#ffffff",
+          "surface-dim": "#ceded4",
+          "on-secondary": "#ffffff",
+          "on-tertiary-fixed": "#00210d",
+          "on-primary-container": "#79a894",
+          "primary-container": "#0b3d2e",
+          "on-surface": "#111e19",
+          "secondary-fixed": "#a3f4bd",
+          "on-secondary-fixed-variant": "#00522d",
+          "secondary": "#176c40",
+          "on-background": "#111e19",
+          "inverse-primary": "#a0d1bc",
+          "surface-variant": "#d7e6dd",
+          "outline": "#717974",
+          "secondary-fixed-dim": "#87d8a2",
+          "surface": "#eefdf3",
+          "primary": "#00261b",
+          "on-primary-fixed-variant": "#214f3f",
+          "surface-container-high": "#ddece2",
+          "surface-tint": "#396756",
+          "surface-container-low": "#e8f7ee",
+          "on-tertiary-container": "#45b36c",
+          "surface-container-highest": "#d7e6dd",
+          "secondary-container": "#a0f1ba",
+          "on-primary": "#ffffff",
+          "inverse-surface": "#26332d",
+          "tertiary-fixed": "#8cf9ab"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "2rem",
+          "space-xl": "2.5rem",
+          "gutter": "1.5rem",
+          "space-lg": "1.5rem",
+          "space-md": "1rem",
+          "space-xs": "0.25rem",
+          "space-sm": "0.5rem"
+        },
+        "fontFamily": {
+          "label-md": [
+            "Plus Jakarta Sans"
+          ],
+          "title-md": [
+            "Plus Jakarta Sans"
+          ],
+          "body-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "title-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "display-mobile": [
+            "Plus Jakarta Sans"
+          ],
+          "label-sm": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-md": [
+            "Plus Jakarta Sans"
+          ],
+          "label-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "display": [
+            "Plus Jakarta Sans"
+          ],
+          "body-sm": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-lg-mobile": [
+            "Plus Jakarta Sans"
+          ],
+          "body-md": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-sm": [
+            "Plus Jakarta Sans"
+          ]
+        },
+        "fontSize": {
+          "label-md": [
+            "12px",
+            {
+              "lineHeight": "16px",
+              "letterSpacing": "0.02em",
+              "fontWeight": "600"
+            }
+          ],
+          "title-md": [
+            "16px",
+            {
+              "lineHeight": "24px",
+              "letterSpacing": "0",
+              "fontWeight": "600"
+            }
+          ],
+          "body-lg": [
+            "16px",
+            {
+              "lineHeight": "26px",
+              "letterSpacing": "0",
+              "fontWeight": "400"
+            }
+          ],
+          "title-lg": [
+            "18px",
+            {
+              "lineHeight": "26px",
+              "letterSpacing": "0",
+              "fontWeight": "600"
+            }
+          ],
+          "display-mobile": [
+            "36px",
+            {
+              "lineHeight": "44px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "800"
+            }
+          ],
+          "label-sm": [
+            "11px",
+            {
+              "lineHeight": "14px",
+              "letterSpacing": "0.04em",
+              "fontWeight": "700"
+            }
+          ],
+          "headline-lg": [
+            "32px",
+            {
+              "lineHeight": "40px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "700"
+            }
+          ],
+          "headline-md": [
+            "24px",
+            {
+              "lineHeight": "32px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-lg": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "letterSpacing": "0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "display": [
+            "48px",
+            {
+              "lineHeight": "56px",
+              "letterSpacing": "-0.03em",
+              "fontWeight": "800"
+            }
+          ],
+          "body-sm": [
+            "12px",
+            {
+              "lineHeight": "18px",
+              "letterSpacing": "0.01em",
+              "fontWeight": "400"
+            }
+          ],
+          "headline-lg-mobile": [
+            "26px",
+            {
+              "lineHeight": "34px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "700"
+            }
+          ],
+          "body-md": [
+            "14px",
+            {
+              "lineHeight": "22px",
+              "letterSpacing": "0",
+              "fontWeight": "400"
+            }
+          ],
+          "headline-sm": [
+            "20px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "0",
+              "fontWeight": "600"
+            }
+          ]
+        }
+      },
+    },
+  };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><header class="sticky top-0 w-full z-50 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-[62px] max-w-[1100px] mx-auto px-4 flex items-center justify-between"><a class="flex items-center gap-space-sm" data-path="beranda" href="#"><div class="w-[36px] h-[36px] rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[20px]">school</span></div><div class="flex flex-col"><span class="font-title-md text-title-md text-primary leading-tight">MTs Al-Huda</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">Gondang</span></div></a><nav class="hidden lg:flex items-center gap-space-xs" data-active-classes="bg-secondary text-on-secondary rounded-lg"><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="beranda" href="#">Beranda</a><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="profil" href="#">Profil</a><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="akademik" href="#">Akademik</a><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="fasilitas" href="#">Fasilitas</a><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="galeri" href="#">Galeri</a><a aria-current="page" class="px-3 py-1.5 font-label-lg transition-colors bg-secondary text-on-secondary rounded-lg" data-path="berita" href="#">Berita</a><a class="px-3 py-1.5 font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors rounded-lg" data-path="kontak" href="#">Kontak</a></nav><div class="flex items-center gap-space-sm"><a class="h-[44px] px-space-md bg-secondary text-on-secondary rounded-lg font-label-lg text-label-lg flex items-center justify-center hover:bg-primary transition-colors" data-path="ppdb" href="#">PPDB</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-[62px] bg-surface"><div class="flex flex-col w-full">
+<!-- KEPALA HALAMAN (HERO HEADER) -->
+<section class="w-full bg-gradient-to-b from-surface-bright via-surface-container-low to-surface-container py-12 px-4 shadow-sm">
+<div class="max-w-[1100px] mx-auto flex flex-col items-center text-center">
+<!-- Breadcrumb -->
+<nav aria-label="Breadcrumb" class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant mb-space-sm">
+<a class="hover:text-secondary text-secondary transition-colors" data-path="beranda" href="#">Beranda</a>
+<span class="text-outline">/</span>
+<span class="text-on-surface-variant font-medium">Berita &amp; Artikel</span>
+</nav>
+<!-- Eyebrow Badge -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm tracking-wider uppercase mb-space-sm shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        Warta &amp; Informasi Madrasah
+      </div>
+<!-- Main Title -->
+<h1 class="font-display text-display text-primary max-w-3xl font-extrabold tracking-tight mb-space-xs">
+        Berita &amp; Artikel
+      </h1>
+<!-- Subtitle -->
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+        Koleksi berita resmi, liputan prestasi, agenda akademik, dan artikel edukatif seputar dinamika santri MTs Al-Huda Gondang.
+      </p>
+</div>
+</section>
+<!-- CONTENT WRAPPER -->
+<div class="w-full max-w-[1100px] mx-auto px-4 py-space-xl flex flex-col gap-space-lg">
+<!-- BAR FILTER (PENCARIAN & KATEGORI) -->
+<div class="w-full bg-surface-container-lowest p-space-sm md:p-space-md rounded-xl shadow-sm flex flex-col lg:flex-row items-center justify-between gap-space-md">
+<!-- Search Input -->
+<div class="relative w-full lg:w-80">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-outline">
+<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 6.65a7.5 7.5 0 010 10.6z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</div>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded-lg placeholder-outline focus:outline-none focus:ring-2 focus:ring-secondary transition-all" id="news-search-input" placeholder="Cari berita atau pengumuman..." type="text"/>
+</div>
+<!-- Category Filter Pills -->
+<div aria-label="Filter Kategori" class="flex items-center flex-wrap gap-2 w-full lg:w-auto" role="tablist">
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-secondary text-on-secondary shadow-sm transition-all focus:outline-none" type="button">
+          Semua
+        </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container transition-all focus:outline-none" type="button">
+          Kegiatan
+        </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container transition-all focus:outline-none" type="button">
+          Prestasi
+        </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container transition-all focus:outline-none" type="button">
+          Pengumuman
+        </button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container transition-all focus:outline-none" type="button">
+          Akademik
+        </button>
+</div>
+</div>
+<!-- MAIN GRID 2/3 and 1/3 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT/MAIN COLUMN (2/3 -> 8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-space-lg min-w-0">
+<!-- A. KARTU BERITA UTAMA HORIZONTAL -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 grid grid-cols-1 md:grid-cols-12 group">
+<!-- Image Container (40%) -->
+<div class="md:col-span-5 relative overflow-hidden h-64 md:h-auto min-h-[220px]">
+<img alt="Santri Meraih Juara Sains" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Indonesian madrasah junior high students celebrating together wearing green Islamic uniform with gold medals and science trophy in front of Al-Huda academy backdrop, bright daylight, editorial photo style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiz4rDJP_XYvlklfzp9j2QegJYTNp2Yz08Y1izgVFNr1F7XOlKnIgnhJNSvk_b7UxwwRSiqfoV8nVuCkwV9jwE4elAzxGhzo696FBtuf2p5dPy11w0YWRgz-IzhE_Ik51ZVcgz4bwR1uPHZYrHYHWmRoC8ayql7RoGRFTj2fqxiQdtldFYdGb1UYMgEJw6ltel9YO-bJGrAqWnzJr8y9h2phEvyYwXnFmOJd4JAtHHvXMVzF4gFJau"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent md:hidden"></div>
+</div>
+<!-- Text Container (60%) -->
+<div class="md:col-span-7 p-6 md:p-7 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-space-sm mb-3">
+<span class="px-3 py-1 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-container">
+                  Prestasi
+                </span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                  18 Oktober 2026
+                </span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary transition-colors font-bold leading-tight mb-2">
+                Santri MTs Al-Huda Gondang Raih Juara 1 Olimpiade Matematika dan Sains Kemenag se-Jawa Timur
+              </h2>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                Delegasi sains madrasah berhasil menyabet medali emas setelah melalui tahap seleksi riset dan pemecahan soal aplikatif tingkat provinsi.
+              </p>
+</div>
+<div>
+<a class="inline-flex items-center gap-1 font-label-lg text-label-lg text-secondary group-hover:text-primary transition-colors font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-4 h-4 ml-0.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</a>
+</div>
+</div>
+</article>
+<!-- B. GRID BERITA (2 Kolom, 6 Kartu) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Upacara Hari Santri" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Indonesian madrasah flag ceremony on campus courtyard, santri students in neat white peci and green ties standing solemnly under clear blue sky, photorealistic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVyuqE7_kjEezTD6Hac_hSn9jvL6ZKsV6-jAA6_H3g7ugHZCm4PSZR29qbpq3nHbLMuz9nGXSYOeIixYH5z-lx2u1wwpM9I-3xbhJ_DePXXihzr3XH1H-0WgI_tR2Uwgfyiyf13QFYO63eon4dd9u9qsa9umC0bW2IOvWqR3w1i0jiqrQ1vKuQSDfQzZ9YRAzqOHATn0IMaW7lhadn3FFS9hOiAzaXVwSDymIubgiGPV2iZuSZVx5o"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Kegiatan
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  14 Oktober 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Peringatan Hari Santri Nasional 2026 Digelar Khidmat dengan Apel Akbar
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Ratusan santri dan asatidz memadati halaman kampus madrasah dengan busana sarung dan peci putih.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Sosialisasi CBT" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Students in modern madrasah computer lab typing diligently on computer terminals under cool white LED lighting, supervisor in traditional batik observing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtypls_QIQtAN_Dx5aRDaCoy68d6JST_J47yxmW2JgbU0MNP9qw85PCQG9EIOcWILpeYh3lqNOgzYSjJHGcnPfsbEY04IMNEsoeUsjlR2ILxDEvaRFyUU3HlU49lDf2tVTH2a8lnjM079-_UOIr3n_0OWghR9N5ljABwRechB3J3fdj_6-pK6dtbm7XEudvz8v5telS-x2uJugYZTi44k0sNeH-rTo8Mc309wTnBn4qjqkdzNsjhjp"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Pengumuman
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  10 Oktober 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Sosialisasi Pelaksanaan Asesmen Sumatif Berbasis Komputer (CBT)
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Jadwal dan tata tertib simulasi CBT semester ganjil untuk seluruh jenjang kelas VII, VIII, dan IX.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Pojok Baca Santri" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Islamic boarding school library filled with bookshelves and wooden tables, junior students quietly studying Arabic grammar books and Islamic jurisprudence literature" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc6bv_DnjYON6T-bBaQXBwEVPqCbJRltBP3IgXInTmbQf7NuaJ0zJ2Nl56fOw7vQN0tiXn-cFPGb1EgC4p6IqtP2gdvitXVtz3xU33PzCa3Tm92j17XxbfyVecro0AYZ0ejz_qY3EzDWM1yErrwIhlwWj7IC1ENwAPpHV7cFbHETsQJFszkGs63anHbAn_Jaw6Fq9JZtnSwXNz9Slv7J2o3-aVl2ShGF2vnuh5sVmQn3dJNEW12jBp"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Akademik
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  05 Oktober 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Penguatan Budaya Literasi Melalui Pojok Baca Santri dan Bedah Kitab
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Program literasi pagi rutin ditingkatkan guna mengasah pemahaman nahwu shorof dan sains modern.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Perkemahan Pramuka" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Scout camp outdoor setting in lush green pine valley mountain slopes, Indonesian scout uniformed students pitching dome tents cheerfully under morning mist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARrYf3s8C4dXko4aismJ7ZAZDdgOVOJDh9jbHh4B3K8E355WYj0UIoLi05aFfnsv1-WkEMJ40DhG4eRmZkPxVik-x-8joT2llc09J7ov9vNTcNGFRBbtkBgEhxqNUjrCp8okIpeiwa0z0-H40toO1OOfs1iRPGistXZR55UqpnzGdLZ2GVookeNZVWthpKGhAhDx8PKxkv2dBcrMCtjWKYg4at3D59lFRYSoGadO6Uig3PTzSP3jZZ"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Kegiatan
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  28 September 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Perkemahan Sabtu Minggu (Persami) Latih Disiplin dan Kemandirian Santri
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Regu Pramuka Gugus Depan MTs Al-Huda sukses menyelenggarakan kegiatan alam terbuka di lereng Wilis.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+<!-- Card 5 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Prestasi Drumband" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="School marching band and Islamic drumband ensemble performing during regional city carnival, vibrant green and gold costumes, lively brass and snare instruments" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl_Xm8HcBPn2QqVPR9qNfBfK6fa280ndE3X6T-lsNFCxhVBochHu6zu8LWBaw4b6zZ_hfSRlgXhzLZV7-xIzvX6Qb3I_YBh1VAK-iZXAWw2tnQyV0b9YhfmxV1CGB8mXNm7yfBx8lv0T24q7b3XYwhdAo1mI_O3iCRTrFuiJBYXpMJwt6m4hnHcz2Fm_y_uFGpHhpJLCGJ-SEoyVGRMiONV9ihiRyLTroMM6ezXm2TIGT6mxWDfZlG"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Prestasi
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  22 September 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Grup Drumband Gema Al-Huda Sabet Penghargaan Kostum &amp; Aransemen Terbaik
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Penampilan memukau dalam parade pawai budaya HUT Kabupaten Nganjuk mendapat apresiasi ribuan warga.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+<!-- Card 6 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+<div class="w-full h-[180px] overflow-hidden relative">
+<img alt="Workshop Guru Kurikulum Merdeka" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Indonesian Islamic school teachers and educators gathered in a seminar hall discussing lesson plans with interactive whiteboards and modular laptops, bright and professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDon9hmrb5xgxXkPOWnLyE8iT6B_Reb4jGg3u9bBDNxtTVAbNOmfaQpUZaf2Jwfvwr2dw6Jm7ZH8oB0a1QAGB9YZrrr-RMFtL7Mey6DvmRexjtzR4-h0_KHjfovseBpdDysCdqAIuvjXQ4tLY-7_7V5xVHQKsbgw5HYmQ_cjJtlEwGYIAv6DcVXPGS79J44uRtnn_AvAy3jdVNggYYaT9ijQo_CxCNVPruaBMVjq0_urumK_bC_b968"/>
+<span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-lowest/90 backdrop-blur text-on-secondary-container">
+                Akademik
+              </span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold block mb-1.5">
+                  15 September 2026
+                </span>
+<h3 class="font-title-md text-title-md text-on-surface group-hover:text-secondary transition-colors font-bold line-clamp-2 leading-snug mb-2">
+                  Workshop Kurikulum Merdeka: Optimalisasi Pembelajaran Berdiferensiasi
+                </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">
+                  Dewan asatidz mengikuti pembekalan intensif pemetaan potensi siswa bersama pengawas madrasah.
+                </p>
+</div>
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold" href="#">
+                Baca selengkapnya
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</article>
+</div>
+<!-- C. PAGINASI -->
+<div class="w-full flex flex-col sm:flex-row items-center justify-between gap-space-sm pt-4 border-t-0">
+<p class="font-label-sm text-label-sm text-on-surface-variant order-2 sm:order-1">
+            Menampilkan <span class="font-bold text-on-surface">1–7</span> dari <span class="font-bold text-on-surface">28</span> artikel
+          </p>
+<nav aria-label="Pagination" class="flex items-center gap-1.5 order-1 sm:order-2">
+<button class="px-3.5 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant transition-colors flex items-center gap-1 focus:outline-none" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+              Sebelumnya
+            </button>
+<button class="w-9 h-9 rounded-lg font-label-md text-label-md bg-secondary text-on-secondary font-bold shadow-sm flex items-center justify-center focus:outline-none" type="button">
+              1
+            </button>
+<button class="w-9 h-9 rounded-lg font-label-md text-label-md bg-surface-container-lowest hover:bg-surface-container text-on-surface transition-colors flex items-center justify-center focus:outline-none" type="button">
+              2
+            </button>
+<button class="w-9 h-9 rounded-lg font-label-md text-label-md bg-surface-container-lowest hover:bg-surface-container text-on-surface transition-colors flex items-center justify-center focus:outline-none" type="button">
+              3
+            </button>
+<button class="px-3.5 py-2 rounded-lg font-label-md text-label-md bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant transition-colors flex items-center gap-1 focus:outline-none" type="button">
+              Selanjutnya
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+<!-- RIGHT SIDEBAR (1/3 -> 4 cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-space-lg w-full">
+<!-- A. KARTU "BERITA POPULER" -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-5">
+<span class="w-1.5 h-5 bg-secondary rounded-full"></span>
+<h3 class="font-title-lg text-title-lg text-primary font-bold">
+              Berita Populer
+            </h3>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Item 1 -->
+<a class="group flex items-start gap-3 pb-3 border-b-0 hover:opacity-90 transition-opacity" href="#">
+<span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold flex items-center justify-center shrink-0">
+                1
+              </span>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors font-bold leading-snug line-clamp-2">
+                  Alur dan Persyaratan Resmi PPDB Tahun Pelajaran 2026/2027
+                </h4>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                    12.4k pembaca
+                  </span>
+</div>
+</div>
+</a>
+<!-- Item 2 -->
+<a class="group flex items-start gap-3 pb-3 hover:opacity-90 transition-opacity" href="#">
+<span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold flex items-center justify-center shrink-0">
+                2
+              </span>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors font-bold leading-snug line-clamp-2">
+                  Jadwal Ujian Penilaian Akhir Semester (PAS) Semester Ganjil
+                </h4>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                    8.9k pembaca
+                  </span>
+</div>
+</div>
+</a>
+<!-- Item 3 -->
+<a class="group flex items-start gap-3 pb-3 hover:opacity-90 transition-opacity" href="#">
+<span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold flex items-center justify-center shrink-0">
+                3
+              </span>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors font-bold leading-snug line-clamp-2">
+                  Prestasi Gemilang: Santri MTs Al-Huda Lolos Seleksi KSM Nasional
+                </h4>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                    6.1k pembaca
+                  </span>
+</div>
+</div>
+</a>
+<!-- Item 4 -->
+<a class="group flex items-start gap-3 pb-3 hover:opacity-90 transition-opacity" href="#">
+<span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold flex items-center justify-center shrink-0">
+                4
+              </span>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors font-bold leading-snug line-clamp-2">
+                  Daftar Ekstrakurikuler Pilihan dan Tata Cara Pendaftaran Santri Baru
+                </h4>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                    4.8k pembaca
+                  </span>
+</div>
+</div>
+</a>
+<!-- Item 5 -->
+<a class="group flex items-start gap-3 hover:opacity-90 transition-opacity" href="#">
+<span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold flex items-center justify-center shrink-0">
+                5
+              </span>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface group-hover:text-secondary transition-colors font-bold leading-snug line-clamp-2">
+                  Tata Tertib Madrasah dan Budaya 5S (Senyum, Salam, Sapa, Sopan, Santun)
+                </h4>
+<div class="flex items-center gap-2 mt-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+                    3.5k pembaca
+                  </span>
+</div>
+</div>
+</a>
+</div>
+</div>
+<!-- B. KARTU "KATEGORI" -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-4">
+<span class="w-1.5 h-5 bg-secondary rounded-full"></span>
+<h3 class="font-title-lg text-title-lg text-primary font-bold">
+              Kategori Berita
+            </h3>
+</div>
+<div class="flex flex-col divide-y-0">
+<a class="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary font-medium">Semua Berita</span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">28</span>
+</a>
+<a class="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary font-medium">Berita Kegiatan</span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">12</span>
+</a>
+<a class="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary font-medium">Prestasi Santri</span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">8</span>
+</a>
+<a class="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary font-medium">Pengumuman Resmi</span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">5</span>
+</a>
+<a class="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary font-medium">Artikel &amp; Pembelajaran</span>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">3</span>
+</a>
+</div>
+</div>
+<!-- C. KARTU "LANGGANAN WARTA MADRASAH" -->
+<div class="bg-surface-container-low rounded-xl p-6 shadow-sm relative overflow-hidden">
+<div class="absolute -right-4 -bottom-4 w-28 h-28 bg-secondary-container/40 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center gap-2 mb-2">
+<div class="w-8 h-8 rounded-lg bg-secondary text-on-secondary flex items-center justify-center shrink-0">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="font-title-md text-title-md text-primary font-bold">
+              Kanal Informasi Madrasah
+            </h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4 leading-relaxed">
+            Dapatkan pemberitahuan agenda dan prestasi santri langsung ke email Anda.
+          </p>
+<form class="flex flex-col gap-2.5" onsubmit="event.preventDefault(); alert('Terima kasih telah berlangganan warta MTs Al-Huda!');">
+<input class="w-full px-3.5 py-2.5 bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary placeholder-outline transition-all" placeholder="Masukkan alamat email..." required="" type="email"/>
+<button class="w-full py-2.5 px-4 bg-secondary hover:bg-primary text-on-secondary font-label-md text-label-md rounded-lg shadow-sm transition-colors font-bold text-center flex items-center justify-center gap-1.5" type="submit">
+<span>Langganan</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</form>
+</div>
+</aside>
+</div>
+</div>
+</div></main><footer class="w-full bg-primary-container text-on-primary-fixed"><div class="max-w-[1100px] mx-auto px-4 py-space-xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-lg"><div class="flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><div class="w-[36px] h-[36px] rounded-full bg-secondary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-secondary text-[20px]">mosque</span></div><div class="flex flex-col"><span class="font-title-md text-title-md text-on-primary leading-tight">MTs Al-Huda</span><span class="font-label-sm text-label-sm text-on-primary-container leading-tight">Gondang</span></div></div><p class="font-body-sm text-body-sm text-on-primary-container mt-space-xs">Membina generasi berakhlak mulia, berprestasi akademik, dan berpegang teguh pada nilai-nilai Islami yang moderat.</p><div class="flex flex-col gap-space-xs mt-space-xs font-body-sm text-body-sm text-on-primary-container"><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">location_on</span><span>Jl. Raya Gondang No. 45, Gondang, Mojokerto</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">call</span><span>(0321) 495123</span></div><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px] text-secondary-fixed shrink-0">mail</span><span>info@mtsalhudagondang.sch.id</span></div></div></div><div class="flex flex-col gap-space-sm"><span class="font-title-md text-title-md text-on-primary">Tautan Cepat</span><div class="flex flex-col gap-space-xs"><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="beranda" href="#">Beranda</a><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="profil" href="#">Profil Madrasah</a><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="fasilitas" href="#">Fasilitas Kampus</a><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="galeri" href="#">Galeri Dokumentasi</a><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="berita" href="#">Warta &amp; Berita</a><a class="font-body-sm text-body-sm text-on-primary-container hover:text-on-primary transition-colors" data-path="kontak" href="#">Hubungi Kami</a></div></div><div class="flex flex-col gap-space-sm"><span class="font-title-md text-title-md text-on-primary">Program Akademik</span><div class="flex flex-col gap-space-xs"><span class="font-body-sm text-body-sm text-on-primary-container">Tahfidz Al-Qur'an</span><span class="font-body-sm text-body-sm text-on-primary-container">Madrasah Riset Sains</span><span class="font-body-sm text-body-sm text-on-primary-container">Kelas Unggulan Bahasa Arab &amp; Inggris</span><span class="font-body-sm text-body-sm text-on-primary-container">Kajian Kitab Kuning</span><span class="font-body-sm text-body-sm text-on-primary-container">Pramuka &amp; Kepanduan Islam</span><span class="font-body-sm text-body-sm text-on-primary-container">Ekstrakurikuler Seni Hadrah</span></div></div><div class="flex flex-col gap-space-sm"><span class="font-title-md text-title-md text-on-primary">Jam Operasional &amp; Media</span><div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-primary-container"><div><span class="text-on-primary block">Senin - Kamis:</span><span>07.00 - 14.30 WIB</span></div><div><span class="text-on-primary block">Jumat:</span><span>07.00 - 11.00 WIB</span></div><div><span class="text-on-primary block">Sabtu:</span><span>07.00 - 13.30 WIB</span></div><div><span class="text-on-primary block">Ahad &amp; Hari Libur:</span><span>Tutup</span></div></div><div class="flex items-center gap-space-xs mt-space-sm"><a aria-label="School Media" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-secondary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">public</span></a><a aria-label="School Announcements" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-secondary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">campaign</span></a><a aria-label="School Video Channel" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-secondary transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">smart_display</span></a></div></div></div></div><div class="w-full bg-primary py-space-sm"><div class="max-w-[1100px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between text-on-primary-container font-label-sm text-label-sm"><span>© 2024 MTs Al-Huda Gondang. Hak Cipta Dilindungi.</span><span>Terakreditasi A • Madrasah Tsanawiyah Mandiri Berprestasi</span></div></div></footer></body></html>

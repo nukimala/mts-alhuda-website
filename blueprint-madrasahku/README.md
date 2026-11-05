@@ -94,6 +94,10 @@ Versi siap kirim: `00-DOKUMEN-PERSETUJUAN-MITRA.docx` (A4, halaman sampul terpis
 python tools/md2docx.py PRD.md PRD.docx
 ```
 
+## Panduan demo & integrasi database
+
+Untuk menyiapkan demo tim dan menyambungkan tampilan ke database, baca `15-demo-dan-integrasi-database.md`. Isinya tiga jalur integrasi (controller→model→view, REST API, akun database LAN), contoh kode per halaman, aturan wajib query/escape, susunan demo 12–15 menit beserta skenario cadangan, hasil uji API online, dan rencana kerja menuju demo.
+
 ## Dokumen khusus web
 
 Untuk brainstorming perombakan website, baca `10-perombakan-web.md`. Dokumen itu berisi audit kondisi saat ini, sitemap, struktur folder, tabel CMS, UX admin, keamanan, rencana migrasi, dan prompt siap pakai untuk platform lain.

@@ -3,7 +3,7 @@
  * Rate limiter sederhana berbasis database.
  *
  * Dipakai untuk mencegah brute force login API dan penyalahgunaan endpoint.
- * Tanpa Redis, tanpa memori bersama — cukup tabel `rate_limits`.
+ * Tanpa Redis, tanpa memori bersama — cukup tabel `batas_akses`.
  *
  * Catatan: tabel ini dibuat oleh migrasi 013. Kalau belum ada, limiter
  * melewati pemeriksaan dan mencatatnya di log. API tetap jalan.
@@ -20,18 +20,18 @@ class RateLimiter
             $pdo = Database::connection();
 
             $pdo->prepare(
-                'DELETE FROM rate_limits WHERE expires_at < NOW() LIMIT 500'
+                'DELETE FROM batas_akses WHERE expires_at < NOW() LIMIT 500'
             )->execute();
 
             $stmt = $pdo->prepare(
-                'SELECT attempts, expires_at FROM rate_limits WHERE bucket = ? LIMIT 1'
+                'SELECT attempts, expires_at FROM batas_akses WHERE bucket = ? LIMIT 1'
             );
             $stmt->execute([$key]);
             $row = $stmt->fetch();
 
             if ($row === false) {
                 $pdo->prepare(
-                    'INSERT INTO rate_limits (bucket, attempts, expires_at)
+                    'INSERT INTO batas_akses (bucket, attempts, expires_at)
                      VALUES (?, 1, DATE_ADD(NOW(), INTERVAL ? SECOND))
                      ON DUPLICATE KEY UPDATE attempts = 1, expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)'
                 )->execute([$key, $windowSeconds, $windowSeconds]);
@@ -45,7 +45,7 @@ class RateLimiter
                 return ['allowed' => false, 'remaining' => 0, 'retry_after' => $retry];
             }
 
-            $pdo->prepare('UPDATE rate_limits SET attempts = attempts + 1 WHERE bucket = ?')
+            $pdo->prepare('UPDATE batas_akses SET attempts = attempts + 1 WHERE bucket = ?')
                 ->execute([$key]);
 
             return [
@@ -63,7 +63,7 @@ class RateLimiter
     {
         try {
             Database::connection()
-                ->prepare('DELETE FROM rate_limits WHERE bucket = ?')
+                ->prepare('DELETE FROM batas_akses WHERE bucket = ?')
                 ->execute([$key]);
         } catch (PDOException $e) {
             // diabaikan

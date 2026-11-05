@@ -23,7 +23,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS accreditation_periods (
+CREATE TABLE IF NOT EXISTS `periode_akreditasi` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     name        VARCHAR(80)     NOT NULL,           -- "Akreditasi 2026"
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS accreditation_periods (
     CONSTRAINT chk_acc_periods_range CHECK (end_date IS NULL OR start_date IS NULL OR end_date > start_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS accreditation_components (
+CREATE TABLE IF NOT EXISTS `komponen_akreditasi` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     period_id  BIGINT UNSIGNED NOT NULL,
 
@@ -62,11 +62,11 @@ CREATE TABLE IF NOT EXISTS accreditation_components (
     PRIMARY KEY (id),
     UNIQUE KEY uq_acc_components_code (period_id, code),
     KEY idx_acc_components_order (period_id, sort_order, number),
-    CONSTRAINT fk_acc_components_period FOREIGN KEY (period_id) REFERENCES accreditation_periods (id)
+    CONSTRAINT fk_acc_components_period FOREIGN KEY (period_id) REFERENCES `periode_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS accreditation_butirs (
+CREATE TABLE IF NOT EXISTS `butir_akreditasi` (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     component_id BIGINT UNSIGNED NOT NULL,
 
@@ -84,11 +84,11 @@ CREATE TABLE IF NOT EXISTS accreditation_butirs (
     UNIQUE KEY uq_acc_butirs_number (component_id, number),
     KEY idx_acc_butirs_order (component_id, sort_order, number),
     KEY idx_acc_butirs_status (status),
-    CONSTRAINT fk_acc_butirs_component FOREIGN KEY (component_id) REFERENCES accreditation_components (id)
+    CONSTRAINT fk_acc_butirs_component FOREIGN KEY (component_id) REFERENCES `komponen_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS accreditation_indicators (
+CREATE TABLE IF NOT EXISTS `indikator_akreditasi` (
     id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     butir_id       BIGINT UNSIGNED NOT NULL,
 
@@ -102,13 +102,13 @@ CREATE TABLE IF NOT EXISTS accreditation_indicators (
     PRIMARY KEY (id),
     UNIQUE KEY uq_acc_indicators_number (butir_id, number),
     KEY idx_acc_indicators_order (butir_id, sort_order, number),
-    CONSTRAINT fk_acc_indicators_butir FOREIGN KEY (butir_id) REFERENCES accreditation_butirs (id)
+    CONSTRAINT fk_acc_indicators_butir FOREIGN KEY (butir_id) REFERENCES `butir_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS accreditation_indicators;
-DROP TABLE IF EXISTS accreditation_butirs;
-DROP TABLE IF EXISTS accreditation_components;
-DROP TABLE IF EXISTS accreditation_periods;
+DROP TABLE IF EXISTS `indikator_akreditasi`;
+DROP TABLE IF EXISTS `butir_akreditasi`;
+DROP TABLE IF EXISTS `komponen_akreditasi`;
+DROP TABLE IF EXISTS `periode_akreditasi`;

@@ -50,7 +50,7 @@ class ApiContentController
         $whereSql = implode(' AND ', $where);
         $pdo = Database::connection();
 
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM posts p WHERE {$whereSql}");
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM berita p WHERE {$whereSql}");
         $countStmt->execute($args);
         $total = (int) $countStmt->fetchColumn();
 
@@ -59,8 +59,8 @@ class ApiContentController
         $sql = "SELECT p.id, p.public_id, p.title, p.slug, p.excerpt, p.cover_path,
                        p.is_featured, p.views, p.published_at,
                        u.name AS author_name
-                FROM posts p
-                LEFT JOIN users u ON u.id = p.author_id
+                FROM berita p
+                LEFT JOIN pengguna u ON u.id = p.author_id
                 WHERE {$whereSql}
                 ORDER BY p.published_at DESC, p.id DESC
                 LIMIT {$page['per_page']} OFFSET {$page['offset']}";
@@ -88,7 +88,7 @@ class ApiContentController
         }
 
         ApiResponse::json(
-            ['posts' => $posts],
+            ['berita' => $posts],
             200,
             ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]
         );
@@ -115,8 +115,8 @@ class ApiContentController
             "SELECT p.id, p.public_id, p.title, p.slug, p.excerpt, p.content, p.cover_path,
                     p.is_featured, p.views, p.published_at,
                     u.name AS author_name
-             FROM posts p
-             LEFT JOIN users u ON u.id = p.author_id
+             FROM berita p
+             LEFT JOIN pengguna u ON u.id = p.author_id
              WHERE p.slug = ?
                AND p.status = 'published'
                AND p.deleted_at IS NULL
@@ -131,7 +131,7 @@ class ApiContentController
             return;
         }
 
-        $pdo->prepare('UPDATE posts SET views = views + 1 WHERE id = ?')
+        $pdo->prepare('UPDATE berita SET views = views + 1 WHERE id = ?')
             ->execute([(int) $row['id']]);
 
         ApiResponse::ok([
@@ -194,13 +194,13 @@ class ApiContentController
 
         $pdo = Database::connection();
 
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM announcements a WHERE {$where}");
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM pengumuman a WHERE {$where}");
         $countStmt->execute($audiences);
         $total = (int) $countStmt->fetchColumn();
 
         $stmt = $pdo->prepare(
             "SELECT a.id, a.title, a.slug, a.content, a.audience, a.is_pinned, a.published_at
-             FROM announcements a
+             FROM pengumuman a
              WHERE {$where}
              ORDER BY a.is_pinned DESC, a.published_at DESC, a.id DESC
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
@@ -221,7 +221,7 @@ class ApiContentController
         }
 
         ApiResponse::json(
-            ['announcements' => $items],
+            ['pengumuman' => $items],
             200,
             ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]
         );
@@ -253,14 +253,14 @@ class ApiContentController
 
         $pdo = Database::connection();
 
-        $countStmt = $pdo->query("SELECT COUNT(*) FROM agendas a WHERE {$where}");
+        $countStmt = $pdo->query("SELECT COUNT(*) FROM agenda a WHERE {$where}");
         $total = (int) $countStmt->fetchColumn();
 
         $order = $past ? 'a.start_at DESC' : 'a.start_at ASC';
 
         $stmt = $pdo->query(
             "SELECT a.id, a.title, a.description, a.location, a.start_at, a.end_at, a.all_day
-             FROM agendas a
+             FROM agenda a
              WHERE {$where}
              ORDER BY {$order}
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
@@ -280,7 +280,7 @@ class ApiContentController
         }
 
         ApiResponse::json(
-            ['agendas' => $items],
+            ['agenda' => $items],
             200,
             ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]
         );
@@ -295,12 +295,12 @@ class ApiContentController
         $pdo = Database::connection();
 
         $total = (int) $pdo->query(
-            'SELECT COUNT(*) FROM facilities WHERE is_active = 1 AND deleted_at IS NULL'
+            'SELECT COUNT(*) FROM fasilitas WHERE is_active = 1 AND deleted_at IS NULL'
         )->fetchColumn();
 
         $stmt = $pdo->query(
             "SELECT id, name, description, image_path, icon, sort_order
-             FROM facilities
+             FROM fasilitas
              WHERE is_active = 1 AND deleted_at IS NULL
              ORDER BY sort_order ASC, id ASC
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
@@ -318,7 +318,7 @@ class ApiContentController
         }
 
         ApiResponse::json(
-            ['facilities' => $items],
+            ['fasilitas' => $items],
             200,
             ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]
         );
@@ -342,13 +342,13 @@ class ApiContentController
 
         $pdo = Database::connection();
 
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM galleries WHERE {$where}");
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM galeri WHERE {$where}");
         $countStmt->execute($args);
         $total = (int) $countStmt->fetchColumn();
 
         $stmt = $pdo->prepare(
             "SELECT id, album, title, image_path, caption, sort_order
-             FROM galleries
+             FROM galeri
              WHERE {$where}
              ORDER BY album ASC, sort_order ASC, id ASC
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
@@ -367,7 +367,7 @@ class ApiContentController
         }
 
         ApiResponse::json(
-            ['galleries' => $items],
+            ['galeri' => $items],
             200,
             ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]
         );
@@ -389,7 +389,7 @@ class ApiContentController
 
         $stmt = Database::connection()->prepare(
             "SELECT slug, title, content, meta_title, meta_description, updated_at
-             FROM pages
+             FROM halaman
              WHERE slug = ? AND status = 'published' AND deleted_at IS NULL
              LIMIT 1"
         );

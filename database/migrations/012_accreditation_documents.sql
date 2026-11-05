@@ -16,7 +16,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS main_documents (
+CREATE TABLE IF NOT EXISTS `dokumen_utama` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     period_id   BIGINT UNSIGNED NOT NULL,
 
@@ -39,13 +39,13 @@ CREATE TABLE IF NOT EXISTS main_documents (
     PRIMARY KEY (id),
     KEY idx_main_documents_period (period_id, doc_type, sort_order),
     KEY idx_main_documents_status (period_id, status),
-    CONSTRAINT fk_main_documents_period FOREIGN KEY (period_id) REFERENCES accreditation_periods (id)
+    CONSTRAINT fk_main_documents_period FOREIGN KEY (period_id) REFERENCES `periode_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_main_documents_uploader FOREIGN KEY (uploaded_by) REFERENCES users (id)
+    CONSTRAINT fk_main_documents_uploader FOREIGN KEY (uploaded_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE IF NOT EXISTS `agenda_tugas` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     period_id   BIGINT UNSIGNED NOT NULL,
 
@@ -67,15 +67,15 @@ CREATE TABLE IF NOT EXISTS tasks (
     KEY idx_tasks_assignee (assigned_to, status, due_date),
     KEY idx_tasks_period (period_id, status, due_date),
     KEY idx_tasks_overdue (due_date, status),
-    CONSTRAINT fk_tasks_period FOREIGN KEY (period_id) REFERENCES accreditation_periods (id)
+    CONSTRAINT fk_tasks_period FOREIGN KEY (period_id) REFERENCES `periode_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_tasks_assignee FOREIGN KEY (assigned_to) REFERENCES users (id)
+    CONSTRAINT fk_tasks_assignee FOREIGN KEY (assigned_to) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_tasks_creator FOREIGN KEY (created_by) REFERENCES users (id)
+    CONSTRAINT fk_tasks_creator FOREIGN KEY (created_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS accreditation_results (
+CREATE TABLE IF NOT EXISTS `hasil_akreditasi` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     period_id   BIGINT UNSIGNED NOT NULL,
 
@@ -93,14 +93,14 @@ CREATE TABLE IF NOT EXISTS accreditation_results (
     PRIMARY KEY (id),
     UNIQUE KEY uq_acc_results_period (period_id),
     KEY idx_acc_results_grade (grade, decided_at),
-    CONSTRAINT fk_acc_results_period FOREIGN KEY (period_id) REFERENCES accreditation_periods (id)
+    CONSTRAINT fk_acc_results_period FOREIGN KEY (period_id) REFERENCES `periode_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_acc_results_by FOREIGN KEY (decided_by) REFERENCES users (id)
+    CONSTRAINT fk_acc_results_by FOREIGN KEY (decided_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_acc_results_score CHECK (score IS NULL OR (score >= 0 AND score <= 100))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS follow_ups (
+CREATE TABLE IF NOT EXISTS `tindak_lanjut` (
     id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     result_id      BIGINT UNSIGNED NOT NULL,
 
@@ -117,15 +117,15 @@ CREATE TABLE IF NOT EXISTS follow_ups (
     KEY idx_follow_ups_result (result_id, status, due_date),
     KEY idx_follow_ups_open (status, due_date),
     KEY idx_follow_ups_owner (responsible_id),
-    CONSTRAINT fk_follow_ups_result FOREIGN KEY (result_id) REFERENCES accreditation_results (id)
+    CONSTRAINT fk_follow_ups_result FOREIGN KEY (result_id) REFERENCES `hasil_akreditasi` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_follow_ups_owner FOREIGN KEY (responsible_id) REFERENCES users (id)
+    CONSTRAINT fk_follow_ups_owner FOREIGN KEY (responsible_id) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS follow_ups;
-DROP TABLE IF EXISTS accreditation_results;
-DROP TABLE IF EXISTS tasks;
-DROP TABLE IF EXISTS main_documents;
+DROP TABLE IF EXISTS `tindak_lanjut`;
+DROP TABLE IF EXISTS `hasil_akreditasi`;
+DROP TABLE IF EXISTS `agenda_tugas`;
+DROP TABLE IF EXISTS `dokumen_utama`;

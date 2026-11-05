@@ -8,7 +8,7 @@
 -- jadi aman dijalankan berulang tanpa menggandakan baris.
 -- ============================================================================
 
-INSERT INTO settings (setting_key, setting_value, value_type, group_name, label, is_public) VALUES
+INSERT INTO `pengaturan` (setting_key, setting_value, value_type, group_name, label, is_public) VALUES
 -- --- identitas -------------------------------------------------------------
 ('site_name',        'MTs Al-Huda',                          'string', 'identitas', 'Nama madrasah',        1),
 ('site_subtitle',    'Gondang',                              'string', 'identitas', 'Keterangan nama',      1),

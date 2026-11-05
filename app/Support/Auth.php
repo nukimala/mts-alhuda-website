@@ -55,7 +55,7 @@ class Auth
         $stmt = Database::connection()->prepare(
             'SELECT id, name, email, username, role, role_label, avatar_path,
                     is_active, must_change_password, last_login_at
-             FROM users
+             FROM pengguna
              WHERE id = ? AND deleted_at IS NULL
              LIMIT 1'
         );
@@ -123,7 +123,7 @@ class Auth
         $stmt = $pdo->prepare(
             'SELECT id, name, password_hash, role, is_active, must_change_password,
                     failed_login_attempts, locked_until
-             FROM users
+             FROM pengguna
              WHERE (email = ? OR username = ?) AND deleted_at IS NULL
              LIMIT 1'
         );
@@ -166,11 +166,11 @@ class Auth
             }
 
             $upd = $pdo->prepare(
-                'UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?'
+                'UPDATE pengguna SET failed_login_attempts = ?, locked_until = ? WHERE id = ?'
             );
             $upd->execute([$attempts, $lockUntil, $userId]);
 
-            self::log('login.failed', 'users', $userId, 'Percobaan login gagal', $ip);
+            self::log('login.failed', 'pengguna', $userId, 'Percobaan login gagal', $ip);
 
             return $pesan;
         }
@@ -178,7 +178,7 @@ class Auth
         // Berhasil. Reset penghitung, perbarui waktu masuk, perbarui hash kalau
         // algoritmanya sudah usang.
         $upd = $pdo->prepare(
-            'UPDATE users
+            'UPDATE pengguna
              SET failed_login_attempts = 0, locked_until = NULL,
                  last_login_at = NOW(), last_login_ip = ?
              WHERE id = ?'
@@ -186,7 +186,7 @@ class Auth
         $upd->execute([$ip, $userId]);
 
         if (password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT)) {
-            $rehash = $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+            $rehash = $pdo->prepare('UPDATE pengguna SET password_hash = ? WHERE id = ?');
             $rehash->execute([password_hash($password, PASSWORD_DEFAULT), $userId]);
         }
 
@@ -195,7 +195,7 @@ class Auth
         $_SESSION[self::SESSION_KEY] = $userId;
         self::$cachedUser = null;
 
-        self::log('login.success', 'users', $userId, 'Berhasil masuk panel admin', $ip);
+        self::log('login.success', 'pengguna', $userId, 'Berhasil masuk panel admin', $ip);
 
         return null;
     }
@@ -244,7 +244,7 @@ class Auth
 
         try {
             $stmt = Database::connection()->prepare(
-                'SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1'
+                'SELECT setting_value FROM pengaturan WHERE setting_key = ? LIMIT 1'
             );
             $stmt->execute([$key]);
             $value = $stmt->fetchColumn();
@@ -261,7 +261,7 @@ class Auth
     {
         try {
             $stmt = Database::connection()->prepare(
-                'INSERT INTO activity_logs (user_id, action, entity, entity_id, description, ip_address, user_agent)
+                'INSERT INTO log_aktivitas (user_id, action, entity, entity_id, description, ip_address, user_agent)
                  VALUES (?, ?, ?, ?, ?, ?, ?)'
             );
             $stmt->execute([

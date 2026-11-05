@@ -3,7 +3,7 @@
 -- academic_years, classes, subjects, class_subjects
 --
 -- Sekaligus menutup utang dari migrasi 002: `students.class_id` dibuat tanpa
--- foreign key di sana karena tabel `classes` belum ada. Di sini FK-nya
+-- foreign key di sana karena tabel `kelas` belum ada. Di sini FK-nya
 -- ditambahkan lewat ALTER TABLE.
 --
 -- Keputusan K-3: hanya boleh ada SATU tahun ajaran aktif.
@@ -15,7 +15,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS academic_years (
+CREATE TABLE IF NOT EXISTS `tahun_akademik` (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name        VARCHAR(40)     NOT NULL,          -- "2025/2026"
     start_date  DATE            NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS academic_years (
     CONSTRAINT chk_academic_years_range CHECK (end_date > start_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS classes (
+CREATE TABLE IF NOT EXISTS `kelas` (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     academic_year_id    BIGINT UNSIGNED NOT NULL,
 
@@ -54,14 +54,14 @@ CREATE TABLE IF NOT EXISTS classes (
     UNIQUE KEY uq_classes_year_name (academic_year_id, name),
     KEY idx_classes_level (academic_year_id, level, sort_order),
     KEY idx_classes_homeroom (homeroom_teacher_id),
-    CONSTRAINT fk_classes_year FOREIGN KEY (academic_year_id) REFERENCES academic_years (id)
+    CONSTRAINT fk_classes_year FOREIGN KEY (academic_year_id) REFERENCES `tahun_akademik` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_classes_homeroom FOREIGN KEY (homeroom_teacher_id) REFERENCES teachers (id)
+    CONSTRAINT fk_classes_homeroom FOREIGN KEY (homeroom_teacher_id) REFERENCES `guru` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_classes_level CHECK (level BETWEEN 1 AND 12)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS subjects (
+CREATE TABLE IF NOT EXISTS `mata_pelajaran` (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     code       VARCHAR(20)     NOT NULL,            -- "MTK", "QH"
     name       VARCHAR(120)    NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS subjects (
 
 -- Mata pelajaran yang diajarkan di satu kelas, oleh satu guru.
 -- teacher_id boleh NULL: pembagian tugas mengajar sering ditentukan belakangan.
-CREATE TABLE IF NOT EXISTS class_subjects (
+CREATE TABLE IF NOT EXISTS `mata_pelajaran_kelas` (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     class_id      BIGINT UNSIGNED NOT NULL,
     subject_id    BIGINT UNSIGNED NOT NULL,
@@ -96,26 +96,26 @@ CREATE TABLE IF NOT EXISTS class_subjects (
     UNIQUE KEY uq_class_subjects_pair (class_id, subject_id),
     KEY idx_class_subjects_teacher (teacher_id),
     KEY idx_class_subjects_subject (subject_id),
-    CONSTRAINT fk_class_subjects_class FOREIGN KEY (class_id) REFERENCES classes (id)
+    CONSTRAINT fk_class_subjects_class FOREIGN KEY (class_id) REFERENCES `kelas` (id)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_class_subjects_subject FOREIGN KEY (subject_id) REFERENCES subjects (id)
+    CONSTRAINT fk_class_subjects_subject FOREIGN KEY (subject_id) REFERENCES `mata_pelajaran` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_class_subjects_teacher FOREIGN KEY (teacher_id) REFERENCES teachers (id)
+    CONSTRAINT fk_class_subjects_teacher FOREIGN KEY (teacher_id) REFERENCES `guru` (id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- FK yang ditunda dari migrasi 002.
 -- ON DELETE SET NULL: kalau kelas dihapus, siswa tetap ada tapi tanpa kelas.
 -- Menghapus siswa karena kelasnya dihapus adalah kehilangan data.
-ALTER TABLE students
-    ADD CONSTRAINT fk_students_class FOREIGN KEY (class_id) REFERENCES classes (id)
+ALTER TABLE `siswa`
+    ADD CONSTRAINT fk_students_class FOREIGN KEY (class_id) REFERENCES `kelas` (id)
         ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- @DOWN
 
-ALTER TABLE students DROP FOREIGN KEY fk_students_class;
+ALTER TABLE `siswa` DROP FOREIGN KEY fk_students_class;
 
-DROP TABLE IF EXISTS class_subjects;
-DROP TABLE IF EXISTS subjects;
-DROP TABLE IF EXISTS classes;
-DROP TABLE IF EXISTS academic_years;
+DROP TABLE IF EXISTS `mata_pelajaran_kelas`;
+DROP TABLE IF EXISTS `mata_pelajaran`;
+DROP TABLE IF EXISTS `kelas`;
+DROP TABLE IF EXISTS `tahun_akademik`;

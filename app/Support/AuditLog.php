@@ -21,7 +21,7 @@ class AuditLog
         try {
             Database::connection()
                 ->prepare(
-                    'INSERT INTO activity_logs
+                    'INSERT INTO log_aktivitas
                         (user_id, action, entity, entity_id, description, ip_address, user_agent)
                      VALUES (?, ?, ?, ?, ?, ?, ?)'
                 )

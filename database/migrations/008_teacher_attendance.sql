@@ -22,7 +22,7 @@
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS teacher_attendances (
+CREATE TABLE IF NOT EXISTS `presensi_guru` (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     teacher_id      BIGINT UNSIGNED NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS teacher_attendances (
     -- catatan audit. Menghapus guru tidak boleh menghapus riwayat
     -- kehadirannya diam-diam. Guru yang tidak lagi mengajar cukup
     -- dinonaktifkan lewat users.is_active = 0.
-    CONSTRAINT fk_attendance_teacher FOREIGN KEY (teacher_id) REFERENCES teachers (id)
+    CONSTRAINT fk_attendance_teacher FOREIGN KEY (teacher_id) REFERENCES `guru` (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     -- ON DELETE RESTRICT, bukan SET NULL. Kalau jadwal dihapus dan schedule_id
     -- jadi NULL, presensi per jam mengajar berubah jadi presensi harian dan
@@ -82,9 +82,9 @@ CREATE TABLE IF NOT EXISTS teacher_attendances (
     -- MariaDB mengizinkannya, jadi perbedaan ini baru muncul saat pindah
     -- engine. Tidak ada yang hilang: `id` adalah AUTO_INCREMENT yang tidak
     -- pernah berubah, sehingga CASCADE di sini tidak pernah terpicu.
-    CONSTRAINT fk_attendance_schedule FOREIGN KEY (schedule_id) REFERENCES schedules (id)
+    CONSTRAINT fk_attendance_schedule FOREIGN KEY (schedule_id) REFERENCES `jadwal` (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT fk_attendance_verifier FOREIGN KEY (verified_by) REFERENCES users (id)
+    CONSTRAINT fk_attendance_verifier FOREIGN KEY (verified_by) REFERENCES `pengguna` (id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_attendance_type CHECK (
         (attendance_type = 'daily'   AND schedule_id IS NULL) OR
@@ -97,4 +97,4 @@ CREATE TABLE IF NOT EXISTS teacher_attendances (
 
 -- @DOWN
 
-DROP TABLE IF EXISTS teacher_attendances;
+DROP TABLE IF EXISTS `presensi_guru`;

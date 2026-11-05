@@ -39,7 +39,7 @@ class ApiAuth
         }
 
         $stmt = $pdo->prepare(
-            'INSERT INTO api_tokens
+            'INSERT INTO token_api
                 (user_id, access_token_hash, refresh_token_hash, device_name, platform,
                  ip_address, user_agent, access_expires_at, refresh_expires_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
@@ -75,7 +75,7 @@ class ApiAuth
 
         $stmt = $pdo->prepare(
             'SELECT id, user_id, device_name, platform
-             FROM api_tokens
+             FROM token_api
              WHERE refresh_token_hash = ?
                AND revoked_at IS NULL
                AND refresh_expires_at > NOW()
@@ -89,7 +89,7 @@ class ApiAuth
         }
 
         // Akun masih aktif?
-        $check = $pdo->prepare('SELECT is_active FROM users WHERE id = ? AND deleted_at IS NULL LIMIT 1');
+        $check = $pdo->prepare('SELECT is_active FROM pengguna WHERE id = ? AND deleted_at IS NULL LIMIT 1');
         $check->execute([(int) $row['user_id']]);
         $active = $check->fetchColumn();
 
@@ -97,7 +97,7 @@ class ApiAuth
             return null;
         }
 
-        $pdo->prepare('UPDATE api_tokens SET revoked_at = NOW() WHERE id = ?')
+        $pdo->prepare('UPDATE token_api SET revoked_at = NOW() WHERE id = ?')
             ->execute([(int) $row['id']]);
 
         return self::issue(
@@ -130,8 +130,8 @@ class ApiAuth
         $stmt = $pdo->prepare(
             'SELECT t.id AS token_id, t.user_id, u.id, u.name, u.email, u.username,
                     u.role, u.role_label, u.must_change_password
-             FROM api_tokens t
-             JOIN users u ON u.id = t.user_id
+             FROM token_api t
+             JOIN pengguna u ON u.id = t.user_id
              WHERE t.access_token_hash = ?
                AND t.revoked_at IS NULL
                AND t.access_expires_at > NOW()
@@ -149,7 +149,7 @@ class ApiAuth
         // Catat pemakaian terakhir. Tidak setiap request — cukup sekali per menit,
         // supaya tidak ada UPDATE di setiap panggilan.
         $pdo->prepare(
-            'UPDATE api_tokens SET last_used_at = NOW()
+            'UPDATE token_api SET last_used_at = NOW()
              WHERE id = ? AND (last_used_at IS NULL OR last_used_at < DATE_SUB(NOW(), INTERVAL 1 MINUTE))'
         )->execute([(int) $row['token_id']]);
 
@@ -166,14 +166,14 @@ class ApiAuth
         }
 
         Database::connection()
-            ->prepare('UPDATE api_tokens SET revoked_at = NOW() WHERE id = ?')
+            ->prepare('UPDATE token_api SET revoked_at = NOW() WHERE id = ?')
             ->execute([(int) $user['token_id']]);
     }
 
     public static function revokeAllForUser(int $userId): int
     {
         $stmt = Database::connection()->prepare(
-            'UPDATE api_tokens SET revoked_at = NOW() WHERE user_id = ? AND revoked_at IS NULL'
+            'UPDATE token_api SET revoked_at = NOW() WHERE user_id = ? AND revoked_at IS NULL'
         );
         $stmt->execute([$userId]);
 
@@ -221,7 +221,7 @@ class ApiAuth
     {
         try {
             $stmt = Database::connection()->prepare(
-                'SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1'
+                'SELECT setting_value FROM pengaturan WHERE setting_key = ? LIMIT 1'
             );
             $stmt->execute([$key]);
             $value = $stmt->fetchColumn();

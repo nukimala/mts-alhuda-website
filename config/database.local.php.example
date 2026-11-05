@@ -1,0 +1,19 @@
+<?php
+/**
+ * Konfigurasi Database untuk Lingkungan Server / Hosting (cPanel).
+ *
+ * Salin file ini menjadi `database.local.php` di folder `config/`
+ * lalu sesuaikan nilai koneksi database dari cPanel Anda.
+ */
+
+return [
+    'host'     => '127.0.0.1', // atau 'localhost'
+    'port'     => 3306,
+    'database' => 'nama_cpanel_mtsalhuda', // Nama database cPanel Anda
+    'username' => 'nama_cpanel_dbuser',   // Username database cPanel Anda
+    'password' => 'PasswordDatabaseAnda',  // Password database cPanel Anda
+    'charset'  => 'utf8mb4',
+    'collation'=> 'utf8mb4_unicode_ci',
+    'timezone' => '+07:00',
+    'app_env'  => 'production',
+];

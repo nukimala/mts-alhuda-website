@@ -6,13 +6,13 @@
 --
 -- Catatan penting:
 --   students.class_id sengaja dibuat TANPA foreign key di sini.
---   Tabel `classes` baru dibuat pada migrasi 006. FK-nya ditambahkan di sana
+--   Tabel `kelas` baru dibuat pada migrasi 006. FK-nya ditambahkan di sana
 --   lewat ALTER TABLE. Kalau dipaksakan sekarang, migrasi ini akan gagal.
 -- ============================================================================
 
 -- @UP
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS `pengguna` (
     id                    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name                  VARCHAR(120)    NOT NULL,
     email                 VARCHAR(160)    NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS users (
     KEY idx_users_locked (locked_until)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS teachers (
+CREATE TABLE IF NOT EXISTS `guru` (
     id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id            BIGINT UNSIGNED NOT NULL,
     nip                VARCHAR(30)     NULL,
@@ -63,11 +63,11 @@ CREATE TABLE IF NOT EXISTS teachers (
     UNIQUE KEY uq_teachers_nip (nip),
     UNIQUE KEY uq_teachers_nuptk (nuptk),
     KEY idx_teachers_status (employment_status),
-    CONSTRAINT fk_teachers_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_teachers_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS students (
+CREATE TABLE IF NOT EXISTS `siswa` (
     id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id        BIGINT UNSIGNED NOT NULL,
     nis            VARCHAR(20)     NOT NULL,
@@ -88,12 +88,12 @@ CREATE TABLE IF NOT EXISTS students (
     UNIQUE KEY uq_students_nis (nis),
     UNIQUE KEY uq_students_nisn (nisn),
     KEY idx_students_class_active (class_id, is_active),
-    CONSTRAINT fk_students_user FOREIGN KEY (user_id) REFERENCES users (id)
+    CONSTRAINT fk_students_user FOREIGN KEY (user_id) REFERENCES `pengguna` (id)
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- @DOWN
 
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS teachers;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS `siswa`;
+DROP TABLE IF EXISTS `guru`;
+DROP TABLE IF EXISTS `pengguna`;
