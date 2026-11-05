@@ -68,7 +68,7 @@ $facilities = $data['facilities'] ?? [];
                          style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
                 <h4 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-top: 14px; margin-bottom: 2px;">
-                    Drs. H. M. Sholihin, M.Pd.I
+                    M. Abdul Haris Jauhari, S.Pd.I
                 </h4>
                 <p style="font-size: 12px; color: #15803D; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
                     Kepala Madrasah

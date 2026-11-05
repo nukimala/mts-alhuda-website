@@ -41,11 +41,11 @@ $settings = $data['settings'] ?? [];
                     </div>
                     <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
                         <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">NPSN / NSM</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">20582910 / 121235180045</strong>
+                        <strong style="color: #0F172A; font-size: 14.5px;">20582910 / 121235180039</strong>
                     </div>
                     <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
                         <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Kepala Madrasah</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">Drs. H. M. Sholihin, M.Pd.I</strong>
+                        <strong style="color: #0F172A; font-size: 14.5px;">M. Abdul Haris Jauhari, S.Pd.I</strong>
                     </div>
                     <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
                         <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Alamat Lengkap</span>

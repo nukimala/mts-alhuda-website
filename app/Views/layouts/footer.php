@@ -13,7 +13,7 @@
                 Madrasah Tsanawiyah terpadu yang memadukan kurikulum nasional dan nilai-nilai kepesantrenan untuk membina generasi cerdas, mandiri, dan berakhlakul karimah.
             </p>
             <div style="font-size: 12px; color: #BBF7D0;">
-                NPSN: <strong>20582910</strong> • NSM: <strong>121235180045</strong>
+                NPSN: <strong>20582910</strong> • NSM: <strong>121235180039</strong>
             </div>
         </div>
 
