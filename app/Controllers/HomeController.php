@@ -25,7 +25,7 @@ class HomeController
         $settingsRaw = $pdo->query("SELECT setting_key, setting_value FROM pengaturan WHERE is_public = 1")->fetchAll(PDO::FETCH_KEY_PAIR);
 
         $data = [
-            'title' => 'MTs Al-Huda Gondang — Madrasah Berakhlak Mulia & Berprestasi',
+            'title' => 'MTs Al-Huda Gondang | Madrasah Berakhlak Mulia & Berprestasi',
             'latest_posts' => $latestPosts,
             'facilities' => $facilities,
             'settings' => $settingsRaw,

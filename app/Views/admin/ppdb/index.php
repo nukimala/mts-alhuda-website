@@ -10,7 +10,7 @@ $documents = $data['documents'] ?? [];
 
 <div class="page-head">
     <div>
-        <h1>PPDB — Informasi &amp; Dokumen</h1>
+        <h1>PPDB: Informasi &amp; Dokumen</h1>
         <p>Halaman publik <b>/ppdb</b> &middot; <?= count($documents) ?> dokumen terdaftar &middot; <?= (int) $data['total_downloads'] ?> total unduhan</p>
     </div>
     <div class="actions">

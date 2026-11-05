@@ -8,48 +8,39 @@ $facilities = $data['facilities'] ?? [];
 
 <main>
     <!-- HERO SECTION -->
-    <section class="hero" style="background: #F8FAF9; padding: 60px 0 55px; border-bottom: 1px solid #E1ECE5;">
-        <div class="container hero-grid" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: center;">
-            <div class="hero-copy">
-                <div class="eyebrow" style="display: inline-flex; align-items: center; gap: 8px; background: #DCFCE7; color: #15803D; padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 16px; border: 1px solid #BBF7D0;">
-                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#15803D;"></span> Terakreditasi "A" Unggul BAN-PDM
+    <section class="hero-v2">
+        <div class="container hero-v2-grid">
+            <div class="hero-v2-copy">
+                <div class="hero-tag-badge">
+                    <span class="hero-tag-dot"></span>
+                    <span>Terakreditasi "A" (Unggul) BAN-PDM</span>
                 </div>
-                <h1 style="font-size: 38px; line-height: 1.22; font-weight: 800; color: #0F172A; margin-bottom: 18px; letter-spacing: -0.02em;">
-                    Membentuk Generasi Cerdas, Berilmu Amaliah, dan <span style="color: #15803D;">Berakhlakul Karimah.</span>
+                <h1 class="hero-v2-title">
+                    Membentuk Generasi Cerdas, Berilmu Amaliah, dan <span>Berakhlakul Karimah.</span>
                 </h1>
-                <p class="hero-description" style="font-size: 15px; color: #475569; line-height: 1.65; margin-bottom: 26px;">
-                    MTs Al-Huda Gondang memadukan kurikulum nasional dan nilai-nilai luhur kepesantrenan. Didukung fasilitas digital, bimbingan tahfidz intensif, dan lingkungan asri di Desa Pandean, Gondang, Kab. Nganjuk.
+                <p class="hero-v2-desc">
+                    MTs Al-Huda Gondang menyelenggarakan pendidikan tingkat menengah pertama terpadu yang memadukan kurikulum nasional dan pembiasaan nilai kepesantrenan di Desa Pandean, Kecamatan Gondang, Kabupaten Nganjuk.
                 </p>
-                <div class="hero-actions" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px;">
-                    <a href="<?= url('akademik') ?>" class="btn btn-primary" style="padding: 11px 22px; font-size: 14px; font-weight: 700; border-radius: 10px;">
-                        Jelajahi Akademik &amp; Jadwal
+                <div class="hero-v2-actions">
+                    <a href="<?= url('ppdb') ?>" class="btn btn-primary">
+                        Informasi &amp; Pendaftaran PPDB
                     </a>
-                    <a href="<?= url('ppdb') ?>" class="btn btn-outline" style="padding: 11px 22px; font-size: 14px; font-weight: 700; border-radius: 10px; border-color: #CBD5E1;">
-                        Informasi PPDB 2026/2027
+                    <a href="<?= url('profil') ?>" class="btn btn-secondary">
+                        Profil &amp; Visi Madrasah
                     </a>
-                </div>
-                <div class="trust-line" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #64748B;">
-                    <span style="font-size: 18px;">🏛️</span>
-                    <span>Dipercaya <strong>187+ siswa aktif</strong> dan wali santri se-Kecamatan Gondang</span>
                 </div>
             </div>
 
-            <div class="hero-visual" style="position: relative;">
-                <div style="border-radius: 16px; overflow: hidden; box-shadow: 0 16px 36px rgba(15,61,30,.15); border: 4px solid #fff;">
+            <div class="hero-v2-visual">
+                <div class="hero-visual-frame">
                     <img src="<?= base_url('assets/images/Mengikuti Upacara Pembukaan Jambore Cabang.jpg') ?>"
-                         alt="Kegiatan Santri MTs Al-Huda Gondang"
+                         alt="Kegiatan Kepramukaan Santri MTs Al-Huda Gondang"
                          width="600"
-                         height="400"
-                         fetchpriority="high"
-                         style="width: 100%; height: auto; object-fit: cover; display: block;">
-                </div>
-                <div style="position: absolute; bottom: -18px; left: -18px; background: #ffffff; padding: 14px 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border: 1px solid #E2E8F0; display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 44px; height: 44px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: grid; place-items: center; font-size: 20px; font-weight: 800;">
-                        A
-                    </div>
-                    <div>
-                        <div style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase;">Akreditasi BAN-PDM</div>
-                        <div style="font-size: 15px; font-weight: 800; color: #0F172A;">Peringkat A (Unggul)</div>
+                         height="380"
+                         fetchpriority="high">
+                    <div class="hero-visual-caption">
+                        <span>🏛️</span>
+                        <span>Dokumentasi Kegiatan &amp; Kepanduan Santri MTs Al-Huda</span>
                     </div>
                 </div>
             </div>
@@ -57,127 +48,134 @@ $facilities = $data['facilities'] ?? [];
     </section>
 
     <!-- SAMBUTAN KEPALA MADRASAH -->
-    <section style="padding: 60px 0; background: #ffffff; border-bottom: 1px solid #E2E8F0;">
-        <div class="container" style="display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 40px; align-items: center;">
-            <div style="text-align: center;">
-                <div style="width: 220px; height: 260px; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #DCFCE7; border: 3px solid #15803D; box-shadow: 0 10px 24px rgba(21,128,61,.12); display: flex; align-items: center; justify-content: center;">
+    <section class="speech-section">
+        <div class="container speech-grid">
+            <div class="speech-photo-wrap">
+                <div class="speech-photo-box">
                     <img src="<?= base_url('assets/images/Pertemuan Wali Santri.jpg') ?>"
-                         alt="Kepala MTs Al-Huda"
+                         alt="Kepala Madrasah MTs Al-Huda Gondang"
                          width="220"
-                         height="260"
-                         style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                         height="270"
+                         loading="lazy">
                 </div>
-                <h4 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-top: 14px; margin-bottom: 2px;">
-                    M. Abdul Haris Jauhari, S.Pd.I
-                </h4>
-                <p style="font-size: 12px; color: #15803D; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                    Kepala Madrasah
-                </p>
+                <div class="speech-meta">
+                    <h3 class="speech-name">M. Abdul Haris Jauhari, S.Pd.I</h3>
+                    <p class="speech-role">Kepala Madrasah</p>
+                </div>
             </div>
-            <div>
-                <div style="display: inline-block; background: #E9F9EF; color: #15803D; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;">
-                    Sambutan Pimpinan
-                </div>
-                <h2 style="font-size: 26px; font-weight: 800; color: #0F172A; margin-bottom: 16px; line-height: 1.3;">
+
+            <div class="speech-content">
+                <span class="speech-quote-tag">Sambutan Pimpinan</span>
+                <h2 class="speech-title">
                     Mewujudkan Pendidikan Berkualitas, Terpadu, dan Berakhlak Mulia
                 </h2>
-                <div style="font-size: 14.5px; color: #475569; line-height: 1.75; margin-bottom: 20px;">
-                    <p style="margin-bottom: 12px;">
+                <div class="speech-paragraphs">
+                    <p>
                         <em>Assalamu’alaikum Warahmatullahi Wabarakatuh.</em>
                     </p>
-                    <p style="margin-bottom: 12px;">
-                        Selamat datang di portal informasi resmi MTs Al-Huda Gondang. Di era keterbukaan informasi dan transformasi digital, madrasah kami berkomitmen menghadirkan layanan pendidikan yang transparan, akuntabel, dan adaptif terhadap perkembangan ilmu pengetahuan dan teknologi tanpa mengesampingkan jati diri pesantren.
+                    <p>
+                        Selamat datang di portal informasi resmi MTs Al-Huda Gondang. Di tengah perkembangan zaman dan teknologi, madrasah kami berkomitmen menghadirkan iklim belajar yang aman, beradab, serta membekali putra-putri dengan dasar keilmuan yang seimbang antara agama dan pengetahuan umum.
                     </p>
                     <p>
-                        Melalui perpaduan Kurikulum Merdeka dan keteladanan salafus sholih, kami mendidik santri untuk tidak hanya unggul secara kognitif, namun juga memiliki integritas spiritual dan kesiapan berdaya saing global.
+                        Dengan bimbingan para guru yang berdedikasi serta dukungan penuh wali santri dan masyarakat, kami mendidik generasi penerus agar memiliki budi pekerti luhur, kemandirian, dan kesiapan melanjutkan ke jenjang yang lebih tinggi.
                     </p>
                 </div>
-                <a href="<?= url('profil') ?>" class="btn btn-outline" style="font-weight: 700; font-size: 13px; border-radius: 10px;">
-                    Baca Profil &amp; Visi Misi Lengkap
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- STATS SEKOLAH (BUKTI AKREDITASI) -->
-    <section class="stats-section" style="padding: 50px 0; background: #F8FAFC;">
-        <div class="container stats-card" style="background: #15803D; color: #ffffff; border-radius: 16px; padding: 36px 40px; box-shadow: 0 12px 30px rgba(21,128,61,.2);">
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center;">
                 <div>
-                    <div style="font-size: 38px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; color: #BBF7D0;">A</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Akreditasi Unggul</div>
-                    <div style="font-size: 12px; color: #E2E8F0;">Standar Mutu Nasional BAN-PDM</div>
-                </div>
-                <div>
-                    <div style="font-size: 38px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; color: #BBF7D0;">187+</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Santri &amp; Siswa Aktif</div>
-                    <div style="font-size: 12px; color: #E2E8F0;">Terbina dalam 3 jenjang kelas</div>
-                </div>
-                <div>
-                    <div style="font-size: 38px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; color: #BBF7D0;">14</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Tenaga Pendidik</div>
-                    <div style="font-size: 12px; color: #E2E8F0;">Guru tersertifikasi &amp; berpengalaman</div>
-                </div>
-                <div>
-                    <div style="font-size: 38px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; color: #BBF7D0;">100%</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px;">Kelulusan &amp; Pembinaan</div>
-                    <div style="font-size: 12px; color: #E2E8F0;">Lanjutan ke MA / SMA / SMK favorit</div>
+                    <a href="<?= url('profil') ?>" class="btn btn-secondary">
+                        Profil Lengkap Madrasah
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- BERITA TERBARU (LIVE DARI DATABASE) -->
-    <section style="padding: 60px 0; background: #ffffff;">
+    <!-- TIGA PILAR PENDIDIKAN MADRASAH -->
+    <section class="pillars-section">
+        <div class="container">
+            <div class="section-head centered">
+                <div class="section-pretitle">Pilar Penyelenggaraan</div>
+                <h2 class="section-title">Komitmen Mutu &amp; Karakter Santri</h2>
+                <p class="section-subtitle">
+                    Tiga landasan pembinaan yang menjadi ciri khas dan pedoman pembelajaran di MTs Al-Huda Gondang.
+                </p>
+            </div>
+
+            <div class="pillars-grid">
+                <article class="pillar-item">
+                    <span class="pillar-badge">01. Akademik &amp; Kemenag</span>
+                    <h3 class="pillar-heading">Kurikulum Nasional &amp; Agama</h3>
+                    <p class="pillar-desc">
+                        Pembelajaran Kurikulum Merdeka dipadukan dengan penguatan mata pelajaran rumpun PAI (Akidah Akhlak, Fikih, Quran Hadits, dan SKI) serta Bahasa Arab.
+                    </p>
+                </article>
+
+                <article class="pillar-item">
+                    <span class="pillar-badge">02. Spiritual &amp; Karakter</span>
+                    <h3 class="pillar-heading">Pembiasaan Ibadah Harian</h3>
+                    <p class="pillar-desc">
+                        Penanaman disiplin melalui sholat dhuha terpimpin, sholat dhuhur berjamaah di musholla madrasah, bimbingan tahsin tartil Al-Qur'an, dan pembacaan sholawat.
+                    </p>
+                </article>
+
+                <article class="pillar-item">
+                    <span class="pillar-badge">03. Minat &amp; Keterampilan</span>
+                    <h3 class="pillar-heading">Eksplorasi Bakat &amp; IT</h3>
+                    <p class="pillar-desc">
+                        Pengembangan potensi non-akademik meliputi Gerakan Pramuka, grup banjari Al-Huda, drumband, olahraga, serta pengenalan dasar komputer di laboratorium.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- WARTA TERKINI (LIVE DARI DATABASE) -->
+    <section style="padding: 64px 0; background: #FFFFFF; border-bottom: 1px solid var(--border);">
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 14px;">
                 <div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: #15803D; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
-                        Warta Terkini
-                    </div>
-                    <h2 style="font-size: 26px; font-weight: 800; color: #0F172A; margin: 0;">
-                        Kabar &amp; Prestasi Terbaru Madrasah
-                    </h2>
+                    <div class="section-pretitle">Warta &amp; Informasi</div>
+                    <h2 class="section-title" style="margin: 0;">Kabar &amp; Prestasi Madrasah</h2>
                 </div>
-                <a href="<?= url('berita') ?>" class="btn btn-outline" style="font-weight: 700; font-size: 13px; border-radius: 10px;">
-                    Lihat Semua Berita
+                <a href="<?= url('berita') ?>" class="btn btn-secondary">
+                    Semua Berita
                 </a>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div class="news-v2-grid">
                 <?php if (empty($latestPosts)): ?>
-                    <p style="color: #64748B;">Belum ada berita terbit.</p>
+                    <p style="color: #64748B; grid-column: 1 / -1; padding: 24px; background: #F8FAFC; border-radius: 12px; text-align: center;">
+                        Belum ada warta berita yang diterbitkan saat ini.
+                    </p>
                 <?php else: ?>
                     <?php foreach ($latestPosts as $bp): ?>
-                        <article style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .2s ease;">
-                            <div style="height: 180px; background: #E2E8F0; overflow: hidden; position: relative;">
+                        <article class="news-v2-card">
+                            <div class="news-v2-thumb">
                                 <?php if (!empty($bp['cover_path'])): ?>
                                     <img src="<?= base_url($bp['cover_path']) ?>"
                                          alt="<?= htmlspecialchars($bp['title']) ?>"
                                          width="360"
-                                         height="180"
-                                         loading="lazy"
-                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                         height="190"
+                                         loading="lazy">
                                 <?php else: ?>
-                                    <div style="width:100%;height:100%;background:linear-gradient(135deg, #15803D, #0B3D1E);display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px">
-                                        MTs Al-Huda
+                                    <div class="news-v2-thumb-fallback">
+                                        MTs Al-Huda Gondang
                                     </div>
                                 <?php endif; ?>
                             </div>
-                            <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
-                                <div style="font-size: 12px; color: #64748B; margin-bottom: 6px;">
-                                    📅 <?= !empty($bp['published_at']) ? date('d M Y', strtotime($bp['published_at'])) : date('d M Y') ?>
+                            <div class="news-v2-body">
+                                <div class="news-v2-date">
+                                    <?= !empty($bp['published_at']) ? date('d M Y', strtotime($bp['published_at'])) : date('d M Y') ?>
                                 </div>
-                                <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 8px; line-height: 1.35;">
-                                    <a href="<?= url('berita/' . $bp['slug']) ?>" style="text-decoration: none; color: inherit;">
+                                <h3 class="news-v2-title">
+                                    <a href="<?= url('berita/' . $bp['slug']) ?>">
                                         <?= htmlspecialchars($bp['title']) ?>
                                     </a>
                                 </h3>
-                                <p style="font-size: 13px; color: #475569; line-height: 1.55; margin-bottom: 16px; flex: 1;">
-                                    <?= htmlspecialchars($bp['excerpt'] ?? mb_substr(strip_tags($bp['content']), 0, 95) . '...') ?>
+                                <p class="news-v2-excerpt">
+                                    <?= htmlspecialchars($bp['excerpt'] ?? mb_substr(strip_tags($bp['content']), 0, 110) . '...') ?>
                                 </p>
-                                <a href="<?= url('berita/' . $bp['slug']) ?>" style="color: #15803D; font-weight: 700; font-size: 13px; text-decoration: none;">
-                                    Baca Selengkapnya
+                                <a href="<?= url('berita/' . $bp['slug']) ?>" class="news-v2-cta">
+                                    Baca selengkapnya &rarr;
                                 </a>
                             </div>
                         </article>
@@ -187,111 +185,72 @@ $facilities = $data['facilities'] ?? [];
         </div>
     </section>
 
-    <!-- FASILITAS UNGGULAN (LIVE DARI DATABASE) -->
-    <section style="padding: 60px 0; background: #F8FAFC;">
+    <!-- FASILITAS & SARANA (LIVE DARI DATABASE) -->
+    <section style="padding: 64px 0; background: #F8FAFC; border-bottom: 1px solid var(--border);">
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 14px;">
                 <div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: #15803D; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
-                        Sarana &amp; Prasarana
-                    </div>
-                    <h2 style="font-size: 26px; font-weight: 800; color: #0F172A; margin: 0;">
-                        Fasilitas Lengkap Pendukung Prestasi
-                    </h2>
+                    <div class="section-pretitle">Sarana &amp; Prasarana</div>
+                    <h2 class="section-title" style="margin: 0;">Fasilitas Pendukung Belajar</h2>
                 </div>
-                <a href="<?= url('fasilitas') ?>" class="btn btn-outline" style="font-weight: 700; font-size: 13px; border-radius: 10px;">
-                    Lihat Semua Fasilitas
+                <a href="<?= url('fasilitas') ?>" class="btn btn-secondary">
+                    Semua Fasilitas
                 </a>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
-                <?php foreach ($facilities as $fac): ?>
-                    <div style="background: #ffffff; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,.04);">
-                        <div style="height: 160px; background: #E2E8F0; position: relative;">
-                            <?php if (!empty($fac['image_path'])): ?>
-                                <img src="<?= base_url($fac['image_path']) ?>"
-                                     alt="<?= htmlspecialchars($fac['name']) ?>"
-                                     width="280"
-                                     height="160"
-                                     loading="lazy"
-                                     style="width: 100%; height: 100%; object-fit: cover;">
-                            <?php else: ?>
-                                <div style="width:100%;height:100%;background:linear-gradient(135deg, #15803D 0%, #0B3D1E 100%);display:grid;place-items:center;color:#fff;font-weight:700">
-                                    Sarana Madrasah
-                                </div>
-                            <?php endif; ?>
-                            <span style="position: absolute; top: 10px; right: 10px; background: rgba(15,23,42,.75); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 6px;">
-                                <?= htmlspecialchars($fac['icon'] ?? 'Gedung') ?>
-                            </span>
+            <div class="fac-v2-grid">
+                <?php if (empty($facilities)): ?>
+                    <p style="color: #64748B; grid-column: 1 / -1; padding: 24px; background: #FFFFFF; border-radius: 12px; text-align: center;">
+                        Informasi fasilitas sedang diperbarui.
+                    </p>
+                <?php else: ?>
+                    <?php foreach ($facilities as $fac): ?>
+                        <div class="fac-v2-card">
+                            <div class="fac-v2-thumb">
+                                <?php if (!empty($fac['image_path'])): ?>
+                                    <img src="<?= base_url($fac['image_path']) ?>"
+                                         alt="<?= htmlspecialchars($fac['name']) ?>"
+                                         width="280"
+                                         height="165"
+                                         loading="lazy">
+                                <?php else: ?>
+                                    <div class="news-v2-thumb-fallback">
+                                        Sarana Madrasah
+                                    </div>
+                                <?php endif; ?>
+                                <span class="fac-v2-tag">
+                                    <?= htmlspecialchars($fac['icon'] ?? 'Fasilitas') ?>
+                                </span>
+                            </div>
+                            <div class="fac-v2-body">
+                                <h3 class="fac-v2-name">
+                                    <?= htmlspecialchars($fac['name']) ?>
+                                </h3>
+                                <p class="fac-v2-desc">
+                                    <?= htmlspecialchars($fac['description'] ?? 'Sarana penunjang kegiatan santri.') ?>
+                                </p>
+                            </div>
                         </div>
-                        <div style="padding: 16px;">
-                            <h3 style="font-size: 15px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">
-                                <?= htmlspecialchars($fac['name']) ?>
-                            </h3>
-                            <p style="font-size: 12.5px; color: #64748B; line-height: 1.5; margin: 0;">
-                                <?= htmlspecialchars($fac['description'] ?? 'Sarana pendukung belajar santri.') ?>
-                            </p>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </section>
 
-    <!-- PROGRAM UNGGULAN & EKSTRAKURIKULER -->
-    <section style="padding: 60px 0; background: #ffffff;">
-        <div class="container">
-            <div style="text-align: center; max-width: 680px; margin: 0 auto 36px;">
-                <div style="font-size: 11.5px; font-weight: 700; color: #15803D; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
-                    Pengembangan Bakat Santri
-                </div>
-                <h2 style="font-size: 26px; font-weight: 800; color: #0F172A; margin-bottom: 10px;">
-                    Ekstrakurikuler &amp; Pembinaan Karakter
-                </h2>
-                <p style="font-size: 14px; color: #64748B;">
-                    Menyediakan wadah eksplorasi minat, kepemimpinan, dan spiritual santri melalui bimbingan rutin.
-                </p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 10px;">📖</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Tahfidz &amp; Seni Sholawat</h3>
-                    <p style="font-size: 12.5px; color: #64748B; margin: 0;">Bimbingan tahsin, hafalan juz 30, dan grup banjari Al-Huda.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 10px;">🏕️</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Gerakan Pramuka</h3>
-                    <p style="font-size: 12.5px; color: #64748B; margin: 0;">Kedisiplinan, kemandirian, dan kepemimpinan di Jambore Cabang.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 10px;">💻</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Klub Sains &amp; IT Komputer</h3>
-                    <p style="font-size: 12.5px; color: #64748B; margin: 0;">Pembelajaran dasar teknologi, internet sehat, dan olimpiade madrasah.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; text-align: center;">
-                    <div style="font-size: 32px; margin-bottom: 10px;">⚽</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Olahraga &amp; Drumband</h3>
-                    <p style="font-size: 12.5px; color: #64748B; margin: 0;">Futsal, bola voli, senam sehat, dan atraksi drumband madrasah.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CALL TO ACTION PPDB -->
-    <section style="padding: 50px 0; background: linear-gradient(135deg, #0B3D1E 0%, #15803D 100%); color: #fff; text-align: center;">
-        <div class="container" style="max-width: 680px;">
-            <h2 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 12px;">
+    <!-- CALL TO ACTION RESMI PPDB -->
+    <section class="cta-official">
+        <div class="container cta-official-inner">
+            <h2 class="cta-official-h2">
                 Penerimaan Peserta Didik Baru (PPDB) 2026/2027
             </h2>
-            <p style="font-size: 15px; color: #E2E8F0; margin-bottom: 26px; line-height: 1.6;">
-                Daftarkan putra-putri Anda segera. Kuota terbatas untuk memastikan rasio pembelajaran yang kondusif dan pendampingan karakter santri yang optimal.
+            <p class="cta-official-p">
+                Bergabunglah bersama keluarga besar MTs Al-Huda Gondang. Pendaftaran dibuka untuk lulusan SD/MI dengan kuota terbatas guna menjamin efektivitas pendampingan santri.
             </p>
-            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                <a href="<?= url('ppdb') ?>" class="btn" style="background: #ffffff; color: #15803D; font-weight: 800; padding: 12px 26px; border-radius: 10px; font-size: 14px;">
-                    Daftar Sekarang Secara Online
+            <div class="cta-official-btns">
+                <a href="<?= url('ppdb') ?>" class="btn btn-primary" style="background: #FFFFFF !important; color: #15803D !important; border-color: #FFFFFF !important;">
+                    Daftar Secara Online
                 </a>
-                <a href="<?= url('kontak') ?>" class="btn" style="background: rgba(255,255,255,.15); color: #ffffff; font-weight: 700; padding: 12px 24px; border-radius: 10px; font-size: 14px; border: 1px solid rgba(255,255,255,.3);">
+                <a href="<?= url('kontak') ?>" class="btn btn-secondary" style="background: transparent !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.4) !important;">
                     Hubungi Panitia PPDB
                 </a>
             </div>

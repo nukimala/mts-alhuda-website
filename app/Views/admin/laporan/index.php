@@ -133,15 +133,15 @@ ob_start();
         </div>
     </div>
 
-    <!-- Akreditasi -->
+    <!-- Akademik & Mobile -->
     <div class="card stat">
-        <div class="stat-icon <?= $s['akreditasiPct'] >= 80 ? '' : ($s['akreditasiPct'] >= 50 ? 'amber' : 'red') ?>">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 14-1.5 7 5-2.5 5 2.5-1.5-7"/></svg>
+        <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>
         <div>
-            <small>Kesiapan Akreditasi</small>
-            <strong><?= $s['akreditasiPct'] ?>%</strong>
-            <div class="hint"><?= $s['butirTerpenuhi'] ?> / <?= $s['butirTotal'] ?> butir</div>
+            <small>Jadwal Aktif</small>
+            <strong><?= $s['jadwalTotal'] ?></strong>
+            <div class="hint"><?= $s['totalKelas'] ?> rombel · <?= $s['totalMapel'] ?> mapel</div>
         </div>
     </div>
 </div>
@@ -213,36 +213,33 @@ ob_start();
         </table>
     </div>
 
-    <!-- Akreditasi -->
+    <!-- Akademik & Mobile App -->
     <div class="card">
-        <div class="card-head"><h3 class="card-title">Akreditasi IA2024</h3></div>
+        <div class="card-head"><h3 class="card-title">Akademik &amp; Madrasahku App</h3></div>
         <table class="data">
             <thead>
                 <tr><th>Item</th><th style="text-align:right">Nilai</th></tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Total Butir Instrumen</td>
-                    <td style="text-align:right"><?= $s['butirTotal'] ?></td>
+                    <td>Total Jadwal Terjadwal</td>
+                    <td style="text-align:right"><?= $s['jadwalTotal'] ?></td>
                 </tr>
                 <tr>
-                    <td>Butir Terpenuhi</td>
-                    <td style="text-align:right"><span class="pill green"><?= $s['butirTerpenuhi'] ?></span></td>
+                    <td>Total Rombongan Belajar</td>
+                    <td style="text-align:right"><?= $s['totalKelas'] ?></td>
                 </tr>
                 <tr>
-                    <td>Butir Belum Terpenuhi</td>
-                    <td style="text-align:right">
-                        <?php $gap = $s['butirTotal'] - $s['butirTerpenuhi']; ?>
-                        <span class="pill <?= $gap > 0 ? 'red' : 'gray' ?>"><?= $gap ?></span>
-                    </td>
+                    <td>Mata Pelajaran Aktif</td>
+                    <td style="text-align:right"><?= $s['totalMapel'] ?></td>
                 </tr>
                 <tr>
-                    <td>Bank Bukti (Total)</td>
-                    <td style="text-align:right"><?= $s['buktiTotal'] ?></td>
+                    <td>Presensi Hari Ini (Total)</td>
+                    <td style="text-align:right"><?= $s['presensiHariIni'] ?></td>
                 </tr>
                 <tr>
-                    <td>DKA Terisi</td>
-                    <td style="text-align:right"><?= $s['dkaTotal'] ?></td>
+                    <td>Presensi Hadir</td>
+                    <td style="text-align:right"><span class="pill green"><?= $s['presensiHadir'] ?></span></td>
                 </tr>
             </tbody>
         </table>

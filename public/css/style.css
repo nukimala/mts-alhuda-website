@@ -1,7 +1,8 @@
 :root {
     --white: #FFFFFF;
     --green: #15803D;
-    --gray: #6B7280;
+    --gray: #475569;
+    --green-hover: #166534;
     --dark-green: #0B3D1E;
     --light-green: #4ADE80;
     --mint: #A7F3D0;
@@ -9,8 +10,16 @@
     --slate: #94A3B8;
     --border: #E1ECE5;
     --soft: #F9FAFB;
-    --text: #111827;
-    --container: 1100px;
+    --text: #0F172A;
+    --container: 1140px;
+    --r-sm: 7px;
+    --r-md: 10px;
+    --r-lg: 16px;
+    --r-xl: 22px;
+    --r-full: 999px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, .06);
+    --shadow-md: 0 4px 14px rgba(15, 23, 42, .07);
+    --shadow-lg: 0 12px 30px rgba(11, 61, 30, .10);
     --radius-lg: 16px;
     --shadow: 0 12px 30px rgba(15, 61, 30, .10);
 }
@@ -793,6 +802,709 @@ button:disabled, [aria-disabled="true"] {
         padding: 40px 0 34px;
     }
     .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==========================================================================
+   SISTEM TAMPILAN ANTI-SLOP MTs AL-HUDA & DESIGN.MD (BERANDA & PROFIL)
+   Prinsip: Tertib, Tenang, Terpercaya, Islami Tanpa Berlebihan
+   ========================================================================== */
+
+/* TOMBOL RESMI */
+.btn-primary {
+    background: var(--green) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--green) !important;
+    border-radius: var(--r-md);
+    min-height: 44px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.2);
+    transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.btn-primary:hover {
+    background: var(--green-hover) !important;
+    border-color: var(--green-hover) !important;
+    transform: translateY(-1px);
+}
+.btn-secondary {
+    background: #FFFFFF !important;
+    color: var(--green) !important;
+    border: 1.5px solid var(--green) !important;
+    border-radius: var(--r-md);
+    min-height: 44px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: background-color .15s ease, color .15s ease;
+}
+.btn-secondary:hover {
+    background: #F0FDF4 !important;
+}
+
+/* HERO SECTION RESMI */
+.hero-v2 {
+    background: #F8FAFC;
+    padding: 60px 0 54px;
+    border-bottom: 1px solid var(--border);
+}
+.hero-v2-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 48px;
+    align-items: center;
+}
+.hero-tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #DCFCE7;
+    color: #15803D;
+    padding: 6px 14px;
+    border-radius: var(--r-full);
+    font-size: 12.5px;
+    font-weight: 700;
+    border: 1px solid #BBF7D0;
+    margin-bottom: 18px;
+}
+.hero-tag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #15803D;
+    display: inline-block;
+}
+.hero-v2-title {
+    font-size: clamp(30px, 3.8vw, 44px);
+    line-height: 1.22;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+}
+.hero-v2-title span {
+    color: #15803D;
+}
+.hero-v2-desc {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0 0 28px;
+}
+.hero-v2-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+.hero-visual-frame {
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #FFFFFF;
+    box-shadow: var(--shadow-md);
+}
+.hero-visual-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+.hero-visual-caption {
+    padding: 12px 18px;
+    background: #FFFFFF;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: #334155;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* SAMBUTAN KEPALA MADRASAH */
+.speech-section {
+    padding: 64px 0;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--border);
+}
+.speech-grid {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 44px;
+    align-items: center;
+}
+.speech-photo-box {
+    width: 220px;
+    height: 270px;
+    margin: 0 auto;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: #E2E8F0;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+.speech-photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.speech-meta {
+    text-align: center;
+    margin-top: 12px;
+}
+.speech-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 2px;
+}
+.speech-role {
+    font-size: 12px;
+    font-weight: 700;
+    color: #15803D;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+.speech-quote-tag {
+    display: inline-block;
+    background: #E9F9EF;
+    color: #15803D;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--r-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+}
+.speech-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.35;
+    margin: 0 0 16px;
+}
+.speech-paragraphs {
+    font-size: 14.5px;
+    color: #475569;
+    line-height: 1.75;
+    margin-bottom: 24px;
+}
+.speech-paragraphs p {
+    margin: 0 0 12px;
+}
+.speech-paragraphs p:last-child {
+    margin-bottom: 0;
+}
+
+/* PILAR PENDIDIKAN MADRASAH (BUKAN FAKE STATS) */
+.pillars-section {
+    padding: 64px 0;
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--border);
+}
+.section-head {
+    margin-bottom: 36px;
+}
+.section-head.centered {
+    text-align: center;
+    max-width: 680px;
+    margin-inline: auto;
+}
+.section-pretitle {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #15803D;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+.section-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+.section-subtitle {
+    font-size: 14.5px;
+    color: #64748B;
+    margin: 0;
+    line-height: 1.6;
+}
+.pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 24px;
+}
+.pillar-item {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.pillar-item:hover {
+    border-color: #BBF7D0;
+    box-shadow: var(--shadow-md);
+}
+.pillar-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #15803D;
+    background: #E9F9EF;
+    padding: 4px 10px;
+    border-radius: var(--r-sm);
+    margin-bottom: 14px;
+}
+.pillar-heading {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 10px;
+    line-height: 1.35;
+}
+.pillar-desc {
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* WARTA BERITA */
+.news-v2-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 24px;
+}
+.news-v2-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.news-v2-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.news-v2-thumb {
+    height: 190px;
+    background: #E2E8F0;
+    overflow: hidden;
+    position: relative;
+}
+.news-v2-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.news-v2-thumb-fallback {
+    width: 100%;
+    height: 100%;
+    background: #0B3D1E;
+    display: grid;
+    place-items: center;
+    color: #BBF7D0;
+    font-weight: 800;
+    font-size: 16px;
+}
+.news-v2-body {
+    padding: 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.news-v2-date {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.news-v2-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.4;
+    margin: 0 0 10px;
+}
+.news-v2-title a {
+    color: inherit;
+    text-decoration: none;
+}
+.news-v2-title a:hover {
+    color: #15803D;
+}
+.news-v2-excerpt {
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0 0 18px;
+    flex: 1;
+}
+.news-v2-cta {
+    font-size: 13px;
+    font-weight: 700;
+    color: #15803D;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.news-v2-cta:hover {
+    text-decoration: underline;
+}
+
+/* FASILITAS */
+.fac-v2-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+.fac-v2-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+.fac-v2-thumb {
+    height: 165px;
+    background: #E2E8F0;
+    position: relative;
+    overflow: hidden;
+}
+.fac-v2-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.fac-v2-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #FFFFFF;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--r-sm);
+}
+.fac-v2-body {
+    padding: 18px;
+}
+.fac-v2-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 6px;
+}
+.fac-v2-desc {
+    font-size: 13px;
+    color: #64748B;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* CTA BANNER RESMI MADRASAH */
+.cta-official {
+    background: #0B3D1E;
+    border-top: 3px solid #15803D;
+    color: #FFFFFF;
+    padding: 56px 0;
+    text-align: center;
+}
+.cta-official-inner {
+    max-width: 680px;
+    margin-inline: auto;
+}
+.cta-official-h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin: 0 0 12px;
+}
+.cta-official-p {
+    font-size: 15px;
+    color: #E2E8F0;
+    line-height: 1.65;
+    margin: 0 0 28px;
+}
+.cta-official-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   HALAMAN PROFIL MADRASAH
+   ========================================================================== */
+.page-hero-clean {
+    background: #0B3D1E;
+    color: #FFFFFF;
+    padding: 48px 0 42px;
+    border-bottom: 3px solid #15803D;
+}
+.page-hero-clean .hero-label {
+    color: #4ADE80;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 11.5px;
+    margin-bottom: 8px;
+}
+.page-hero-clean h1 {
+    color: #FFFFFF;
+    font-size: clamp(26px, 3.2vw, 36px);
+    font-weight: 800;
+    margin: 0 0 10px;
+}
+.page-hero-clean h1 span {
+    color: #4ADE80;
+}
+.page-hero-clean p {
+    color: #E2E8F0;
+    font-size: 15px;
+    max-width: 720px;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* DOKUMEN RESMI DATA POKOK */
+.doc-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 40px;
+}
+.doc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.doc-card-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0;
+}
+.doc-status-badge {
+    background: #DCFCE7;
+    color: #15803D;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 5px 16px;
+    border-radius: var(--r-full);
+    border: 1px solid #BBF7D0;
+}
+.doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+.doc-item {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+}
+.doc-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 4px;
+}
+.doc-value {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0;
+}
+
+/* VISI MISI */
+.visi-misi-v2-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 28px;
+    margin-bottom: 48px;
+    align-items: stretch;
+}
+.visi-v2-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-top: 4px solid #15803D;
+    border-radius: var(--r-lg);
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+.misi-v2-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-top: 4px solid #1D4ED8;
+    border-radius: var(--r-lg);
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
+}
+.vm-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: var(--r-full);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+}
+.vm-tag.green {
+    background: #DCFCE7;
+    color: #15803D;
+}
+.vm-tag.blue {
+    background: #EFF6FF;
+    color: #1D4ED8;
+}
+.visi-v2-quote {
+    font-size: 19px;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.45;
+    margin: 0 0 16px;
+}
+.visi-v2-desc {
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0;
+}
+.misi-v2-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.misi-v2-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.65;
+}
+.misi-v2-item:last-child {
+    margin-bottom: 0;
+}
+.misi-v2-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    color: #1D4ED8;
+    font-weight: 800;
+    font-size: 12.5px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* DATA GURU */
+.teachers-v2-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+.teacher-v2-card {
+    background: #FFFFFF;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.teacher-v2-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--r-md);
+    background: #DCFCE7;
+    color: #15803D;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+    font-weight: 800;
+    flex-shrink: 0;
+    border: 1px solid #BBF7D0;
+    text-transform: uppercase;
+}
+.teacher-v2-name {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #0F172A;
+    margin: 0 0 4px;
+    line-height: 1.35;
+}
+.teacher-v2-role {
+    font-size: 12.5px;
+    color: #15803D;
+    font-weight: 700;
+}
+.teacher-v2-nip {
+    font-size: 11.5px;
+    color: #64748B;
+    margin-top: 3px;
+}
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 900px) {
+    .hero-v2-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .speech-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .speech-photo-box {
+        width: 180px;
+        height: 220px;
+    }
+    .visi-misi-v2-grid {
         grid-template-columns: 1fr;
     }
 }

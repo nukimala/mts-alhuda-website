@@ -50,10 +50,11 @@ class AdminController
             'berita'          => $this->count($pdo, 'berita', "status = 'published'"),
             'presensi'        => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE()"),
             'presensi_mobile' => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE() AND method = 'self'"),
-            'bukti'           => $this->count($pdo, 'bukti', null),
             'jadwal'          => $this->count($pdo, 'jadwal', "is_active = 1"),
             'tugas'           => $this->count($pdo, 'tugas', "is_published = 1"),
             'tokens'          => $this->count($pdo, 'token_api', "revoked_at IS NULL"),
+            'pesan_baru'      => $this->count($pdo, 'pesan_kontak', "status = 'baru'"),
+            'pesan_total'     => $this->count($pdo, 'pesan_kontak', null),
         ];
     }
 

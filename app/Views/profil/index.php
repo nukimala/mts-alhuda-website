@@ -4,130 +4,169 @@ require_once __DIR__ . '/../layouts/navbar.php';
 
 $guru = $data['guru'] ?? [];
 $settings = $data['settings'] ?? [];
+
+function get_initials(string $name): string {
+    $words = preg_split('/\s+/', trim($name));
+    $initials = '';
+    foreach (array_slice($words, 0, 2) as $w) {
+        $initials .= mb_substr($w, 0, 1);
+    }
+    return strtoupper($initials ?: 'M');
+}
 ?>
 
 <main>
-    <section class="page-hero" style="background: linear-gradient(135deg, #0B3D1E 0%, #15803D 100%); color: #fff; padding: 48px 0 40px;">
+    <!-- HERO PROFIL RESMI -->
+    <section class="page-hero-clean">
         <div class="container">
-            <div class="section-label" style="color: #4ADE80; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11.5px; margin-bottom: 8px;">
-                Identitas &amp; Dokumen Resmi Madrasah
-            </div>
-            <h1 style="color: #ffffff; font-size: 32px; font-weight: 800; margin-bottom: 12px;">
-                Profil Lengkap <span>MTs Al-Huda</span> Gondang
-            </h1>
-            <p style="color: rgba(255,255,255,.85); max-width: 680px; font-size: 14.5px; line-height: 1.6;">
-                Mewujudkan institusi pendidikan Islam terpadu yang unggul dalam ilmu keagamaan dan ilmu pengetahuan umum di Desa Pandean, Kecamatan Gondang, Kabupaten Nganjuk.
+            <div class="hero-label">Identitas &amp; Dokumen Resmi Madrasah</div>
+            <h1>Profil Lengkap <span>MTs Al-Huda</span> Gondang</h1>
+            <p>
+                Membina generasi yang berilmu amaliah, cerdas dalam ilmu pengetahuan, dan teguh dalam akhlakul karimah di bawah naungan Yayasan Pendidikan Islam Al-Huda Pandean, Gondang, Nganjuk.
             </p>
         </div>
     </section>
 
-    <!-- SECTION 1: IDENTITAS RESMI (STANDAR AKREDITASI) -->
-    <section style="padding: 50px 0 30px; background: #ffffff;">
+    <!-- SECTION 1: DATA POKOK PENDIDIKAN MADRASAH -->
+    <section style="padding: 56px 0 32px; background: #FFFFFF;">
         <div class="container">
-            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,.04); margin-bottom: 36px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #E2E8F0; padding-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="font-size: 20px; font-weight: 800; color: #0F172A; margin: 0;">
-                        🏛️ Data Pokok Pendidikan Madrasah
-                    </h2>
-                    <span style="background: #DCFCE7; color: #15803D; font-weight: 800; font-size: 12.5px; padding: 4px 14px; border-radius: 20px;">
-                        Status: Terakreditasi "A" (Unggul)
+            <div class="doc-card">
+                <div class="doc-card-header">
+                    <div>
+                        <div class="section-pretitle">Satuan Pendidikan</div>
+                        <h2 class="doc-card-title">Data Pokok Kelembagaan Madrasah</h2>
+                    </div>
+                    <span class="doc-status-badge">
+                        Status: Terakreditasi "A" (Unggul) BAN-PDM
                     </span>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 13.5px;">
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Nama Lembaga</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">MTs Al-Huda Gondang</strong>
+                <div class="doc-grid">
+                    <div class="doc-item">
+                        <span class="doc-label">Nama Lembaga</span>
+                        <div class="doc-value">MTs Al-Huda Gondang</div>
                     </div>
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">NPSN / NSM</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">20582910 / 121235180039</strong>
+
+                    <div class="doc-item">
+                        <span class="doc-label">NPSN / NSM</span>
+                        <div class="doc-value">20582910 / 121235180039</div>
                     </div>
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Kepala Madrasah</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">M. Abdul Haris Jauhari, S.Pd.I</strong>
+
+                    <div class="doc-item">
+                        <span class="doc-label">Kepala Madrasah</span>
+                        <div class="doc-value">M. Abdul Haris Jauhari, S.Pd.I</div>
                     </div>
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Alamat Lengkap</span>
-                        <strong style="color: #0F172A; font-size: 14px;">Jl. Letjend Suprapto No. 16, Pandean, Gondang, Nganjuk</strong>
+
+                    <div class="doc-item">
+                        <span class="doc-label">Naungan Yayasan</span>
+                        <div class="doc-value">Yayasan Pendidikan Islam Al-Huda</div>
                     </div>
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">Naungan Yayasan</span>
-                        <strong style="color: #0F172A; font-size: 14.5px;">Yayasan Pendidikan Islam Al-Huda</strong>
+
+                    <div class="doc-item">
+                        <span class="doc-label">Alamat Lengkap</span>
+                        <div class="doc-value" style="font-size: 13.5px; font-weight: 700;">
+                            Jl. Letjend Suprapto No. 16, Desa Pandean, Kec. Gondang, Kab. Nganjuk
+                        </div>
                     </div>
-                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <span style="color: #64748B; font-size: 11.5px; font-weight: 700; display: block; text-transform: uppercase;">SK Izin Operasional</span>
-                        <strong style="color: #0F172A; font-size: 14px;">Kemenag Jawa Timur (Terdaftar Resmi)</strong>
+
+                    <div class="doc-item">
+                        <span class="doc-label">Izin Operasional &amp; Afiliasi</span>
+                        <div class="doc-value" style="font-size: 13.5px; font-weight: 700;">
+                            Kementerian Agama Republik Indonesia
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- VISI, MISI, & TUJUAN STRATEGIS -->
-            <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 30px; margin-bottom: 40px; align-items: start;">
+            <div class="visi-misi-v2-grid">
                 <!-- VISI -->
-                <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,.04);">
-                    <div style="display: inline-block; background: #DCFCE7; color: #15803D; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 10px;">
-                        Visi Madrasah
-                    </div>
-                    <h3 style="font-size: 20px; font-weight: 800; color: #0F172A; line-height: 1.4; margin-bottom: 14px;">
+                <article class="visi-v2-card">
+                    <span class="vm-tag green">Visi Madrasah</span>
+                    <h3 class="visi-v2-quote">
                         "Terbentuknya Generasi Cerdas, Berilmu Amaliah, Beramal Ilmiah, dan Berakhlakul Karimah."
                     </h3>
-                    <p style="font-size: 13.5px; color: #475569; line-height: 1.65; margin: 0;">
-                        Visi ini mencerminkan tekad madrasah untuk melahirkan lulusan yang seimbang antara kematangan intelektual, kedalaman spiritual, dan keluhuran pekerti di tengah masyarakat.
+                    <p class="visi-v2-desc">
+                        Visi ini mencerminkan tekad madrasah untuk melahirkan lulusan yang seimbang antara kematangan intelektual, kecakapan hidup, dan keluhuran pekerti di tengah kehidupan masyarakat.
                     </p>
-                </div>
+                </article>
 
                 <!-- MISI -->
-                <div style="background: #ffffff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,.04);">
-                    <div style="display: inline-block; background: #EFF6FF; color: #1D4ED8; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 10px;">
-                        Misi Madrasah
-                    </div>
-                    <ol style="padding-left: 20px; margin: 0; font-size: 13.5px; color: #334155; line-height: 1.7;">
-                        <li style="margin-bottom: 8px;">Menyelenggarakan pendidikan formal dan kepesantrenan yang berkualitas dan terjangkau bagi masyarakat.</li>
-                        <li style="margin-bottom: 8px;">Membina kemampuan baca tulis, tahsin, dan tahfidz Al-Qur'an secara berkesinambungan.</li>
-                        <li style="margin-bottom: 8px;">Membiasakan nilai-nilai akhlakul karimah dan ibadah harian (sholat dhuha, sholat dhuhur berjamaah, dan sholawat).</li>
-                        <li style="margin-bottom: 8px;">Mengembangkan potensi akademik dan non-akademik siswa melalui bimbingan intensif dan ekstrakurikuler.</li>
-                        <li>Mewujudkan tata kelola madrasah yang akuntabel, transparan, dan berbasis teknologi informasi.</li>
+                <article class="misi-v2-card">
+                    <span class="vm-tag blue">Misi Madrasah</span>
+                    <ol class="misi-v2-list">
+                        <li class="misi-v2-item">
+                            <span class="misi-v2-num">1</span>
+                            <span>Menyelenggarakan pendidikan formal dan kepesantrenan yang berkualitas dan terjangkau bagi masyarakat.</span>
+                        </li>
+                        <li class="misi-v2-item">
+                            <span class="misi-v2-num">2</span>
+                            <span>Membina kemampuan baca tulis, tahsin tartil, dan tahfidz Al-Qur'an secara berkesinambungan.</span>
+                        </li>
+                        <li class="misi-v2-item">
+                            <span class="misi-v2-num">3</span>
+                            <span>Membiasakan nilai akhlakul karimah dan ibadah harian seperti sholat dhuha dan sholat dhuhur berjamaah.</span>
+                        </li>
+                        <li class="misi-v2-item">
+                            <span class="misi-v2-num">4</span>
+                            <span>Mengembangkan potensi akademik dan non-akademik siswa melalui bimbingan intensif dan kegiatan kepanduan.</span>
+                        </li>
+                        <li class="misi-v2-item">
+                            <span class="misi-v2-num">5</span>
+                            <span>Mewujudkan tata kelola madrasah yang akuntabel, transparan, dan berbasis teknologi informasi.</span>
+                        </li>
                     </ol>
-                </div>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- SECTION 2: DATA PENDIDIK & TENAGA KEPENDIDIKAN (BUKTI AKREDITASI GURU) -->
-    <section style="padding: 50px 0 70px; background: #F8FAFC; border-top: 1px solid #E2E8F0;">
+    <!-- SECTION 2: DATA PENDIDIK & TENAGA KEPENDIDIKAN (GTK) -->
+    <section style="padding: 56px 0 72px; background: #F8FAFC; border-top: 1px solid var(--border);">
         <div class="container">
-            <div style="text-align: center; max-width: 680px; margin: 0 auto 36px;">
-                <div style="font-size: 11.5px; font-weight: 700; color: #15803D; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
-                    Sumber Daya Manusia (SDM)
-                </div>
-                <h2 style="font-size: 24px; font-weight: 800; color: #0F172A; margin-bottom: 8px;">
-                    Tenaga Pendidik &amp; Kependidikan Profesional
-                </h2>
-                <p style="font-size: 14px; color: #64748B;">
-                    Guru berkompeten dengan kualifikasi S1/S2 dan dedikasi tinggi mendidik santri MTs Al-Huda.
+            <div class="section-head centered">
+                <div class="section-pretitle">Tenaga Pendidik</div>
+                <h2 class="section-title">Guru &amp; Tenaga Kependidikan</h2>
+                <p class="section-subtitle">
+                    Dewan asatidz dan tenaga kependidikan berdedikasi membimbing dan mendampingi santri MTs Al-Huda Gondang.
                 </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <div class="teachers-v2-grid">
                 <?php if (empty($guru)): ?>
-                    <p style="color: #64748B; text-align: center; grid-column: 1 / -1;">Data pendidik tersedia di kantor tata usaha madrasah.</p>
+                    <p style="color: #64748B; text-align: center; grid-column: 1 / -1; padding: 32px; background: #FFFFFF; border-radius: 12px; border: 1px solid var(--border);">
+                        Data tenaga pendidik sedang diperbarui oleh bagian tata usaha madrasah.
+                    </p>
                 <?php else: ?>
                     <?php foreach ($guru as $g): ?>
-                        <div style="background: #ffffff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,.04); display: flex; align-items: center; gap: 14px;">
-                            <div style="width: 50px; height: 50px; border-radius: 50%; background: #DCFCE7; color: #15803D; display: grid; place-items: center; font-size: 20px; font-weight: 800; flex: 0 0 50px;">
-                                👤
-                            </div>
-                            <div>
-                                <h4 style="font-size: 14.5px; font-weight: 800; color: #0F172A; margin-bottom: 4px; line-height: 1.3;">
+                        <div class="teacher-v2-card">
+                            <?php if (!empty($g['avatar_path'])): ?>
+                                <img src="<?= base_url($g['avatar_path']) ?>"
+                                     alt="<?= htmlspecialchars($g['name']) ?>"
+                                     class="teacher-v2-avatar"
+                                     style="object-fit: cover;">
+                            <?php else: ?>
+                                <div class="teacher-v2-avatar">
+                                    <?= htmlspecialchars(get_initials($g['name'])) ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div style="min-width: 0; flex: 1;">
+                                <h3 class="teacher-v2-name">
                                     <?= htmlspecialchars($g['name']) ?>
-                                </h4>
-                                <div style="font-size: 12px; color: #15803D; font-weight: 700;">
-                                    Guru Mata Pelajaran
+                                </h3>
+                                <div class="teacher-v2-role">
+                                    <?= htmlspecialchars($g['subject_specialty'] ?? 'Guru / Pendidik') ?>
                                 </div>
-                                <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
-                                    NIP: <?= htmlspecialchars($g['nip'] ?? '-') ?>
-                                </div>
+                                <?php if (!empty($g['nip'])): ?>
+                                    <div class="teacher-v2-nip">
+                                        NIP: <?= htmlspecialchars($g['nip']) ?>
+                                    </div>
+                                <?php elseif (!empty($g['employment_status'])): ?>
+                                    <div class="teacher-v2-nip" style="text-transform: uppercase;">
+                                        Status: <?= htmlspecialchars($g['employment_status']) ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>

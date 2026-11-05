@@ -27,78 +27,73 @@ foreach ($schedules as $s) {
 ?>
 
 <main>
-    <section class="page-hero" style="background: linear-gradient(135deg, #0B3D1E 0%, #15803D 100%); color: #fff; padding: 48px 0 40px;">
+    <section class="page-hero-clean">
         <div class="container">
-            <div class="section-label" style="color: #4ADE80; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11.5px; margin-bottom: 8px;">
-                Standar Proses &amp; Mutu Pembelajaran
-            </div>
-            <h1 style="color: #ffffff; font-size: 32px; font-weight: 800; margin-bottom: 12px;">
-                Program Akademik &amp; <span>Jadwal Pelajaran</span>
-            </h1>
-            <p style="color: rgba(255,255,255,.85); max-width: 680px; font-size: 14.5px; line-height: 1.6;">
-                Penyelenggaraan kurikulum terpadu (Kurikulum Merdeka &amp; Kepesantrenan Salafiyah) yang terstruktur, transparan, dan berorientasi pada pembentukan akhlak mulia.
+            <div class="hero-label">Standar Mutu Pembelajaran</div>
+            <h1>Program Akademik &amp; <span>Jadwal Pelajaran</span></h1>
+            <p>
+                Penyelenggaraan kurikulum terpadu (Kurikulum Merdeka dan Kepesantrenan Salafiyah) yang terstruktur, transparan, dan berorientasi pada pembentukan akhlak mulia.
             </p>
         </div>
     </section>
 
     <!-- KURIKULUM & PROGRAM -->
-    <section class="page-section" style="padding: 50px 0 30px; background: #ffffff;">
+    <section style="padding: 56px 0 32px; background: #FFFFFF;">
         <div class="container">
-            <div style="text-align: center; max-width: 680px; margin: 0 auto 36px;">
-                <h2 style="font-size: 24px; font-weight: 800; color: #0F172A; margin-bottom: 8px;">
-                    Integrasi Kurikulum Terpadu
-                </h2>
-                <p style="font-size: 14px; color: #64748B;">
-                    Mengharmonisasikan standar kompetensi nasional dengan keilmuan khas pesantren.
+            <div class="section-head centered">
+                <div class="section-pretitle">Kurikulum Berkelanjutan</div>
+                <h2 class="section-title">Integrasi Kurikulum Terpadu</h2>
+                <p class="section-subtitle">
+                    Mengharmonisasikan standar kompetensi nasional Kemenag dengan khazanah keilmuan kepesantrenan.
                 </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px;">
-                    <div style="font-size: 28px; margin-bottom: 8px;">📚</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Kurikulum Merdeka</h3>
-                    <p style="font-size: 13px; color: #475569; line-height: 1.55; margin: 0;">Pembelajaran berbasis proyek (P5RA) yang mengasah nalar kritis, kolaborasi, dan kemandirian siswa.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px;">
-                    <div style="font-size: 28px; margin-bottom: 8px;">🕌</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Pendidikan Kepesantrenan</h3>
-                    <p style="font-size: 13px; color: #475569; line-height: 1.55; margin: 0;">Kajian kitab kuning dasar (Safinah, Aqidatul Awam, Jurumiyah), tahsin, dan hafalan Juz 'Amma.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px;">
-                    <div style="font-size: 28px; margin-bottom: 8px;">🔬</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Literasi Digital &amp; IT</h3>
-                    <p style="font-size: 13px; color: #475569; line-height: 1.55; margin: 0;">Praktik komputer di laboratorium, internet sehat, serta presensi mandiri santri via aplikasi mobile.</p>
-                </div>
-                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 22px;">
-                    <div style="font-size: 28px; margin-bottom: 8px;">🏆</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin-bottom: 6px;">Bimbingan Prestasi</h3>
-                    <p style="font-size: 13px; color: #475569; line-height: 1.55; margin: 0;">Klinik belajar intensif untuk persiapan kompetisi sains madrasah (KSM) dan kejuaraan seni islami.</p>
-                </div>
+            <div class="pillars-grid">
+                <article class="pillar-item">
+                    <span class="pillar-badge">Kurikulum Nasional</span>
+                    <h3 class="pillar-heading">Kurikulum Merdeka &amp; P5RA</h3>
+                    <p class="pillar-desc">
+                        Pembelajaran berbasis nalar kritis, eksplorasi sains terapan, serta penguatan Profil Pelajar Pancasila dan Rahmatan lil Alamin.
+                    </p>
+                </article>
+
+                <article class="pillar-item">
+                    <span class="pillar-badge">Kepesantrenan</span>
+                    <h3 class="pillar-heading">Pendalaman Kitab Kuning</h3>
+                    <p class="pillar-desc">
+                        Pembelajaran materi keagamaan mendalam: Mabadi Fiqih, Safinatun Najah, Aqidatul Awam, tata bahasa Arab Jurumiyah, serta tahsin Al-Qur'an.
+                    </p>
+                </article>
+
+                <article class="pillar-item">
+                    <span class="pillar-badge">Kompetensi Abad 21</span>
+                    <h3 class="pillar-heading">Literasi Digital &amp; IT Komputer</h3>
+                    <p class="pillar-desc">
+                        Praktik terarah di laboratorium komputer madrasah, penguasaan aplikasi perkantoran, internet sehat, dan pembiasaan sistem digital madrasah.
+                    </p>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- JADWAL PELAJARAN PUBLIK (INTERAKTIF & AKREDITASI READY) -->
-    <section id="jadwal" style="padding: 40px 0 70px; background: #F8FAFC; border-top: 1px solid #E2E8F0;">
+    <!-- JADWAL PELAJARAN PUBLIK -->
+    <section id="jadwal" style="padding: 44px 0 72px; background: #F8FAFC; border-top: 1px solid var(--border);">
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
-                    <div style="font-size: 11.5px; font-weight: 700; color: #15803D; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
-                        Transparansi Akademik
-                    </div>
-                    <h2 style="font-size: 24px; font-weight: 800; color: #0F172A; margin: 0;">
-                        Jadwal Pembelajaran Mingguan Siswa
-                    </h2>
-                    <p style="font-size: 13px; color: #64748B; margin-top: 4px;">
-                        Tahun Ajaran <?= htmlspecialchars($year['name'] ?? '2026/2027') ?> • Akses jadwal resmi santri per rombongan belajar
+                    <div class="section-pretitle">Transparansi Akademik</div>
+                    <h2 class="section-title" style="margin: 0;">Jadwal Pembelajaran Mingguan</h2>
+                    <p style="font-size: 13.5px; color: #64748B; margin: 4px 0 0;">
+                        Tahun Ajaran <?= htmlspecialchars($year['name'] ?? '2026/2027') ?> &middot; Akses jadwal resmi per rombongan belajar
                     </p>
                 </div>
 
-                <!-- Pilihan Kelas (Tab Pills) -->
-                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <!-- Pilihan Kelas -->
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <?php foreach ($classes as $c): ?>
                         <a href="<?= url('akademik?kelas=' . $c['id'] . '#jadwal') ?>" 
-                           style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: all .15s ease; <?= (int) $c['id'] === $selectedClassId ? 'background:#15803D;color:#fff;box-shadow:0 2px 6px rgba(21,128,61,.2)' : 'background:#fff;color:#475569;border:1px solid #CBD5E1' ?>">
+                           class="btn <?= (int) $c['id'] === $selectedClassId ? 'btn-primary' : 'btn-outline' ?>"
+                           style="min-height: 38px; padding: 7px 16px; font-size: 13px;">
                             Kelas <?= htmlspecialchars($c['name']) ?> (Tk. <?= $c['level'] ?>)
                         </a>
                     <?php endforeach; ?>
@@ -106,18 +101,17 @@ foreach ($schedules as $s) {
             </div>
 
             <!-- Tabel Jadwal Pelajaran -->
-            <div style="background: #ffffff; border-radius: 14px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.04);">
+            <div style="background: #FFFFFF; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm);">
                 <?php if (empty($schedules)): ?>
                     <div style="padding: 48px 20px; text-align: center; color: #64748B;">
-                        <span style="font-size: 32px; display: block; margin-bottom: 8px;">📅</span>
-                        <b style="color: #0F172A; font-size: 15px;">Jadwal pelajaran untuk kelas ini sedang dalam penyusunan.</b>
-                        <p style="font-size: 13px; margin-top: 4px;">Silakan pilih kelas lainnya di atas.</p>
+                        <b style="color: #0F172A; font-size: 15px; display: block; margin-bottom: 6px;">Jadwal pelajaran untuk kelas ini belum diinput atau sedang diperbarui.</b>
+                        <p style="font-size: 13.5px; margin: 0;">Silakan pilih rombongan belajar (kelas) lainnya pada tombol pilihan di atas.</p>
                     </div>
                 <?php else: ?>
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
                             <thead>
-                                <tr style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; color: #475569; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                <tr style="background: #F8FAFC; border-bottom: 1px solid var(--border); color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">
                                     <th style="padding: 14px 20px; width: 120px;">Hari</th>
                                     <th style="padding: 14px 20px; width: 160px;">Waktu</th>
                                     <th style="padding: 14px 20px;">Mata Pelajaran</th>
@@ -131,24 +125,24 @@ foreach ($schedules as $s) {
                                         <?php foreach ($byDay[$d] as $idx => $sch): ?>
                                             <tr style="border-bottom: 1px solid #F1F5F9;">
                                                 <?php if ($idx === 0): ?>
-                                                    <td rowspan="<?= count($byDay[$d]) ?>" style="padding: 14px 20px; font-weight: 800; color: #15803D; background: #F0FDF4; vertical-align: middle; border-right: 1px solid #E2E8F0;">
+                                                    <td rowspan="<?= count($byDay[$d]) ?>" style="padding: 14px 20px; font-weight: 800; color: #15803D; background: #F0FDF4; vertical-align: middle; border-right: 1px solid var(--border);">
                                                         <span style="background: #DCFCE7; padding: 4px 10px; border-radius: 6px; display: inline-block;">
                                                             <?= $dayNames[$d] ?>
                                                         </span>
                                                     </td>
                                                 <?php endif; ?>
                                                 <td style="padding: 14px 20px; font-weight: 700; color: #334155;">
-                                                    ⏱️ <?= date('H:i', strtotime($sch['start_time'])) ?> – <?= date('H:i', strtotime($sch['end_time'])) ?> WIB
+                                                    <?= date('H:i', strtotime($sch['start_time'])) ?> - <?= date('H:i', strtotime($sch['end_time'])) ?> WIB
                                                 </td>
                                                 <td style="padding: 14px 20px;">
-                                                    <b style="color: #0F172A; font-size: 14px;"><?= htmlspecialchars($sch['subject_name']) ?></b>
-                                                    <span style="font-size: 11.5px; color: #64748B; margin-left: 6px;">(<?= htmlspecialchars($sch['subject_code']) ?>)</span>
+                                                    <strong style="color: #0F172A; font-size: 14px;"><?= htmlspecialchars($sch['subject_name']) ?></strong>
+                                                    <span style="font-size: 12px; color: #64748B; margin-left: 6px;">(<?= htmlspecialchars($sch['subject_code']) ?>)</span>
                                                 </td>
                                                 <td style="padding: 14px 20px; color: #334155;">
-                                                    👤 <?= htmlspecialchars($sch['teacher_name']) ?>
+                                                    <?= htmlspecialchars($sch['teacher_name']) ?>
                                                 </td>
                                                 <td style="padding: 14px 20px;">
-                                                    <span style="background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    <span style="background: #F1F5F9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;">
                                                         <?= htmlspecialchars($sch['room'] ?? 'Ruang Kelas') ?>
                                                     </span>
                                                 </td>

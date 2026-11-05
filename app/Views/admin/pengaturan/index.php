@@ -144,8 +144,8 @@ $tab = $data['tab'] ?? 'identitas';
                     <div class="field">
                         <label for="attendance_mobile_enabled">Status Presensi Mobile</label>
                         <select id="attendance_mobile_enabled" name="attendance_mobile_enabled">
-                            <option value="1" <?= ($settings['attendance_mobile_enabled'] ?? '1') === '1' ? 'selected' : '' ?>>Aktif — Guru Diizinkan Presensi via Ponsel</option>
-                            <option value="0" <?= ($settings['attendance_mobile_enabled'] ?? '1') === '0' ? 'selected' : '' ?>>Nonaktif — Hanya Presensi Operator Web</option>
+                            <option value="1" <?= ($settings['attendance_mobile_enabled'] ?? '1') === '1' ? 'selected' : '' ?>>Aktif : Guru Diizinkan Presensi via Ponsel</option>
+                            <option value="0" <?= ($settings['attendance_mobile_enabled'] ?? '1') === '0' ? 'selected' : '' ?>>Nonaktif : Hanya Presensi Operator Web</option>
                         </select>
                     </div>
                 </div>
@@ -201,7 +201,7 @@ $tab = $data['tab'] ?? 'identitas';
             <div style="max-width:680px">
                 <div class="field">
                     <label for="meta_title">Judul Meta Default</label>
-                    <input type="text" id="meta_title" name="meta_title" value="<?= htmlspecialchars($settings['meta_title'] ?? 'MTs Al-Huda Gondang — Madrasah Unggul & Berkarakter', ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="text" id="meta_title" name="meta_title" value="<?= htmlspecialchars($settings['meta_title'] ?? 'MTs Al-Huda Gondang | Madrasah Unggul & Berkarakter', ENT_QUOTES, 'UTF-8') ?>">
                 </div>
 
                 <div class="field">

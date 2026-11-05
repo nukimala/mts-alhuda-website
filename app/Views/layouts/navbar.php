@@ -38,7 +38,7 @@ $navItems = [
             <a href="<?= url('ppdb') ?>" class="nav-cta" style="background: #15803D; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 12.5px; text-decoration: none; box-shadow: 0 2px 6px rgba(21,128,61,.25);">
                 Daftar PPDB Online
             </a>
-            <button class="nav-toggle" type="button" aria-label="Buka menu navigasi" style="display: flex; align-items: center; justify-content: center; background: none; border: 1px solid #CBD5E1; border-radius: 6px; padding: 6px; cursor: pointer;">
+            <button class="nav-toggle" type="button" aria-label="Buka menu navigasi" style="display: none; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 1px solid #CBD5E1; border-radius: 8px; cursor: pointer;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>

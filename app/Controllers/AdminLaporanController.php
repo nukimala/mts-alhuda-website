@@ -183,20 +183,12 @@ class AdminLaporanController
         $ppdbAktif       = $q("SELECT COUNT(*) FROM dokumen_ppdb WHERE is_active = 1");
         $ppdbTotal       = $q("SELECT COUNT(*) FROM dokumen_ppdb");
 
-        // Akademik
+        // Akademik & Madrasahku
         $jadwalTotal     = $q("SELECT COUNT(*) FROM jadwal");
         $presensiHariIni = $q("SELECT COUNT(*) FROM presensi_guru WHERE attendance_date = CURDATE()");
         $presensiHadir   = $q("SELECT COUNT(*) FROM presensi_guru WHERE attendance_date = CURDATE() AND status = 'hadir'");
-
-        // Akreditasi
-        $buktiTotal      = $q("SELECT COUNT(*) FROM bukti");
-        $butirTotal      = $q("SELECT COUNT(*) FROM butir_akreditasi");
-        $butirTerpenuhi  = $q("SELECT COUNT(*) FROM butir_akreditasi WHERE status = 'terpenuhi'");
-        $dkaTotal        = $q("SELECT COUNT(*) FROM entri_dka WHERE LENGTH(TRIM(content)) > 0");
-
-        $akreditasiPct   = $butirTotal > 0
-            ? round($butirTerpenuhi / $butirTotal * 100, 1)
-            : 0.0;
+        $totalMapel      = $q("SELECT COUNT(*) FROM mata_pelajaran");
+        $totalKelas      = $q("SELECT COUNT(*) FROM kelas");
 
         // Aktivitas
         $logTotal  = $q("SELECT COUNT(*) FROM log_aktivitas");
@@ -207,9 +199,8 @@ class AdminLaporanController
             'beritaTayang', 'beritaDraft',
             'totalGaleri', 'totalFasilitas',
             'ppdbAktif', 'ppdbTotal',
-            'jadwalTotal',
+            'jadwalTotal', 'totalMapel', 'totalKelas',
             'presensiHariIni', 'presensiHadir',
-            'buktiTotal', 'butirTotal', 'butirTerpenuhi', 'dkaTotal', 'akreditasiPct',
             'logTotal', 'logBulanIni'
         );
     }

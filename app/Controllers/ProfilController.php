@@ -8,8 +8,8 @@ class ProfilController
     {
         $pdo = Database::connection();
 
-        // Data guru
-        $guruStmt = $pdo->query("SELECT g.*, u.name, u.email 
+        // Data guru & tenaga kependidikan
+        $guruStmt = $pdo->query("SELECT g.*, u.name, u.email, u.avatar_path 
                                 FROM guru g 
                                 JOIN pengguna u ON u.id = g.user_id 
                                 WHERE u.is_active = 1 AND u.deleted_at IS NULL 

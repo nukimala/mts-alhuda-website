@@ -56,6 +56,10 @@
                 <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M6 21V8l6-4 6 4v13"/><path d="M10 21v-5h4v5"/></svg>
                 Fasilitas
             </a>
+            <a class="side-link <?= $activeMenu === 'kontak' ? 'on' : '' ?>" href="<?= base_url('admin/kontak') ?>">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Kotak Masuk
+            </a>
 
             <div class="side-group">Layanan</div>
             <a class="side-link <?= $activeMenu === 'pengguna' ? 'on' : '' ?>" href="<?= base_url('admin/pengguna') ?>">
@@ -75,20 +79,6 @@
             <a class="side-link <?= $activeMenu === 'presensi' ? 'on' : '' ?>" href="<?= base_url('admin/presensi') ?>">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                 Presensi Guru
-            </a>
-
-            <div class="side-group">Akreditasi</div>
-            <a class="side-link <?= $activeMenu === 'akreditasi' && $activeSub === '' ? 'on' : '' ?>" href="<?= base_url('admin/akreditasi') ?>">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 14-1.5 7 5-2.5 5 2.5-1.5-7"/></svg>
-                Dashboard Kesiapan
-            </a>
-            <a class="side-link <?= $activeMenu === 'akreditasi' && $activeSub === 'bukti' ? 'on' : '' ?>" href="<?= base_url('admin/akreditasi/bukti') ?>">
-                <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h5l2 2h5a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>
-                Bank Bukti
-            </a>
-            <a class="side-link <?= $activeMenu === 'akreditasi' && $activeSub === 'dka' ? 'on' : '' ?>" href="<?= base_url('admin/akreditasi/dka') ?>">
-                <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
-                Editor DKA
             </a>
 
             <div class="side-group">Sistem</div>

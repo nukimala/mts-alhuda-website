@@ -23,7 +23,7 @@ ob_start();
 </div>
 
 <div class="grid-4" style="margin-bottom:18px">
-    <div class="card">
+    <a href="<?= base_url('admin/pengguna') ?>" class="card" style="text-decoration:none; color:inherit; transition:transform .15s ease, box-shadow .15s ease;">
         <div class="stat">
             <div class="stat-icon">
                 <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 11h5M19.5 8.5v5"/></svg>
@@ -34,9 +34,9 @@ ob_start();
                 <div class="hint"><?= (int) $data['stats']['guru'] ?> guru &middot; <?= (int) $data['stats']['siswa'] ?> siswa</div>
             </div>
         </div>
-    </div>
+    </a>
 
-    <div class="card">
+    <a href="<?= base_url('admin/presensi') ?>" class="card" style="text-decoration:none; color:inherit; transition:transform .15s ease, box-shadow .15s ease;">
         <div class="stat">
             <div class="stat-icon amber">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -47,33 +47,33 @@ ob_start();
                 <div class="hint"><?= (int) $data['stats']['presensi_mobile'] ?> via Mobile App</div>
             </div>
         </div>
-    </div>
+    </a>
 
-    <div class="card">
+    <a href="<?= base_url('admin/berita') ?>" class="card" style="text-decoration:none; color:inherit; transition:transform .15s ease, box-shadow .15s ease;">
         <div class="stat">
             <div class="stat-icon blue">
                 <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M7 9h7M7 13h10M7 17h5"/></svg>
             </div>
             <div>
-                <small>Akademik &amp; Tugas</small>
-                <strong><?= number_format((int) $data['stats']['jadwal'], 0, ',', '.') ?> jadwal</strong>
-                <div class="hint"><?= (int) $data['stats']['tugas'] ?> tugas aktif di app</div>
+                <small>Berita Terpublikasi</small>
+                <strong><?= number_format((int) $data['stats']['berita'], 0, ',', '.') ?></strong>
+                <div class="hint">Warta resmi aktif di web</div>
             </div>
         </div>
-    </div>
+    </a>
 
-    <div class="card">
+    <a href="<?= base_url('admin/kontak') ?>" class="card" style="text-decoration:none; color:inherit; transition:transform .15s ease, box-shadow .15s ease;">
         <div class="stat">
-            <div class="stat-icon red">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="m8.5 14-1.5 7 5-2.5 5 2.5-1.5-7"/></svg>
+            <div class="stat-icon" style="background:#E9F9EF; color:#15803D;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
             <div>
-                <small>Bukti Akreditasi IA2024</small>
-                <strong><?= number_format((int) $data['stats']['bukti'], 0, ',', '.') ?></strong>
-                <div class="hint">Bank bukti terdigitalisasi</div>
+                <small>Kotak Masuk Pesan</small>
+                <strong><?= number_format((int) ($data['stats']['pesan_baru'] ?? 0), 0, ',', '.') ?> baru</strong>
+                <div class="hint">Total <?= number_format((int) ($data['stats']['pesan_total'] ?? 0), 0, ',', '.') ?> pesan masuk</div>
             </div>
         </div>
-    </div>
+    </a>
 </div>
 
 <!-- Kartu Kolaborasi Admin & Mobile App -->

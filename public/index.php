@@ -216,27 +216,21 @@ if ($page === 'admin') {
             }
             break;
 
-        // ---------- Akreditasi ----------
-        case 'akreditasi':
+        // ---------- Kontak / Kotak Masuk ----------
+        case 'kontak':
             $sub = $segments[2] ?? '';
             switch ($sub) {
                 case '':
-                    (new AdminAkreditasiController())->dashboard();
+                    (new AdminKontakController())->index();
                     return;
-                case 'bukti':
-                    (new AdminAkreditasiController())->bukti();
+                case 'mark-read':
+                    (new AdminKontakController())->markRead((int) ($segments[3] ?? 0));
                     return;
-                case 'dka':
-                    (new AdminAkreditasiController())->dka();
+                case 'mark-replied':
+                    (new AdminKontakController())->markReplied((int) ($segments[3] ?? 0));
                     return;
-                case 'store-bukti':
-                    (new AdminAkreditasiController())->storeBukti();
-                    return;
-                case 'delete-bukti':
-                    (new AdminAkreditasiController())->deleteBukti((int) ($segments[3] ?? 0));
-                    return;
-                case 'save-dka':
-                    (new AdminAkreditasiController())->saveDka();
+                case 'delete':
+                    (new AdminKontakController())->delete((int) ($segments[3] ?? 0));
                     return;
             }
             break;
@@ -320,6 +314,11 @@ $routes = [
     'ppdb' => ['PpdbController', 'index'],
     'informasi' => ['PpdbController', 'informasi'],
 ];
+
+if ($page === 'kontak' && strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    (new KontakController())->send();
+    return;
+}
 
 if ($page === 'berita' && isset($segments[1])) {
     (new BeritaController())->detail($segments[1]);
