@@ -1,365 +1,327 @@
 -- ========================================================
--- MIGRASI 016: Skema Lengkap Aplikasi Madrasahku (MTs Al-Huda)
+-- MIGRASI 016: Skema Madrasahku Terpadu (Semi-Bahasa Indonesia)
 -- Database: shulkhim_mts_alhuda_website
--- Dibuat sesuai spesifikasi resmi skema mobile app Flutter
+-- Tujuan : Standardisasi seluruh skema ke semi-Bahasa Indonesia,
+--           penghapusan tabel ganda berbahasa Inggris, dan
+--           penyediaan Compatibility Views untuk Flutter mobile app.
 -- ========================================================
+
+-- @UP
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- --------------------------------------------------------
--- 1. TABEL PENGGUNA & AUTENTIKASI (users)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `username` VARCHAR(50) NOT NULL UNIQUE,
-  `email` VARCHAR(100) NULL UNIQUE,
-  `password` VARCHAR(255) NOT NULL,
-  `role` ENUM('admin', 'guru', 'siswa') NOT NULL DEFAULT 'siswa',
-  `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- 1. Bersihkan tabel ganda berbahasa Inggris jika sempat dibuat
+DROP TABLE IF EXISTS `assignment_submissions`;
+DROP TABLE IF EXISTS `assignments`;
+DROP TABLE IF EXISTS `materials`;
+DROP TABLE IF EXISTS `teacher_attendances`;
+DROP TABLE IF EXISTS `schedules`;
+DROP TABLE IF EXISTS `subjects`;
+DROP TABLE IF EXISTS `siswas`;
+DROP TABLE IF EXISTS `classes`;
+DROP TABLE IF EXISTS `gurus`;
+DROP TABLE IF EXISTS `users`;
+
+-- 2. Pastikan tabel pesan_kontak ada
+CREATE TABLE IF NOT EXISTS `pesan_kontak` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nama` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `telepon` varchar(30) DEFAULT NULL,
+  `subjek` varchar(150) NOT NULL,
+  `pesan` text NOT NULL,
+  `status` enum('baru','dibaca','dibalas') NOT NULL DEFAULT 'baru',
+  `balasan` text DEFAULT NULL,
+  `dibalas_oleh` bigint unsigned DEFAULT NULL,
+  `dibalas_pada` datetime DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_kontak_status` (`status`),
+  KEY `idx_kontak_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
--- 2. TABEL DATA GURU (gurus)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `gurus` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL UNIQUE,
-  `nip` VARCHAR(30) NULL UNIQUE,
-  `nama_lengkap` VARCHAR(100) NOT NULL,
-  `jenis_kelamin` ENUM('L', 'P') NOT NULL DEFAULT 'L',
-  `no_hp` VARCHAR(20) NULL,
-  `alamat` TEXT NULL,
-  `foto_url` VARCHAR(255) NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_gurus_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+-- 3. Pastikan tabel lokasi_sekolah ada (QR & GPS Geofencing)
+CREATE TABLE IF NOT EXISTS `lokasi_sekolah` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nama_lokasi` varchar(100) NOT NULL DEFAULT 'Kantor Guru MTs Al-Huda',
+  `qr_token` varchar(100) NOT NULL,
+  `latitude` decimal(10,8) NOT NULL DEFAULT '-7.58430000',
+  `longitude` decimal(11,8) NOT NULL DEFAULT '111.96820000',
+  `radius_meter` int unsigned NOT NULL DEFAULT '15',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_lokasi_qr` (`qr_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
--- 3. TABEL DATA KELAS (classes)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `classes` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `nama_kelas` VARCHAR(20) NOT NULL UNIQUE,
-  `tingkat` ENUM('7', '8', '9') NOT NULL,
-  `wali_kelas_id` BIGINT UNSIGNED NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_classes_wali` FOREIGN KEY (`wali_kelas_id`) REFERENCES `gurus` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT IGNORE INTO `lokasi_sekolah` (`id`, `nama_lokasi`, `qr_token`, `latitude`, `longitude`, `radius_meter`, `is_active`)
+VALUES (1, 'Kantor Guru MTs Al-Huda Gondang', 'MTS-ALHUDA-ABSENSI-2026-SECURE', -7.56234500, 111.89012300, 20, 1);
 
--- --------------------------------------------------------
--- 4. TABEL DATA SISWA (siswas)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `siswas` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL UNIQUE,
-  `kelas_id` BIGINT UNSIGNED NOT NULL,
-  `nisn` VARCHAR(20) NOT NULL UNIQUE,
-  `nama_lengkap` VARCHAR(100) NOT NULL,
-  `jenis_kelamin` ENUM('L', 'P') NOT NULL DEFAULT 'L',
-  `alamat` TEXT NULL,
-  `nama_wali` VARCHAR(100) NULL,
-  `foto_url` VARCHAR(255) NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_siswas_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_siswas_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `classes` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- 4. Sinkronisasi kolom-kolom pendukung mobile app pada tabel semi-Bahasa Indonesia
+ALTER TABLE `pengguna`
+  ADD COLUMN IF NOT EXISTS `nama` VARCHAR(120) NULL AFTER `name`,
+  ADD COLUMN IF NOT EXISTS `telepon` VARCHAR(30) NULL AFTER `phone`,
+  ADD COLUMN IF NOT EXISTS `foto_url` VARCHAR(255) NULL AFTER `avatar_path`;
 
--- --------------------------------------------------------
--- 5. TABEL MATA PELAJARAN (subjects)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `subjects` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `kode_mapel` VARCHAR(20) NOT NULL UNIQUE,
-  `nama_mapel` VARCHAR(100) NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+UPDATE `pengguna` SET `nama` = `name` WHERE `nama` IS NULL;
+UPDATE `pengguna` SET `telepon` = `phone` WHERE `telepon` IS NULL;
+UPDATE `pengguna` SET `foto_url` = `avatar_path` WHERE `foto_url` IS NULL;
 
--- --------------------------------------------------------
--- 6. TABEL JADWAL PELAJARAN (schedules)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `schedules` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `kelas_id` BIGINT UNSIGNED NOT NULL,
-  `subject_id` BIGINT UNSIGNED NOT NULL,
-  `guru_id` BIGINT UNSIGNED NOT NULL,
-  `hari` ENUM('Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu') NOT NULL,
-  `jam_mulai` TIME NOT NULL,
-  `jam_selesai` TIME NOT NULL,
-  `ruangan` VARCHAR(50) DEFAULT 'Ruang Kelas',
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_schedules_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_schedules_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_schedules_guru` FOREIGN KEY (`guru_id`) REFERENCES `gurus` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `guru`
+  ADD COLUMN IF NOT EXISTS `nama_lengkap` VARCHAR(100) NULL AFTER `nuptk`,
+  ADD COLUMN IF NOT EXISTS `jenis_kelamin` ENUM('L','P') NOT NULL DEFAULT 'L' AFTER `gender`,
+  ADD COLUMN IF NOT EXISTS `no_hp` VARCHAR(30) NULL AFTER `phone`,
+  ADD COLUMN IF NOT EXISTS `alamat` TEXT NULL AFTER `address`,
+  ADD COLUMN IF NOT EXISTS `foto_url` VARCHAR(255) NULL AFTER `alamat`,
+  ADD COLUMN IF NOT EXISTS `status_kepegawaian` VARCHAR(50) DEFAULT 'GTT/PTT' AFTER `employment_status`,
+  ADD COLUMN IF NOT EXISTS `bidang_studi` VARCHAR(120) NULL AFTER `subject_specialty`,
+  ADD COLUMN IF NOT EXISTS `kode_jadwal` VARCHAR(10) NULL AFTER `bidang_studi`;
 
--- --------------------------------------------------------
--- 7. TABEL TITIK PRESENSI & QR KANTOR (school_locations)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `school_locations` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `nama_lokasi` VARCHAR(100) NOT NULL DEFAULT 'Kantor Guru MTs Al-Huda',
-  `qr_token` VARCHAR(100) NOT NULL UNIQUE,
-  `latitude` DECIMAL(10, 8) NOT NULL,
-  `longitude` DECIMAL(11, 8) NOT NULL,
-  `radius_meter` INT UNSIGNED NOT NULL DEFAULT 10,
-  `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+UPDATE `guru` SET `nama_lengkap` = COALESCE(`nama_lengkap`, (SELECT `name` FROM `pengguna` WHERE `pengguna`.`id` = `guru`.`user_id`));
+UPDATE `guru` SET `jenis_kelamin` = `gender` WHERE `jenis_kelamin` IS NULL;
+UPDATE `guru` SET `no_hp` = `phone` WHERE `no_hp` IS NULL;
+UPDATE `guru` SET `alamat` = `address` WHERE `alamat` IS NULL;
+UPDATE `guru` SET `status_kepegawaian` = `employment_status` WHERE `status_kepegawaian` IS NULL;
+UPDATE `guru` SET `bidang_studi` = `subject_specialty` WHERE `bidang_studi` IS NULL;
 
--- --------------------------------------------------------
--- 8. TABEL PRESENSI GURU (teacher_attendances)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `teacher_attendances` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `guru_id` BIGINT UNSIGNED NOT NULL,
-  `tanggal` DATE NOT NULL,
-  `jam_masuk` TIME NULL,
-  `jam_pulang` TIME NULL,
-  `lat_masuk` DECIMAL(10, 8) NULL,
-  `long_masuk` DECIMAL(11, 8) NULL,
-  `lat_pulang` DECIMAL(10, 8) NULL,
-  `long_pulang` DECIMAL(11, 8) NULL,
-  `status` ENUM('hadir', 'terlambat', 'izin', 'sakit', 'alpa') NOT NULL DEFAULT 'hadir',
-  `keterangan` VARCHAR(255) NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY `unique_guru_tanggal` (`guru_id`, `tanggal`),
-  CONSTRAINT `fk_attendance_guru` FOREIGN KEY (`guru_id`) REFERENCES `gurus` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `kelas`
+  ADD COLUMN IF NOT EXISTS `nama_kelas` VARCHAR(20) NULL AFTER `name`,
+  ADD COLUMN IF NOT EXISTS `tingkat` TINYINT UNSIGNED NULL AFTER `level`,
+  ADD COLUMN IF NOT EXISTS `wali_kelas_id` BIGINT UNSIGNED NULL AFTER `homeroom_teacher_id`,
+  ADD COLUMN IF NOT EXISTS `ruangan` VARCHAR(60) DEFAULT 'Ruang Kelas' AFTER `room`;
 
--- --------------------------------------------------------
--- 9. TABEL MATERI PEMBELAJARAN (materials)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `materials` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `guru_id` BIGINT UNSIGNED NOT NULL,
-  `kelas_id` BIGINT UNSIGNED NOT NULL,
-  `subject_id` BIGINT UNSIGNED NOT NULL,
-  `judul` VARCHAR(150) NOT NULL,
-  `deskripsi` TEXT NULL,
-  `file_url` VARCHAR(255) NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_materials_guru` FOREIGN KEY (`guru_id`) REFERENCES `gurus` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_materials_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_materials_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+UPDATE `kelas` SET `nama_kelas` = `name` WHERE `nama_kelas` IS NULL;
+UPDATE `kelas` SET `tingkat` = `level` WHERE `tingkat` IS NULL;
+UPDATE `kelas` SET `wali_kelas_id` = `homeroom_teacher_id` WHERE `wali_kelas_id` IS NULL;
+UPDATE `kelas` SET `ruangan` = `room` WHERE `ruangan` IS NULL;
 
--- --------------------------------------------------------
--- 10. TABEL TUGAS PEMBELAJARAN (assignments)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `assignments` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `guru_id` BIGINT UNSIGNED NOT NULL,
-  `kelas_id` BIGINT UNSIGNED NOT NULL,
-  `subject_id` BIGINT UNSIGNED NOT NULL,
-  `judul` VARCHAR(150) NOT NULL,
-  `instruksi` TEXT NOT NULL,
-  `file_tugas_url` VARCHAR(255) NULL,
-  `deadline` DATETIME NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_assignments_guru` FOREIGN KEY (`guru_id`) REFERENCES `gurus` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_assignments_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_assignments_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `siswa`
+  ADD COLUMN IF NOT EXISTS `kelas_id` BIGINT UNSIGNED NULL AFTER `class_id`,
+  ADD COLUMN IF NOT EXISTS `nama_lengkap` VARCHAR(100) NULL AFTER `nisn`,
+  ADD COLUMN IF NOT EXISTS `jenis_kelamin` ENUM('L','P') NOT NULL DEFAULT 'L' AFTER `gender`,
+  ADD COLUMN IF NOT EXISTS `tempat_lahir` VARCHAR(80) DEFAULT 'Nganjuk' AFTER `birth_place`,
+  ADD COLUMN IF NOT EXISTS `tanggal_lahir` DATE NULL AFTER `birth_date`,
+  ADD COLUMN IF NOT EXISTS `nama_wali` VARCHAR(120) NULL AFTER `guardian_name`,
+  ADD COLUMN IF NOT EXISTS `alamat` TEXT NULL AFTER `address`,
+  ADD COLUMN IF NOT EXISTS `foto_url` VARCHAR(255) NULL AFTER `alamat`,
+  ADD COLUMN IF NOT EXISTS `tahun_masuk` YEAR DEFAULT '2026' AFTER `enrolled_at`,
+  ADD COLUMN IF NOT EXISTS `status` ENUM('aktif','lulus','mutasi','keluar') NOT NULL DEFAULT 'aktif' AFTER `tahun_masuk`;
 
--- --------------------------------------------------------
--- 11. TABEL PENGUMPULAN TUGAS SISWA (assignment_submissions)
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `assignment_submissions` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `assignment_id` BIGINT UNSIGNED NOT NULL,
-  `siswa_id` BIGINT UNSIGNED NOT NULL,
-  `file_jawaban_url` VARCHAR(255) NULL,
-  `catatan_siswa` TEXT NULL,
-  `submitted_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `status` ENUM('submitted', 'late') NOT NULL DEFAULT 'submitted',
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY `unique_submission` (`assignment_id`, `siswa_id`),
-  CONSTRAINT `fk_asub_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_asub_siswa` FOREIGN KEY (`siswa_id`) REFERENCES `siswas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+UPDATE `siswa` SET `kelas_id` = `class_id` WHERE `kelas_id` IS NULL;
+UPDATE `siswa` SET `nama_lengkap` = COALESCE(`nama_lengkap`, (SELECT `name` FROM `pengguna` WHERE `pengguna`.`id` = `siswa`.`user_id`));
+UPDATE `siswa` SET `jenis_kelamin` = `gender` WHERE `jenis_kelamin` IS NULL;
+UPDATE `siswa` SET `tempat_lahir` = `birth_place` WHERE `tempat_lahir` IS NULL;
+UPDATE `siswa` SET `tanggal_lahir` = `birth_date` WHERE `tanggal_lahir` IS NULL;
+UPDATE `siswa` SET `nama_wali` = `guardian_name` WHERE `nama_wali` IS NULL;
+UPDATE `siswa` SET `alamat` = `address` WHERE `alamat` IS NULL;
 
--- --------------------------------------------------------
--- SEED / SINKRONISASI DATA DARI TABEL WEB KE MADRASAHKU DB
--- --------------------------------------------------------
+ALTER TABLE `mata_pelajaran`
+  ADD COLUMN IF NOT EXISTS `kode_mapel` VARCHAR(20) NULL AFTER `code`,
+  ADD COLUMN IF NOT EXISTS `nama_mapel` VARCHAR(120) NULL AFTER `name`,
+  ADD COLUMN IF NOT EXISTS `kelompok` ENUM('agama','umum','muatan_lokal','ekstrakurikuler') NOT NULL DEFAULT 'umum' AFTER `group_name`;
 
--- 1. users: salin dari pengguna
-INSERT IGNORE INTO `users` (`id`, `username`, `email`, `password`, `role`, `is_active`, `created_at`, `updated_at`)
-SELECT 
-    `id`, 
-    COALESCE(NULLIF(`username`, ''), LOWER(REPLACE(SUBSTRING_INDEX(`email`, '@', 1), '.', '_')), CONCAT('user_', `id`)),
-    `email`,
-    `password_hash`,
-    CASE 
-        WHEN `role` IN ('admin', 'operator', 'kepala') THEN 'admin'
-        WHEN `role` = 'guru' THEN 'guru'
-        ELSE 'siswa'
-    END,
-    `is_active`,
-    `created_at`,
-    `updated_at`
+UPDATE `mata_pelajaran` SET `kode_mapel` = `code` WHERE `kode_mapel` IS NULL;
+UPDATE `mata_pelajaran` SET `nama_mapel` = `name` WHERE `nama_mapel` IS NULL;
+UPDATE `mata_pelajaran` SET `kelompok` = `group_name` WHERE `kelompok` IS NULL;
+
+ALTER TABLE `mata_pelajaran_kelas`
+  ADD COLUMN IF NOT EXISTS `kelas_id` BIGINT UNSIGNED NULL AFTER `class_id`,
+  ADD COLUMN IF NOT EXISTS `mata_pelajaran_id` BIGINT UNSIGNED NULL AFTER `subject_id`,
+  ADD COLUMN IF NOT EXISTS `guru_id` BIGINT UNSIGNED NULL AFTER `teacher_id`,
+  ADD COLUMN IF NOT EXISTS `jam_mingguan` TINYINT UNSIGNED NOT NULL DEFAULT '2' AFTER `weekly_hours`;
+
+UPDATE `mata_pelajaran_kelas` SET `kelas_id` = `class_id` WHERE `kelas_id` IS NULL;
+UPDATE `mata_pelajaran_kelas` SET `mata_pelajaran_id` = `subject_id` WHERE `mata_pelajaran_id` IS NULL;
+UPDATE `mata_pelajaran_kelas` SET `guru_id` = `teacher_id` WHERE `guru_id` IS NULL;
+UPDATE `mata_pelajaran_kelas` SET `jam_mingguan` = `weekly_hours` WHERE `jam_mingguan` IS NULL;
+
+ALTER TABLE `jadwal`
+  ADD COLUMN IF NOT EXISTS `kelas_id` BIGINT UNSIGNED NULL AFTER `class_subject_id`,
+  ADD COLUMN IF NOT EXISTS `subject_id` BIGINT UNSIGNED NULL AFTER `kelas_id`,
+  ADD COLUMN IF NOT EXISTS `mata_pelajaran_id` BIGINT UNSIGNED NULL AFTER `subject_id`,
+  ADD COLUMN IF NOT EXISTS `guru_id` BIGINT UNSIGNED NULL AFTER `teacher_id`,
+  ADD COLUMN IF NOT EXISTS `hari` ENUM('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') NOT NULL DEFAULT 'Senin' AFTER `day_of_week`,
+  ADD COLUMN IF NOT EXISTS `jam_mulai` TIME NULL AFTER `start_time`,
+  ADD COLUMN IF NOT EXISTS `jam_selesai` TIME NULL AFTER `end_time`,
+  ADD COLUMN IF NOT EXISTS `ruangan` VARCHAR(60) DEFAULT 'Ruang Kelas' AFTER `room`;
+
+UPDATE `jadwal` j
+  JOIN `mata_pelajaran_kelas` mpk ON mpk.`id` = j.`class_subject_id`
+SET j.`kelas_id` = mpk.`class_id`,
+    j.`subject_id` = mpk.`subject_id`,
+    j.`mata_pelajaran_id` = mpk.`subject_id`,
+    j.`guru_id` = j.`teacher_id`
+WHERE j.`kelas_id` IS NULL;
+
+UPDATE `jadwal` SET `jam_mulai` = `start_time` WHERE `jam_mulai` IS NULL;
+UPDATE `jadwal` SET `jam_selesai` = `end_time` WHERE `jam_selesai` IS NULL;
+UPDATE `jadwal` SET `ruangan` = `room` WHERE `ruangan` IS NULL;
+UPDATE `jadwal` SET `hari` = CASE `day_of_week`
+  WHEN 1 THEN 'Senin'
+  WHEN 2 THEN 'Selasa'
+  WHEN 3 THEN 'Rabu'
+  WHEN 4 THEN 'Kamis'
+  WHEN 5 THEN 'Jumat'
+  WHEN 6 THEN 'Sabtu'
+  ELSE 'Minggu'
+END WHERE `hari` IS NULL OR `hari` = 'Senin';
+
+ALTER TABLE `presensi_guru`
+  ADD COLUMN IF NOT EXISTS `guru_id` BIGINT UNSIGNED NULL AFTER `teacher_id`,
+  ADD COLUMN IF NOT EXISTS `tanggal` DATE NULL AFTER `attendance_date`,
+  ADD COLUMN IF NOT EXISTS `jam_masuk` TIME NULL AFTER `check_in_at`,
+  ADD COLUMN IF NOT EXISTS `jam_pulang` TIME NULL AFTER `check_out_at`,
+  ADD COLUMN IF NOT EXISTS `lat_masuk` DECIMAL(10,8) NULL AFTER `jam_masuk`,
+  ADD COLUMN IF NOT EXISTS `long_masuk` DECIMAL(11,8) NULL AFTER `lat_masuk`,
+  ADD COLUMN IF NOT EXISTS `lat_pulang` DECIMAL(10,8) NULL AFTER `jam_pulang`,
+  ADD COLUMN IF NOT EXISTS `long_pulang` DECIMAL(11,8) NULL AFTER `lat_pulang`,
+  ADD COLUMN IF NOT EXISTS `keterangan` VARCHAR(255) NULL AFTER `notes`,
+  ADD COLUMN IF NOT EXISTS `lampiran` VARCHAR(255) NULL AFTER `attachment_path`;
+
+UPDATE `presensi_guru` SET `guru_id` = `teacher_id` WHERE `guru_id` IS NULL;
+UPDATE `presensi_guru` SET `tanggal` = `attendance_date` WHERE `tanggal` IS NULL;
+UPDATE `presensi_guru` SET `jam_masuk` = TIME(`check_in_at`) WHERE `jam_masuk` IS NULL AND `check_in_at` IS NOT NULL;
+UPDATE `presensi_guru` SET `jam_pulang` = TIME(`check_out_at`) WHERE `jam_pulang` IS NULL AND `check_out_at` IS NOT NULL;
+UPDATE `presensi_guru` SET `keterangan` = `notes` WHERE `keterangan` IS NULL;
+UPDATE `presensi_guru` SET `lampiran` = `attachment_path` WHERE `lampiran` IS NULL;
+
+ALTER TABLE `materi`
+  ADD COLUMN IF NOT EXISTS `kelas_id` BIGINT UNSIGNED NULL AFTER `class_subject_id`,
+  ADD COLUMN IF NOT EXISTS `guru_id` BIGINT UNSIGNED NULL AFTER `kelas_id`,
+  ADD COLUMN IF NOT EXISTS `mata_pelajaran_id` BIGINT UNSIGNED NULL AFTER `guru_id`,
+  ADD COLUMN IF NOT EXISTS `judul` VARCHAR(200) NULL AFTER `title`,
+  ADD COLUMN IF NOT EXISTS `deskripsi` TEXT NULL AFTER `description`,
+  ADD COLUMN IF NOT EXISTS `file_url` VARCHAR(255) NULL AFTER `file_path`;
+
+UPDATE `materi` SET `judul` = `title` WHERE `judul` IS NULL;
+UPDATE `materi` SET `deskripsi` = `description` WHERE `deskripsi` IS NULL;
+UPDATE `materi` SET `file_url` = `file_path` WHERE `file_url` IS NULL;
+
+ALTER TABLE `tugas`
+  ADD COLUMN IF NOT EXISTS `kelas_id` BIGINT UNSIGNED NULL AFTER `class_subject_id`,
+  ADD COLUMN IF NOT EXISTS `guru_id` BIGINT UNSIGNED NULL AFTER `kelas_id`,
+  ADD COLUMN IF NOT EXISTS `mata_pelajaran_id` BIGINT UNSIGNED NULL AFTER `guru_id`,
+  ADD COLUMN IF NOT EXISTS `judul` VARCHAR(200) NULL AFTER `title`,
+  ADD COLUMN IF NOT EXISTS `instruksi` TEXT NULL AFTER `description`,
+  ADD COLUMN IF NOT EXISTS `file_tugas_url` VARCHAR(255) NULL AFTER `attachment_path`,
+  ADD COLUMN IF NOT EXISTS `deadline` DATETIME NULL AFTER `due_at`;
+
+UPDATE `tugas` SET `judul` = `title` WHERE `judul` IS NULL;
+UPDATE `tugas` SET `instruksi` = `description` WHERE `instruksi` IS NULL;
+UPDATE `tugas` SET `file_tugas_url` = `attachment_path` WHERE `file_tugas_url` IS NULL;
+UPDATE `tugas` SET `deadline` = `due_at` WHERE `deadline` IS NULL;
+
+ALTER TABLE `pengumpulan_tugas`
+  ADD COLUMN IF NOT EXISTS `tugas_id` BIGINT UNSIGNED NULL AFTER `assignment_id`,
+  ADD COLUMN IF NOT EXISTS `siswa_id` BIGINT UNSIGNED NULL AFTER `student_id`,
+  ADD COLUMN IF NOT EXISTS `file_jawaban_url` VARCHAR(255) NULL AFTER `file_path`,
+  ADD COLUMN IF NOT EXISTS `catatan_siswa` TEXT NULL AFTER `note`,
+  ADD COLUMN IF NOT EXISTS `nilai` DECIMAL(5,2) NULL AFTER `score`,
+  ADD COLUMN IF NOT EXISTS `catatan_guru` TEXT NULL AFTER `feedback`;
+
+UPDATE `pengumpulan_tugas` SET `tugas_id` = `assignment_id` WHERE `tugas_id` IS NULL;
+UPDATE `pengumpulan_tugas` SET `siswa_id` = `student_id` WHERE `siswa_id` IS NULL;
+UPDATE `pengumpulan_tugas` SET `file_jawaban_url` = `file_path` WHERE `file_jawaban_url` IS NULL;
+UPDATE `pengumpulan_tugas` SET `catatan_siswa` = `note` WHERE `catatan_siswa` IS NULL;
+UPDATE `pengumpulan_tugas` SET `nilai` = `score` WHERE `nilai` IS NULL;
+UPDATE `pengumpulan_tugas` SET `catatan_guru` = `feedback` WHERE `catatan_guru` IS NULL;
+
+-- 5. Buat / Perbarui Compatibility Views untuk Mobile App Flutter
+CREATE OR REPLACE VIEW `users` AS 
+SELECT `id`, `username`, `email`, `password_hash` AS `password`, `password_hash`, `name`, `nama`, `role`, `is_active`, `created_at`, `updated_at` 
 FROM `pengguna`;
 
--- 2. gurus: salin dari guru + pengguna
-INSERT IGNORE INTO `gurus` (`id`, `user_id`, `nip`, `nama_lengkap`, `jenis_kelamin`, `no_hp`, `alamat`, `foto_url`, `created_at`, `updated_at`)
-SELECT 
-    g.`id`,
-    g.`user_id`,
-    g.`nip`,
-    p.`name`,
-    COALESCE(g.`gender`, 'L'),
-    p.`phone`,
-    NULL,
-    p.`avatar_path`,
-    g.`created_at`,
-    g.`updated_at`
-FROM `guru` g
-JOIN `pengguna` p ON p.`id` = g.`user_id`;
+CREATE OR REPLACE VIEW `gurus` AS 
+SELECT `id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `jenis_kelamin`, `gender`, `no_hp`, `phone`, `alamat`, `address`, `foto_url`, `status_kepegawaian`, `bidang_studi`, `kode_jadwal`, `is_active`, `created_at`, `updated_at` 
+FROM `guru`;
 
--- 3. classes: salin dari kelas
-INSERT IGNORE INTO `classes` (`id`, `nama_kelas`, `tingkat`, `wali_kelas_id`, `created_at`, `updated_at`)
-SELECT 
-    k.`id`,
-    k.`name`,
-    CASE 
-        WHEN k.`level` IN (7, 8, 9) THEN CAST(k.`level` AS CHAR)
-        WHEN k.`name` LIKE 'VII%' OR k.`name` LIKE '7%' THEN '7'
-        WHEN k.`name` LIKE 'VIII%' OR k.`name` LIKE '8%' THEN '8'
-        WHEN k.`name` LIKE 'IX%' OR k.`name` LIKE '9%' THEN '9'
-        ELSE '7'
-    END,
-    k.`homeroom_teacher_id`,
-    k.`created_at`,
-    k.`updated_at`
-FROM `kelas` k;
+CREATE OR REPLACE VIEW `teachers` AS 
+SELECT `id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `gender`, `jenis_kelamin`, `phone` AS `no_hp`, `address` AS `alamat`, `foto_url`, `employment_status`, `subject_specialty`, `is_active`, `created_at`, `updated_at` 
+FROM `guru`;
 
--- 4. siswas: salin dari siswa + pengguna
-INSERT IGNORE INTO `siswas` (`id`, `user_id`, `kelas_id`, `nisn`, `nama_lengkap`, `jenis_kelamin`, `alamat`, `nama_wali`, `foto_url`, `created_at`, `updated_at`)
-SELECT 
-    s.`id`,
-    s.`user_id`,
-    s.`class_id`,
-    s.`nisn`,
-    p.`name`,
-    COALESCE(s.`gender`, 'L'),
-    s.`address`,
-    s.`guardian_name`,
-    p.`avatar_path`,
-    s.`created_at`,
-    s.`updated_at`
-FROM `siswa` s
-JOIN `pengguna` p ON p.`id` = s.`user_id`;
+CREATE OR REPLACE VIEW `classes` AS 
+SELECT `id`, `academic_year_id`, `name`, `nama_kelas`, `level`, `tingkat`, `homeroom_teacher_id` AS `wali_kelas_id`, `room`, `ruangan`, `capacity`, `sort_order`, `is_active`, `created_at`, `updated_at` 
+FROM `kelas`;
 
--- 5. subjects: salin dari mata_pelajaran
-INSERT IGNORE INTO `subjects` (`id`, `kode_mapel`, `nama_mapel`, `created_at`, `updated_at`)
-SELECT 
-    `id`,
-    `code`,
-    `name`,
-    `created_at`,
-    `updated_at`
+CREATE OR REPLACE VIEW `siswas` AS 
+SELECT `id`, `user_id`, `class_id` AS `kelas_id`, `class_id`, `nis`, `nisn`, `nama_lengkap`, `jenis_kelamin`, `gender`, `tempat_lahir`, `tanggal_lahir`, `nama_wali`, `alamat`, `foto_url`, `status`, `created_at`, `updated_at` 
+FROM `siswa`;
+
+CREATE OR REPLACE VIEW `students` AS 
+SELECT `id`, `user_id`, `class_id`, `class_id` AS `kelas_id`, `nis`, `nisn`, `nama_lengkap`, `gender`, `jenis_kelamin`, `birth_place`, `birth_date`, `guardian_name`, `address`, `foto_url`, `enrolled_at`, `status`, `is_active`, `created_at`, `updated_at` 
+FROM `siswa`;
+
+CREATE OR REPLACE VIEW `subjects` AS 
+SELECT `id`, `code` AS `kode_mapel`, `code`, `name` AS `nama_mapel`, `name`, `group_name` AS `kelompok`, `group_name`, `sort_order`, `is_active`, `created_at`, `updated_at` 
 FROM `mata_pelajaran`;
 
--- 6. schedules: salin dari jadwal + mata_pelajaran_kelas
-INSERT IGNORE INTO `schedules` (`id`, `kelas_id`, `subject_id`, `guru_id`, `hari`, `jam_mulai`, `jam_selesai`, `ruangan`, `created_at`, `updated_at`)
-SELECT 
-    j.`id`,
-    mpk.`class_id`,
-    mpk.`subject_id`,
-    j.`teacher_id`,
-    CASE j.`day_of_week`
-        WHEN 1 THEN 'Senin'
-        WHEN 2 THEN 'Selasa'
-        WHEN 3 THEN 'Rabu'
-        WHEN 4 THEN 'Kamis'
-        WHEN 5 THEN 'Jumat'
-        WHEN 6 THEN 'Sabtu'
-        ELSE 'Senin'
-    END,
-    j.`start_time`,
-    j.`end_time`,
-    COALESCE(j.`room`, 'Ruang Kelas'),
-    j.`created_at`,
-    j.`updated_at`
-FROM `jadwal` j
-JOIN `mata_pelajaran_kelas` mpk ON mpk.`id` = j.`class_subject_id`
-WHERE j.`day_of_week` BETWEEN 1 AND 6;
+CREATE OR REPLACE VIEW `class_subjects` AS 
+SELECT `id`, `class_id` AS `kelas_id`, `class_id`, `subject_id` AS `mata_pelajaran_id`, `subject_id`, `teacher_id` AS `guru_id`, `teacher_id`, `weekly_hours` AS `jam_mingguan`, `weekly_hours`, `is_active`, `created_at`, `updated_at` 
+FROM `mata_pelajaran_kelas`;
 
--- 7. school_locations: koordinat GPS MTs Al-Huda (Pandean, Gondang, Nganjuk)
-INSERT IGNORE INTO `school_locations` (`id`, `nama_lokasi`, `qr_token`, `latitude`, `longitude`, `radius_meter`, `is_active`)
-VALUES (1, 'Kantor Guru MTs Al-Huda', 'MTS-ALHUDA-ABSENSI-2026-SECURE', -7.56234500, 111.89012300, 15, 1);
+CREATE OR REPLACE VIEW `schedules` AS 
+SELECT `id`, `class_subject_id`, `kelas_id` AS `class_id`, `kelas_id`, `subject_id` AS `mata_pelajaran_id`, `subject_id`, `teacher_id` AS `guru_id`, `teacher_id`, `academic_year_id`, `day_of_week`, `hari`, `start_time` AS `jam_mulai`, `start_time`, `end_time` AS `jam_selesai`, `end_time`, `room` AS `ruangan`, `room`, `is_active`, `created_at`, `updated_at` 
+FROM `jadwal`;
 
--- 8. teacher_attendances: salin dari presensi_guru
-INSERT IGNORE INTO `teacher_attendances` (`id`, `guru_id`, `tanggal`, `jam_masuk`, `jam_pulang`, `status`, `keterangan`, `created_at`, `updated_at`)
-SELECT 
-    `id`,
-    `teacher_id`,
-    `attendance_date`,
-    TIME(`check_in_at`),
-    TIME(`check_out_at`),
-    CASE 
-        WHEN `status` IN ('hadir', 'terlambat', 'izin', 'sakit', 'alpa') THEN `status`
-        ELSE 'hadir'
-    END,
-    `note`,
-    `created_at`,
-    `updated_at`
+CREATE OR REPLACE VIEW `school_locations` AS 
+SELECT `id`, `nama_lokasi`, `qr_token`, `latitude`, `longitude`, `radius_meter`, `is_active`, `created_at`, `updated_at` 
+FROM `lokasi_sekolah`;
+
+CREATE OR REPLACE VIEW `teacher_attendances` AS 
+SELECT `id`, `teacher_id` AS `guru_id`, `teacher_id`, `attendance_date` AS `tanggal`, `attendance_date`, `attendance_type`, `schedule_id`, `check_in_at`, `jam_masuk`, `check_out_at`, `jam_pulang`, `lat_masuk`, `long_masuk`, `lat_pulang`, `long_pulang`, `status`, `keterangan`, `notes`, `attachment_path` AS `lampiran`, `created_at`, `updated_at` 
 FROM `presensi_guru`;
 
--- 9. materials: salin dari materi
-INSERT IGNORE INTO `materials` (`id`, `guru_id`, `kelas_id`, `subject_id`, `judul`, `deskripsi`, `file_url`, `created_at`, `updated_at`)
-SELECT 
-    m.`id`,
-    COALESCE(m.`created_by`, mpk.`teacher_id`, 1),
-    mpk.`class_id`,
-    mpk.`subject_id`,
-    m.`title`,
-    m.`description`,
-    m.`file_path`,
-    m.`created_at`,
-    m.`updated_at`
-FROM `materi` m
-JOIN `mata_pelajaran_kelas` mpk ON mpk.`id` = m.`class_subject_id`;
+CREATE OR REPLACE VIEW `materials` AS 
+SELECT `id`, `class_subject_id`, `kelas_id`, `guru_id`, `mata_pelajaran_id`, `title` AS `judul`, `title`, `description` AS `deskripsi`, `description`, `file_path`, `file_url`, `external_url`, `is_published`, `published_at`, `created_by`, `created_at`, `updated_at` 
+FROM `materi`;
 
--- 10. assignments: salin dari tugas
-INSERT IGNORE INTO `assignments` (`id`, `guru_id`, `kelas_id`, `subject_id`, `judul`, `instruksi`, `file_tugas_url`, `deadline`, `created_at`, `updated_at`)
-SELECT 
-    t.`id`,
-    COALESCE(t.`created_by`, mpk.`teacher_id`, 1),
-    mpk.`class_id`,
-    mpk.`subject_id`,
-    t.`title`,
-    COALESCE(t.`description`, 'Harap kerjakan tugas sesuai arahan.'),
-    t.`attachment_path`,
-    COALESCE(t.`due_at`, DATE_ADD(NOW(), INTERVAL 7 DAY)),
-    t.`created_at`,
-    t.`updated_at`
-FROM `tugas` t
-JOIN `mata_pelajaran_kelas` mpk ON mpk.`id` = t.`class_subject_id`;
+CREATE OR REPLACE VIEW `assignments` AS 
+SELECT `id`, `public_id`, `class_subject_id`, `kelas_id`, `guru_id`, `mata_pelajaran_id`, `title` AS `judul`, `title`, `description` AS `instruksi`, `description`, `attachment_path` AS `file_tugas_url`, `attachment_path`, `due_at` AS `deadline`, `due_at`, `max_score`, `is_published`, `created_by`, `created_at`, `updated_at` 
+FROM `tugas`;
 
--- 11. assignment_submissions: salin dari pengumpulan_tugas
-INSERT IGNORE INTO `assignment_submissions` (`id`, `assignment_id`, `siswa_id`, `file_jawaban_url`, `catatan_siswa`, `submitted_at`, `status`, `created_at`, `updated_at`)
-SELECT 
-    pt.`id`,
-    pt.`assignment_id`,
-    pt.`student_id`,
-    pt.`file_path`,
-    pt.`note`,
-    pt.`submitted_at`,
-    'submitted',
-    pt.`created_at`,
-    pt.`updated_at`
-FROM `pengumpulan_tugas` pt;
+CREATE OR REPLACE VIEW `submissions` AS 
+SELECT `id`, `public_id`, `assignment_id`, `assignment_id` AS `tugas_id`, `student_id`, `student_id` AS `siswa_id`, `file_path`, `file_path` AS `file_jawaban_url`, `note` AS `catatan_siswa`, `note`, `submitted_at`, `status`, `score` AS `nilai`, `score`, `feedback` AS `catatan_guru`, `feedback`, `graded_at`, `graded_by`, `created_at`, `updated_at` 
+FROM `pengumpulan_tugas`;
+
+CREATE OR REPLACE VIEW `assignment_submissions` AS 
+SELECT `id`, `public_id`, `assignment_id` AS `tugas_id`, `assignment_id`, `student_id` AS `siswa_id`, `student_id`, `file_jawaban_url`, `catatan_siswa`, `submitted_at`, `status`, `nilai` AS `score`, `nilai`, `catatan_guru` AS `feedback`, `catatan_guru`, `graded_at`, `graded_by`, `created_at`, `updated_at` 
+FROM `pengumpulan_tugas`;
+
+CREATE OR REPLACE VIEW `academic_years` AS 
+SELECT `id`, `name` AS `nama_tahun`, `name`, `semester`, `start_date`, `end_date`, `is_active`, `note`, `created_at`, `updated_at` 
+FROM `tahun_akademik`;
+
+CREATE OR REPLACE VIEW `halaman_profil` AS 
+SELECT `id`, `slug`, `title` AS `judul`, `title`, `content` AS `isi`, `content`, `is_active`, `updated_by`, `created_at`, `updated_at` 
+FROM `halaman`;
+
+CREATE OR REPLACE VIEW `activity_logs` AS 
+SELECT `id`, `user_id`, `action`, `entity_type`, `entity_id`, `details`, `ip_address`, `user_agent`, `created_at` 
+FROM `log_audit`;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- @DOWN
+
+DROP VIEW IF EXISTS `activity_logs`;
+DROP VIEW IF EXISTS `halaman_profil`;
+DROP VIEW IF EXISTS `academic_years`;
+DROP VIEW IF EXISTS `assignment_submissions`;
+DROP VIEW IF EXISTS `submissions`;
+DROP VIEW IF EXISTS `assignments`;
+DROP VIEW IF EXISTS `materials`;
+DROP VIEW IF EXISTS `teacher_attendances`;
+DROP VIEW IF EXISTS `school_locations`;
+DROP VIEW IF EXISTS `schedules`;
+DROP VIEW IF EXISTS `class_subjects`;
+DROP VIEW IF EXISTS `subjects`;
+DROP VIEW IF EXISTS `students`;
+DROP VIEW IF EXISTS `siswas`;
+DROP VIEW IF EXISTS `classes`;
+DROP VIEW IF EXISTS `teachers`;
+DROP VIEW IF EXISTS `gurus`;
+DROP VIEW IF EXISTS `users`;

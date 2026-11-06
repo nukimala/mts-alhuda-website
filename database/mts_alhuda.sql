@@ -1,1218 +1,1404 @@
--- ===========================================================================
--- MTs Al-Huda Gondang - database siap impor (satu berkas)
---
--- Isi    : 42 tabel (14 migrasi) + pengaturan awal + data contoh
--- Dibuat : 23 Oktober 2026, dari MySQL 8.4.3
--- Impor  : lihat database/README.md bagian "Impor satu berkas"
---
--- Akun contoh (username / sandi):
---   admin      / Admin#AlHuda2026   (email admin@mts-alhuda.sch.id; wajib ganti)
---   operator   / Contoh#AlHuda2026
---   guru       / Contoh#AlHuda2026
---   siswa      / Contoh#AlHuda2026
---
--- Berkas ini membuat database `mts_alhuda`. Kalau sudah ada, tabelnya
--- ditimpa satu per satu (DROP TABLE IF EXISTS) - bukan database-nya.
--- ===========================================================================
+-- ============================================================================
+-- DATABASE MASTER DUMP: MTs Al-Huda Gondang
+-- Standar Penamaan: Semi-Bahasa Indonesia (Tunggal)
+-- Terintegrasi: Web Portal Madrasah & Mobile App (Madrasahku)
+-- Disusun: 2026-11-07
+-- ============================================================================
 
-CREATE DATABASE IF NOT EXISTS `mts_alhuda`
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+SET FOREIGN_KEY_CHECKS = 0;
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+SET time_zone = '+07:00';
+SET NAMES utf8mb4;
 
-USE `mts_alhuda`;
+-- --------------------------------------------------------------------------
+-- 0. BERSIHKAN TABEL MODUL AKREDITASI LAMA & TABEL GANDA
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pemeriksaan_indikator`;
+DROP TABLE IF EXISTS `indikator_akreditasi`;
+DROP TABLE IF EXISTS `hasil_akreditasi`;
+DROP TABLE IF EXISTS `tindak_lanjut`;
+DROP TABLE IF EXISTS `entri_dka`;
+DROP TABLE IF EXISTS `bukti_butir`;
+DROP TABLE IF EXISTS `bukti`;
+DROP TABLE IF EXISTS `butir_akreditasi`;
+DROP TABLE IF EXISTS `komponen_akreditasi`;
+DROP TABLE IF EXISTS `periode_akreditasi`;
+DROP TABLE IF EXISTS `agenda_tugas`;
+DROP TABLE IF EXISTS `dokumen_utama`;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `tahun_akademik``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tahun_akademik`` (
+DROP TABLE IF EXISTS `assignment_submissions`;
+DROP TABLE IF EXISTS `assignments`;
+DROP TABLE IF EXISTS `materials`;
+DROP TABLE IF EXISTS `teacher_attendances`;
+DROP TABLE IF EXISTS `schedules`;
+DROP TABLE IF EXISTS `subjects`;
+DROP TABLE IF EXISTS `siswas`;
+DROP TABLE IF EXISTS `classes`;
+DROP TABLE IF EXISTS `gurus`;
+DROP TABLE IF EXISTS `users`;
+
+DROP VIEW IF EXISTS `users`;
+DROP VIEW IF EXISTS `gurus`;
+DROP VIEW IF EXISTS `teachers`;
+DROP VIEW IF EXISTS `classes`;
+DROP VIEW IF EXISTS `siswas`;
+DROP VIEW IF EXISTS `students`;
+DROP VIEW IF EXISTS `subjects`;
+DROP VIEW IF EXISTS `class_subjects`;
+DROP VIEW IF EXISTS `schedules`;
+DROP VIEW IF EXISTS `school_locations`;
+DROP VIEW IF EXISTS `teacher_attendances`;
+DROP VIEW IF EXISTS `materials`;
+DROP VIEW IF EXISTS `assignments`;
+DROP VIEW IF EXISTS `submissions`;
+DROP VIEW IF EXISTS `assignment_submissions`;
+DROP VIEW IF EXISTS `academic_years`;
+DROP VIEW IF EXISTS `halaman_profil`;
+DROP VIEW IF EXISTS `activity_logs`;
+
+-- --------------------------------------------------------------------------
+-- 1. TABEL PENGGUNA (users)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pengguna`;
+CREATE TABLE `pengguna` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(60) NOT NULL,
+  `email` varchar(160) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `nama` varchar(120) DEFAULT NULL,
+  `role` enum('admin','operator','kepala','guru','siswa') NOT NULL DEFAULT 'siswa',
+  `role_label` varchar(50) DEFAULT NULL,
+  `phone` varchar(30) DEFAULT NULL,
+  `telepon` varchar(30) DEFAULT NULL,
+  `avatar_path` varchar(255) DEFAULT NULL,
+  `foto_url` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `must_change_password` tinyint(1) NOT NULL DEFAULT '0',
+  `failed_login_attempts` tinyint unsigned NOT NULL DEFAULT '0',
+  `locked_until` datetime DEFAULT NULL,
+  `last_login_at` datetime DEFAULT NULL,
+  `last_login_ip` varchar(45) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pengguna_username` (`username`),
+  UNIQUE KEY `uq_pengguna_email` (`email`),
+  KEY `idx_pengguna_role` (`role`,`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 2. TABEL GURU (teachers)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `guru`;
+CREATE TABLE `guru` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `nip` varchar(30) DEFAULT NULL,
+  `nuptk` varchar(30) DEFAULT NULL,
+  `gelar_depan` varchar(20) DEFAULT NULL,
+  `nama_lengkap` varchar(100) NOT NULL,
+  `gelar_belakang` varchar(20) DEFAULT NULL,
+  `gender` enum('L','P') NOT NULL DEFAULT 'L',
+  `jenis_kelamin` enum('L','P') NOT NULL DEFAULT 'L',
+  `phone` varchar(30) DEFAULT NULL,
+  `no_hp` varchar(30) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `alamat` text DEFAULT NULL,
+  `foto_url` varchar(255) DEFAULT NULL,
+  `employment_status` varchar(50) NOT NULL DEFAULT 'honorer',
+  `status_kepegawaian` varchar(50) DEFAULT 'GTT/PTT',
+  `subject_specialty` varchar(120) DEFAULT NULL,
+  `bidang_studi` varchar(120) DEFAULT NULL,
+  `kode_jadwal` varchar(10) DEFAULT NULL,
+  `joined_at` date DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_guru_user` (`user_id`),
+  UNIQUE KEY `uq_guru_nip` (`nip`),
+  UNIQUE KEY `uq_guru_nuptk` (`nuptk`),
+  KEY `idx_guru_active` (`is_active`),
+  CONSTRAINT `fk_guru_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 3. TABEL TAHUN AKADEMIK (academic_years)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `tahun_akademik`;
+CREATE TABLE `tahun_akademik` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(40) NOT NULL,
+  `nama_tahun` varchar(40) DEFAULT NULL,
+  `semester` enum('ganjil','genap') NOT NULL DEFAULT 'ganjil',
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '0',
-  `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `active_flag` tinyint GENERATED ALWAYS AS (if((`is_active` = 1),1,NULL)) STORED,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_academic_years_name` (`name`),
-  UNIQUE KEY `uq_academic_years_active` (`active_flag`),
-  KEY `idx_academic_years_range` (`start_date`,`end_date`),
-  CONSTRAINT `chk_academic_years_range` CHECK ((`end_date` > `start_date`))
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `tahun_akademik` WRITE;
-/*!40000 ALTER TABLE `tahun_akademik`` DISABLE KEYS */;
-INSERT INTO `tahun_akademik`` (`id`, `name`, `start_date`, `end_date`, `is_active`, `note`, `created_at`, `updated_at`) VALUES (1,'2025/2026','2025-07-01','2026-06-30',1,'Tahun ajaran contoh','2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `tahun_akademik`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `butir_akreditasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `butir_akreditasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `component_id` bigint unsigned NOT NULL,
-  `number` smallint unsigned NOT NULL,
-  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `butir_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('kosong','proses','lengkap','terverifikasi') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'kosong',
-  `sort_order` int NOT NULL DEFAULT '0',
+  `note` varchar(255) DEFAULT NULL,
+  `active_flag` tinyint GENERATED ALWAYS AS (IF(`is_active` = 1, 1, NULL)) STORED,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_acc_butirs_number` (`component_id`,`number`),
-  KEY `idx_acc_butirs_order` (`component_id`,`sort_order`,`number`),
-  KEY `idx_acc_butirs_status` (`status`),
-  CONSTRAINT `fk_acc_butirs_component` FOREIGN KEY (`component_id`) REFERENCES `komponen_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `butir_akreditasi` WRITE;
-/*!40000 ALTER TABLE `butir_akreditasi`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `butir_akreditasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `komponen_akreditasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `komponen_akreditasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `period_id` bigint unsigned NOT NULL,
-  `code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `number` smallint unsigned NOT NULL DEFAULT '0',
-  `weight` decimal(6,2) DEFAULT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_acc_components_code` (`period_id`,`code`),
-  KEY `idx_acc_components_order` (`period_id`,`sort_order`,`number`),
-  CONSTRAINT `fk_acc_components_period` FOREIGN KEY (`period_id`) REFERENCES `periode_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `komponen_akreditasi` WRITE;
-/*!40000 ALTER TABLE `komponen_akreditasi`` DISABLE KEYS */;
-INSERT INTO `komponen_akreditasi`` VALUES (1,1,'A','Komponen Contoh A',1,NULL,1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `komponen_akreditasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `indikator_akreditasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `indikator_akreditasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `butir_id` bigint unsigned NOT NULL,
-  `number` smallint unsigned NOT NULL,
-  `indicator_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_acc_indicators_number` (`butir_id`,`number`),
-  KEY `idx_acc_indicators_order` (`butir_id`,`sort_order`,`number`),
-  CONSTRAINT `fk_acc_indicators_butir` FOREIGN KEY (`butir_id`) REFERENCES `butir_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `indikator_akreditasi` WRITE;
-/*!40000 ALTER TABLE `indikator_akreditasi`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `indikator_akreditasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `periode_akreditasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `periode_akreditasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `status` enum('draft','berjalan','selesai','arsip') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `is_active` tinyint(1) NOT NULL DEFAULT '0',
-  `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `active_flag` tinyint GENERATED ALWAYS AS (if((`is_active` = 1),1,NULL)) STORED,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_acc_periods_name` (`name`),
-  UNIQUE KEY `uq_acc_periods_active` (`active_flag`),
-  KEY `idx_acc_periods_status` (`status`,`start_date`),
-  CONSTRAINT `chk_acc_periods_range` CHECK (((`end_date` is null) or (`start_date` is null) or (`end_date` > `start_date`)))
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `periode_akreditasi` WRITE;
-/*!40000 ALTER TABLE `periode_akreditasi`` DISABLE KEYS */;
-INSERT INTO `periode_akreditasi`` (`id`, `name`, `start_date`, `end_date`, `status`, `is_active`, `note`, `created_at`, `updated_at`) VALUES (1,'Akreditasi Contoh','2026-01-01','2026-12-31','draft',0,'Kerangka contoh. Teks butir menunggu instrumen resmi IA2024.','2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `periode_akreditasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `hasil_akreditasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `hasil_akreditasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `period_id` bigint unsigned NOT NULL,
-  `grade` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `score` decimal(6,2) DEFAULT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `decided_at` datetime DEFAULT NULL,
-  `decided_by` bigint unsigned DEFAULT NULL,
-  `valid_until` date DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_acc_results_period` (`period_id`),
-  KEY `idx_acc_results_grade` (`grade`,`decided_at`),
-  KEY `fk_acc_results_by` (`decided_by`),
-  CONSTRAINT `fk_acc_results_by` FOREIGN KEY (`decided_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_acc_results_period` FOREIGN KEY (`period_id`) REFERENCES `periode_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `chk_acc_results_score` CHECK (((`score` is null) or ((`score` >= 0) and (`score` <= 100))))
+  UNIQUE KEY `uq_tahun_name_sem` (`name`, `semester`),
+  UNIQUE KEY `uq_tahun_active` (`active_flag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `hasil_akreditasi` WRITE;
-/*!40000 ALTER TABLE `hasil_akreditasi`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hasil_akreditasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `log_aktivitas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `log_aktivitas`` (
+-- --------------------------------------------------------------------------
+-- 4. TABEL KELAS (classes)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `kelas`;
+CREATE TABLE `kelas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint unsigned DEFAULT NULL,
-  `action` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `entity` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `entity_id` bigint unsigned DEFAULT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `metadata` json DEFAULT NULL,
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_activity_logs_user` (`user_id`,`created_at`),
-  KEY `idx_activity_logs_entity` (`entity`,`entity_id`,`created_at`),
-  KEY `idx_activity_logs_action` (`action`,`created_at`),
-  CONSTRAINT `fk_activity_logs_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `log_aktivitas` WRITE;
-/*!40000 ALTER TABLE `log_aktivitas`` DISABLE KEYS */;
-INSERT INTO `log_aktivitas`` VALUES (1,3,'api.login.failed','users',3,'Login API gagal — percobaan ke-1 dari 5',NULL,'::1','','2026-10-23 05:51:24'),(2,3,'api.login.success','users',3,'Masuk lewat API (android: Uji Otomatis)',NULL,'::1','','2026-10-23 05:51:24'),(3,3,'api.token.refresh','users',3,'Refresh token dipakai, pasangan token berotasi',NULL,'::1','','2026-10-23 05:51:24'),(4,3,'api.logout','users',3,'Keluar dari API — token dicabut',NULL,'::1','','2026-10-23 05:51:25'),(5,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:25'),(6,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:25'),(7,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:25'),(8,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:26'),(9,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:26'),(10,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:26'),(11,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:26'),(12,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:26'),(13,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:27'),(14,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 05:51:27'),(15,2,'api.login.success','users',2,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:03:20'),(16,414,'api.login.success','users',414,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:03:21'),(17,2,'api.login.success','users',2,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:04:06'),(18,414,'api.login.success','users',414,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:04:07'),(19,414,'api.login.success','users',414,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:04:16'),(20,3,'api.login.success','users',3,'Masuk lewat API (android: Uji Data)',NULL,'::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:04:17'),(21,3,'api.login.failed','users',3,'Login API gagal — percobaan ke-1 dari 5',NULL,'::1','','2026-10-23 06:05:05'),(22,3,'api.login.success','users',3,'Masuk lewat API (android: Uji Otomatis)',NULL,'::1','','2026-10-23 06:05:06'),(23,3,'api.token.refresh','users',3,'Refresh token dipakai, pasangan token berotasi',NULL,'::1','','2026-10-23 06:05:06'),(24,3,'api.logout','users',3,'Keluar dari API — token dicabut',NULL,'::1','','2026-10-23 06:05:06'),(25,2,'api.login.success','users',2,'Masuk lewat API (android: Uji Peran)',NULL,'::1','','2026-10-23 06:05:06'),(26,414,'api.login.success','users',414,'Masuk lewat API (android: Uji Peran)',NULL,'::1','','2026-10-23 06:05:06'),(27,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(28,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(29,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(30,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(31,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(32,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:07'),(33,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:08'),(34,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:08'),(35,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:08'),(36,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:05:08'),(37,3,'api.login.failed','users',3,'Login API gagal — percobaan ke-1 dari 5',NULL,'::1','','2026-10-23 06:07:50'),(38,3,'api.login.success','users',3,'Masuk lewat API (android: Uji Otomatis)',NULL,'::1','','2026-10-23 06:07:50'),(39,3,'api.token.refresh','users',3,'Refresh token dipakai, pasangan token berotasi',NULL,'::1','','2026-10-23 06:07:51'),(40,3,'api.logout','users',3,'Keluar dari API — token dicabut',NULL,'::1','','2026-10-23 06:07:51'),(41,2,'api.login.success','users',2,'Masuk lewat API (android: Uji Peran)',NULL,'::1','','2026-10-23 06:07:51'),(42,414,'api.login.success','users',414,'Masuk lewat API (android: Uji Peran)',NULL,'::1','','2026-10-23 06:07:51'),(43,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(44,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(45,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(46,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(47,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(48,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:52'),(49,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:53'),(50,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:53'),(51,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:53'),(52,NULL,'api.login.failed','users',NULL,'Login API gagal — akun tidak dikenal',NULL,'::1','','2026-10-23 06:07:53');
-/*!40000 ALTER TABLE `log_aktivitas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `agenda``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `agenda`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `location` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `start_at` datetime NOT NULL,
-  `end_at` datetime DEFAULT NULL,
-  `all_day` tinyint(1) NOT NULL DEFAULT '0',
-  `status` enum('draft','published','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `author_id` bigint unsigned DEFAULT NULL,
+  `academic_year_id` bigint unsigned NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `nama_kelas` varchar(20) NOT NULL,
+  `level` tinyint unsigned NOT NULL,
+  `tingkat` tinyint unsigned NOT NULL,
+  `homeroom_teacher_id` bigint unsigned DEFAULT NULL,
+  `wali_kelas_id` bigint unsigned DEFAULT NULL,
+  `room` varchar(60) DEFAULT 'Ruang Kelas',
+  `ruangan` varchar(60) DEFAULT 'Ruang Kelas',
+  `capacity` smallint unsigned DEFAULT '32',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_agendas_upcoming` (`status`,`start_at`),
-  KEY `idx_agendas_range` (`start_at`,`end_at`),
-  KEY `fk_agendas_author` (`author_id`),
-  CONSTRAINT `fk_agendas_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chk_agendas_range` CHECK (((`end_at` is null) or (`end_at` >= `start_at`)))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `uq_kelas_year_name` (`academic_year_id`,`name`),
+  KEY `idx_kelas_level` (`level`),
+  KEY `idx_kelas_homeroom` (`homeroom_teacher_id`),
+  CONSTRAINT `fk_kelas_year` FOREIGN KEY (`academic_year_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_kelas_homeroom` FOREIGN KEY (`homeroom_teacher_id`) REFERENCES `guru` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `agenda` WRITE;
-/*!40000 ALTER TABLE `agenda`` DISABLE KEYS */;
-INSERT INTO `agenda`` VALUES (1,'Contoh Agenda Kegiatan','Agenda contoh untuk menguji tampilan kalender dan daftar agenda.','Aula Madrasah','2026-11-05 08:00:00','2026-11-05 12:00:00',0,'published',1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `agenda`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pengumuman``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pengumuman`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `audience` enum('semua','siswa','guru','wali') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'semua',
-  `status` enum('draft','published','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
-  `published_at` datetime DEFAULT NULL,
-  `expires_at` datetime DEFAULT NULL,
-  `author_id` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_announcements_slug` (`slug`),
-  KEY `idx_announcements_feed` (`status`,`is_pinned`,`published_at`),
-  KEY `idx_announcements_expiry` (`expires_at`),
-  KEY `idx_announcements_audience` (`audience`,`status`),
-  KEY `fk_announcements_author` (`author_id`),
-  CONSTRAINT `fk_announcements_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `pengumuman` WRITE;
-/*!40000 ALTER TABLE `pengumuman`` DISABLE KEYS */;
-INSERT INTO `pengumuman`` VALUES (1,'Contoh Pengumuman','contoh-pengumuman','Isi pengumuman contoh. Pengumuman yang disematkan tampil paling atas.','semua','published',1,'2026-10-15 07:00:00',NULL,1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `pengumuman`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `token_api``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `token_api`` (
+-- --------------------------------------------------------------------------
+-- 5. TABEL SISWA (students)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `siswa`;
+CREATE TABLE `siswa` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `access_token_hash` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `refresh_token_hash` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `device_name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `platform` enum('android','ios','web','unknown') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'unknown',
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `access_expires_at` datetime NOT NULL,
-  `refresh_expires_at` datetime NOT NULL,
-  `last_used_at` datetime DEFAULT NULL,
-  `revoked_at` datetime DEFAULT NULL,
+  `class_id` bigint unsigned NOT NULL,
+  `kelas_id` bigint unsigned DEFAULT NULL,
+  `nis` varchar(20) NOT NULL,
+  `nisn` varchar(20) DEFAULT NULL,
+  `nama_lengkap` varchar(100) NOT NULL,
+  `gender` enum('L','P') NOT NULL DEFAULT 'L',
+  `jenis_kelamin` enum('L','P') NOT NULL DEFAULT 'L',
+  `birth_place` varchar(80) DEFAULT 'Nganjuk',
+  `tempat_lahir` varchar(80) DEFAULT 'Nganjuk',
+  `birth_date` date DEFAULT NULL,
+  `tanggal_lahir` date DEFAULT NULL,
+  `guardian_name` varchar(120) DEFAULT NULL,
+  `nama_wali` varchar(120) DEFAULT NULL,
+  `guardian_phone` varchar(30) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `alamat` text DEFAULT NULL,
+  `foto_url` varchar(255) DEFAULT NULL,
+  `enrolled_at` date DEFAULT '2026-07-15',
+  `tahun_masuk` year DEFAULT '2026',
+  `status` enum('aktif','lulus','mutasi','keluar') NOT NULL DEFAULT 'aktif',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_api_tokens_access` (`access_token_hash`),
-  UNIQUE KEY `uq_api_tokens_refresh` (`refresh_token_hash`),
-  KEY `idx_api_tokens_user_live` (`user_id`,`revoked_at`,`refresh_expires_at`),
-  KEY `idx_api_tokens_refresh_ttl` (`refresh_expires_at`),
-  CONSTRAINT `fk_api_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `uq_siswa_user` (`user_id`),
+  UNIQUE KEY `uq_siswa_nis` (`nis`),
+  UNIQUE KEY `uq_siswa_nisn` (`nisn`),
+  KEY `idx_siswa_class` (`class_id`),
+  KEY `idx_siswa_status` (`status`),
+  CONSTRAINT `fk_siswa_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_siswa_kelas` FOREIGN KEY (`class_id`) REFERENCES `kelas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `token_api` WRITE;
-/*!40000 ALTER TABLE `token_api`` DISABLE KEYS */;
-INSERT INTO `token_api`` VALUES (3,3,'287be83f3bda9bdab42bbcba5a5b2106fd6f818cf233c838d723101d16682565','58652b13122e2a75aab54a2cf77000c38ec2e4e0b6f116bc47f8e64107ff8099','Uji Otomatis','android','::1','','2026-10-23 06:21:24','2026-11-22 05:51:24','2026-10-23 05:51:24','2026-10-23 05:51:24','2026-10-23 05:51:24'),(4,3,'0db815ed1eff718f5c5be2223ec5bb58d6cf9f95e4c4c1ae221c2e58e53d1151','9c2378a4dd4271ef67af3558cd320966ef088537fb43d7108c28d47b7ab3d654','Uji Otomatis','android','::1','','2026-10-23 06:21:24','2026-11-22 05:51:24','2026-10-23 05:51:25','2026-10-23 05:51:25','2026-10-23 05:51:24'),(5,2,'07ada44ecc5b91059f0b3ece298362288aef07e07cf819dfabf0845646d6e94e','a1b4ac673de7c4c734f1d40ef62922c097348a619cada61f81ec890741eda566','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:33:20','2026-11-22 06:03:20','2026-10-23 06:03:21',NULL,'2026-10-23 06:03:20'),(6,414,'2718361beb1eb93260a4c31cf68cf13b81d5a3f1b57dd9da033dfd14e81fa2d0','372f5c1c1aac995c6cd8afbd78ba65ea2ab4371f314d11be00c820eacf09006e','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:33:21','2026-11-22 06:03:21','2026-10-23 06:03:21',NULL,'2026-10-23 06:03:21'),(7,2,'1f44389c6bc832efd071134f1ae8a13a6979112b0de6f1ef0f12d842d4c193ce','0c591e7a26aa940b1548dbd632394ad99f79f9a3a82b569eb231dc76d05c1879','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:34:06','2026-11-22 06:04:06','2026-10-23 06:04:07',NULL,'2026-10-23 06:04:06'),(8,414,'10c54bcc29d943faa312eef5bd2dc8a28f804e0dff1b971b6761274031dac23e','59ba9978187ea19a5145b80ac8e7db7e6f037b8017e0b64ed549f1a81ec38e74','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:34:07','2026-11-22 06:04:07','2026-10-23 06:04:07',NULL,'2026-10-23 06:04:07'),(9,414,'037a1d59ec101cf1473254516260d3d559ad5f509517ab465afc7d6f0f5f3f42','87c59f0f170b8e96b5e4751aed572d2fa2274bede775af6bbe4e7dfc8485037c','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:34:16','2026-11-22 06:04:16','2026-10-23 06:04:17',NULL,'2026-10-23 06:04:16'),(10,3,'a3510d1ec318e239f847143029d20dfbe04a3d950d5e0922735eca8131616413','f16b8abf1b8fd314682c76b554d12512f2035e84e5219de6221500a3e0b37b8c','Uji Data','android','::1','Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.6133','2026-10-23 06:34:17','2026-11-22 06:04:17','2026-10-23 06:04:17',NULL,'2026-10-23 06:04:17'),(11,3,'ee6e8925893651b0a7cd8ef617a6e662369e38eac6406312eab606585ac8b9b7','df170e6c001a74e3ab1ae03135ef716025861f1bb9bc932c2fc7b9ee5f528810','Uji Otomatis','android','::1','','2026-10-23 06:35:06','2026-11-22 06:05:06','2026-10-23 06:05:06','2026-10-23 06:05:06','2026-10-23 06:05:06'),(12,3,'5d85d49b91a2ead8053627d129d3c7068cd90623d3ff3872356439c61ffe137f','1f63d7648d94ef94d6cd869cfb477457cde3f86d7cdb93acb8f263113bccdd46','Uji Otomatis','android','::1','','2026-10-23 06:35:06','2026-11-22 06:05:06','2026-10-23 06:05:06','2026-10-23 06:05:06','2026-10-23 06:05:06'),(13,2,'83f854424dab1eb3d8d412753f03a1ad5c7ef54e4a98c37713cc90973ae4bc3d','12aa9aed50ae6eddea0a1b90983cdeec5862540546a017b142fc554d3daeb2fa','Uji Peran','android','::1','','2026-10-23 06:35:06','2026-11-22 06:05:06','2026-10-23 06:05:07',NULL,'2026-10-23 06:05:06'),(14,414,'7ebdad038f3aca571535a0d0e5de2b37f5e4129f6b01095f7d4acb34704688fa','c475272672ea10091cb84910c7c492438cd752c315af68b0bf7155a8d3a7f54e','Uji Peran','android','::1','','2026-10-23 06:35:06','2026-11-22 06:05:06','2026-10-23 06:05:07',NULL,'2026-10-23 06:05:06'),(19,3,'b73b07418348f8b16a22cfe5916158fecb2e0c1357159a7536f3723aa974a596','a306986bfad594e92a465dfd5380094767dc6b6a9ba86d01000e79a06bba1caa','Uji Otomatis','android','::1','','2026-10-23 06:37:50','2026-11-22 06:07:50','2026-10-23 06:07:50','2026-10-23 06:07:51','2026-10-23 06:07:50'),(20,3,'d7b6baca02ba3e3e768bb61cbefd29e4b29f73c5a6efa52ed317dce410aa55dc','a52ee029cf61c7a934153155befc4c4ed97e6e8e0431f5466864fb46b7d6f879','Uji Otomatis','android','::1','','2026-10-23 06:37:51','2026-11-22 06:07:51','2026-10-23 06:07:51','2026-10-23 06:07:51','2026-10-23 06:07:51'),(21,2,'4e5f649fdf46e7c62d8d415d86b8a549768dc09c42ade0274d584e66b6f5bbce','1a4c7967aa30068183f776a0792a4199848dbf57bc2184985f6c8a013f38f057','Uji Peran','android','::1','','2026-10-23 06:37:51','2026-11-22 06:07:51','2026-10-23 06:07:51',NULL,'2026-10-23 06:07:51'),(22,414,'cbfe2f2db520bfca01fb24f924481fc2e172eb4fad68352ce8fd932a2ae57ad4','73aef1f653a97d7538d0e62bf75c96ddd0361c2c5d2c29a1cc6ecee82648fb0d','Uji Peran','android','::1','','2026-10-23 06:37:51','2026-11-22 06:07:51','2026-10-23 06:07:52',NULL,'2026-10-23 06:07:51');
-/*!40000 ALTER TABLE `token_api`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `tugas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tugas`` (
+-- --------------------------------------------------------------------------
+-- 6. TABEL MATA PELAJARAN (subjects)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `mata_pelajaran`;
+CREATE TABLE `mata_pelajaran` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `code` varchar(20) NOT NULL,
+  `kode_mapel` varchar(20) NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `nama_mapel` varchar(120) NOT NULL,
+  `group_name` enum('agama','umum','muatan_lokal','ekstrakurikuler') NOT NULL DEFAULT 'umum',
+  `kelompok` enum('agama','umum','muatan_lokal','ekstrakurikuler') NOT NULL DEFAULT 'umum',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mapel_code` (`code`),
+  KEY `idx_mapel_group` (`group_name`),
+  KEY `idx_mapel_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 7. TABEL MATA PELAJARAN KELAS (class_subjects)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `mata_pelajaran_kelas`;
+CREATE TABLE `mata_pelajaran_kelas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `class_id` bigint unsigned NOT NULL,
+  `kelas_id` bigint unsigned DEFAULT NULL,
+  `subject_id` bigint unsigned NOT NULL,
+  `mata_pelajaran_id` bigint unsigned DEFAULT NULL,
+  `teacher_id` bigint unsigned DEFAULT NULL,
+  `guru_id` bigint unsigned DEFAULT NULL,
+  `weekly_hours` tinyint unsigned NOT NULL DEFAULT '2',
+  `jam_mingguan` tinyint unsigned NOT NULL DEFAULT '2',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mpk_class_subject` (`class_id`,`subject_id`),
+  KEY `idx_mpk_teacher` (`teacher_id`),
+  KEY `idx_mpk_subject` (`subject_id`),
+  CONSTRAINT `fk_mpk_class` FOREIGN KEY (`class_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mpk_subject` FOREIGN KEY (`subject_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mpk_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 8. TABEL JADWAL PELAJARAN (schedules)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `jadwal`;
+CREATE TABLE `jadwal` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `class_subject_id` bigint unsigned NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `attachment_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `kelas_id` bigint unsigned NOT NULL,
+  `subject_id` bigint unsigned NOT NULL,
+  `mata_pelajaran_id` bigint unsigned DEFAULT NULL,
+  `teacher_id` bigint unsigned NOT NULL,
+  `guru_id` bigint unsigned DEFAULT NULL,
+  `academic_year_id` bigint unsigned NOT NULL,
+  `day_of_week` tinyint unsigned NOT NULL,
+  `hari` enum('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu') NOT NULL,
+  `start_time` time NOT NULL,
+  `jam_mulai` time DEFAULT NULL,
+  `end_time` time NOT NULL,
+  `jam_selesai` time DEFAULT NULL,
+  `room` varchar(60) DEFAULT 'Ruang Kelas',
+  `ruangan` varchar(60) DEFAULT 'Ruang Kelas',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_jadwal_teacher` (`teacher_id`,`academic_year_id`,`day_of_week`,`start_time`),
+  KEY `idx_jadwal_class` (`kelas_id`,`day_of_week`,`start_time`),
+  CONSTRAINT `fk_jadwal_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_jadwal_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_jadwal_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_jadwal_year` FOREIGN KEY (`academic_year_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 9. TABEL LOKASI SEKOLAH (school_locations - Presensi QR & GPS)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `lokasi_sekolah`;
+CREATE TABLE `lokasi_sekolah` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nama_lokasi` varchar(100) NOT NULL DEFAULT 'Kantor Guru MTs Al-Huda',
+  `qr_token` varchar(100) NOT NULL,
+  `latitude` decimal(10,8) NOT NULL DEFAULT '-7.58430000',
+  `longitude` decimal(11,8) NOT NULL DEFAULT '111.96820000',
+  `radius_meter` int unsigned NOT NULL DEFAULT '15',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_lokasi_qr` (`qr_token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 10. TABEL PRESENSI GURU (teacher_attendances)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `presensi_guru`;
+CREATE TABLE `presensi_guru` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `teacher_id` bigint unsigned NOT NULL,
+  `guru_id` bigint unsigned DEFAULT NULL,
+  `attendance_date` date NOT NULL,
+  `tanggal` date DEFAULT NULL,
+  `attendance_type` enum('daily','session') NOT NULL DEFAULT 'daily',
+  `schedule_id` bigint unsigned DEFAULT NULL,
+  `check_in_at` datetime DEFAULT NULL,
+  `jam_masuk` time DEFAULT NULL,
+  `check_out_at` datetime DEFAULT NULL,
+  `jam_pulang` time DEFAULT NULL,
+  `lat_masuk` decimal(10,8) DEFAULT NULL,
+  `long_masuk` decimal(11,8) DEFAULT NULL,
+  `lat_pulang` decimal(10,8) DEFAULT NULL,
+  `long_pulang` decimal(11,8) DEFAULT NULL,
+  `status` enum('hadir','terlambat','izin','sakit','dinas','alpa') NOT NULL DEFAULT 'hadir',
+  `notes` varchar(255) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `attachment_path` varchar(255) DEFAULT NULL,
+  `lampiran` varchar(255) DEFAULT NULL,
+  `verified_by` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_presensi_daily` (`teacher_id`,`attendance_date`,`attendance_type`),
+  KEY `idx_presensi_date` (`attendance_date`,`status`),
+  CONSTRAINT `fk_presensi_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_presensi_schedule` FOREIGN KEY (`schedule_id`) REFERENCES `jadwal` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 11. TABEL MATERI PEMBELAJARAN (materials)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `materi`;
+CREATE TABLE `materi` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `class_subject_id` bigint unsigned NOT NULL,
+  `kelas_id` bigint unsigned DEFAULT NULL,
+  `guru_id` bigint unsigned DEFAULT NULL,
+  `mata_pelajaran_id` bigint unsigned DEFAULT NULL,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `file_url` varchar(255) DEFAULT NULL,
+  `external_url` varchar(255) DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT '1',
+  `published_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_by` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_materi_class_subject` (`class_subject_id`),
+  CONSTRAINT `fk_materi_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_materi_author` FOREIGN KEY (`created_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 12. TABEL TUGAS PEMBELAJARAN (assignments)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `tugas`;
+CREATE TABLE `tugas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `public_id` char(36) DEFAULT NULL,
+  `class_subject_id` bigint unsigned NOT NULL,
+  `kelas_id` bigint unsigned DEFAULT NULL,
+  `guru_id` bigint unsigned DEFAULT NULL,
+  `mata_pelajaran_id` bigint unsigned DEFAULT NULL,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `instruksi` text DEFAULT NULL,
+  `attachment_path` varchar(255) DEFAULT NULL,
+  `file_tugas_url` varchar(255) DEFAULT NULL,
   `due_at` datetime DEFAULT NULL,
+  `deadline` datetime DEFAULT NULL,
   `max_score` decimal(5,2) NOT NULL DEFAULT '100.00',
   `is_published` tinyint(1) NOT NULL DEFAULT '1',
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_assignments_public` (`public_id`),
-  KEY `idx_assignments_class_due` (`class_subject_id`,`due_at`),
-  KEY `idx_assignments_open` (`is_published`,`due_at`),
-  KEY `idx_assignments_author` (`created_by`),
-  CONSTRAINT `fk_assignments_author` FOREIGN KEY (`created_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_assignments_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `chk_assignments_score` CHECK ((`max_score` > 0))
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `uq_tugas_public` (`public_id`),
+  KEY `idx_tugas_class` (`class_subject_id`),
+  CONSTRAINT `fk_tugas_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_tugas_author` FOREIGN KEY (`created_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `tugas` WRITE;
-/*!40000 ALTER TABLE `tugas`` DISABLE KEYS */;
-INSERT INTO `tugas`` VALUES (3,'bb4b0c18-ce6c-11f1-9083-38142812b636',5,'Tugas Contoh: Operasi Bilangan Bulat','Kerjakan 10 soal pada buku paket halaman 24. Kumpulkan dalam bentuk foto atau PDF.',NULL,'2026-11-10 23:59:59',100.00,1,1,'2026-10-23 06:03:01','2026-10-23 06:03:01'),(4,'bb4bedca-ce6c-11f1-9083-38142812b636',6,'Tugas Contoh: Teks Deskripsi','Tulis teks deskripsi tentang lingkungan madrasah, minimal 200 kata.',NULL,'2026-11-17 23:59:59',100.00,1,1,'2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `tugas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `mata_pelajaran_kelas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mata_pelajaran_kelas`` (
+-- --------------------------------------------------------------------------
+-- 13. TABEL PENGUMPULAN TUGAS (submissions / assignment_submissions)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pengumpulan_tugas`;
+CREATE TABLE `pengumpulan_tugas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `class_id` bigint unsigned NOT NULL,
-  `subject_id` bigint unsigned NOT NULL,
-  `teacher_id` bigint unsigned DEFAULT NULL,
-  `weekly_hours` tinyint unsigned NOT NULL DEFAULT '2',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `public_id` char(36) DEFAULT NULL,
+  `assignment_id` bigint unsigned NOT NULL,
+  `tugas_id` bigint unsigned DEFAULT NULL,
+  `student_id` bigint unsigned NOT NULL,
+  `siswa_id` bigint unsigned DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `file_jawaban_url` varchar(255) DEFAULT NULL,
+  `note` text DEFAULT NULL,
+  `catatan_siswa` text DEFAULT NULL,
+  `submitted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('submitted','late') NOT NULL DEFAULT 'submitted',
+  `score` decimal(5,2) DEFAULT NULL,
+  `nilai` decimal(5,2) DEFAULT NULL,
+  `feedback` text DEFAULT NULL,
+  `catatan_guru` text DEFAULT NULL,
+  `graded_at` datetime DEFAULT NULL,
+  `graded_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_class_subjects_pair` (`class_id`,`subject_id`),
-  KEY `idx_class_subjects_teacher` (`teacher_id`),
-  KEY `idx_class_subjects_subject` (`subject_id`),
-  CONSTRAINT `fk_class_subjects_class` FOREIGN KEY (`class_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_class_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_class_subjects_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `uq_pengumpulan_public` (`public_id`),
+  UNIQUE KEY `uq_pengumpulan_pair` (`assignment_id`,`student_id`),
+  KEY `idx_pengumpulan_student` (`student_id`),
+  CONSTRAINT `fk_sub_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `tugas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_sub_student` FOREIGN KEY (`student_id`) REFERENCES `siswa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_sub_grader` FOREIGN KEY (`graded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `mata_pelajaran_kelas` WRITE;
-/*!40000 ALTER TABLE `mata_pelajaran_kelas`` DISABLE KEYS */;
-INSERT INTO `mata_pelajaran_kelas`` VALUES (5,1,7,5,4,1,'2026-10-23 06:03:01','2026-10-23 06:03:01'),(6,1,5,NULL,4,1,'2026-10-23 06:03:01','2026-10-23 06:03:01'),(7,1,8,NULL,4,1,'2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `mata_pelajaran_kelas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `kelas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `kelas`` (
+-- --------------------------------------------------------------------------
+-- 14. TABEL PESAN KONTAK (contact_messages)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pesan_kontak`;
+CREATE TABLE `pesan_kontak` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `academic_year_id` bigint unsigned NOT NULL,
-  `name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` tinyint unsigned NOT NULL,
-  `homeroom_teacher_id` bigint unsigned DEFAULT NULL,
-  `room` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `capacity` smallint unsigned DEFAULT NULL,
+  `nama` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `telepon` varchar(30) DEFAULT NULL,
+  `subjek` varchar(150) NOT NULL,
+  `pesan` text NOT NULL,
+  `status` enum('baru','dibaca','dibalas') NOT NULL DEFAULT 'baru',
+  `balasan` text DEFAULT NULL,
+  `dibalas_oleh` bigint unsigned DEFAULT NULL,
+  `dibalas_pada` datetime DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_kontak_status` (`status`),
+  KEY `idx_kontak_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 15. TABEL BERITA (posts)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `berita`;
+CREATE TABLE `berita` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `slug` varchar(220) NOT NULL,
+  `excerpt` varchar(300) DEFAULT NULL,
+  `content` mediumtext NOT NULL,
+  `isi` mediumtext DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `category` varchar(50) NOT NULL DEFAULT 'Kegiatan',
+  `kategori` varchar(50) NOT NULL DEFAULT 'Kegiatan',
+  `tags` varchar(255) DEFAULT NULL,
+  `status` enum('draft','published','archived') NOT NULL DEFAULT 'published',
+  `published_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `views_count` int unsigned NOT NULL DEFAULT '0',
+  `author_id` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_berita_slug` (`slug`),
+  KEY `idx_berita_status_date` (`status`,`published_at`),
+  CONSTRAINT `fk_berita_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 16. TABEL GALERI (gallery)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `galeri`;
+CREATE TABLE `galeri` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `album` varchar(100) NOT NULL DEFAULT 'Kegiatan Madrasah',
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `caption` text DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
   `sort_order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `uploaded_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_classes_year_name` (`academic_year_id`,`name`),
-  KEY `idx_classes_level` (`academic_year_id`,`level`,`sort_order`),
-  KEY `idx_classes_homeroom` (`homeroom_teacher_id`),
-  CONSTRAINT `fk_classes_homeroom` FOREIGN KEY (`homeroom_teacher_id`) REFERENCES `guru` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_classes_year` FOREIGN KEY (`academic_year_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `chk_classes_level` CHECK ((`level` between 1 and 12))
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `kelas` WRITE;
-/*!40000 ALTER TABLE `kelas`` DISABLE KEYS */;
-INSERT INTO `kelas`` VALUES (1,1,'7A',7,NULL,NULL,NULL,1,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(2,1,'8A',8,NULL,NULL,NULL,2,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(3,1,'9A',9,NULL,NULL,NULL,3,1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `kelas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pesan_kontak``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pesan_kontak`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `subject` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('baru','dibaca','dibalas','arsip') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'baru',
-  `replied_at` datetime DEFAULT NULL,
-  `replied_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_contact_inbox` (`status`,`created_at`),
-  KEY `idx_contact_email` (`email`),
-  KEY `fk_contact_replied_by` (`replied_by`),
-  CONSTRAINT `fk_contact_replied_by` FOREIGN KEY (`replied_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  KEY `idx_galeri_album` (`album`),
+  CONSTRAINT `fk_galeri_user` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `pesan_kontak` WRITE;
-/*!40000 ALTER TABLE `pesan_kontak`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pesan_kontak`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `entri_dka``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `entri_dka`` (
+-- --------------------------------------------------------------------------
+-- 17. TABEL FASILITAS (facilities / sarpras)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `fasilitas`;
+CREATE TABLE `fasilitas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `butir_id` bigint unsigned NOT NULL,
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `version` smallint unsigned NOT NULL DEFAULT '1',
-  `status` enum('draft','final','revisi') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `name` varchar(120) NOT NULL,
+  `nama_fasilitas` varchar(120) NOT NULL,
+  `slug` varchar(140) NOT NULL,
+  `category` varchar(60) NOT NULL DEFAULT 'Sarana Pembelajaran',
+  `description` text DEFAULT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `gambar` varchar(255) DEFAULT NULL,
+  `condition` enum('sangat_baik','baik','rusak_ringan','rusak_berat') NOT NULL DEFAULT 'baik',
+  `kondisi` enum('sangat_baik','baik','rusak_ringan','rusak_berat') NOT NULL DEFAULT 'baik',
+  `quantity` smallint unsigned NOT NULL DEFAULT '1',
+  `jumlah` smallint unsigned NOT NULL DEFAULT '1',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `deleted_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_fasilitas_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 18. TABEL PENGUMUMAN (announcements)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pengumuman`;
+CREATE TABLE `pengumuman` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `slug` varchar(220) NOT NULL,
+  `content` text NOT NULL,
+  `isi` text DEFAULT NULL,
+  `attachment_path` varchar(255) DEFAULT NULL,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT '0',
+  `status` enum('draft','published','archived') NOT NULL DEFAULT 'published',
+  `published_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `author_id` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pengumuman_slug` (`slug`),
+  KEY `idx_pengumuman_status` (`status`,`published_at`),
+  CONSTRAINT `fk_pengumuman_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 19. TABEL AGENDA KEGIATAN (events)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `agenda`;
+CREATE TABLE `agenda` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `location` varchar(200) DEFAULT NULL,
+  `lokasi` varchar(200) DEFAULT NULL,
+  `start_at` datetime NOT NULL,
+  `tgl_mulai` datetime DEFAULT NULL,
+  `end_at` datetime DEFAULT NULL,
+  `tgl_selesai` datetime DEFAULT NULL,
+  `all_day` tinyint(1) NOT NULL DEFAULT '0',
+  `status` enum('draft','published','cancelled') NOT NULL DEFAULT 'published',
+  `author_id` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_agenda_upcoming` (`status`,`start_at`),
+  CONSTRAINT `fk_agenda_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 20. TABEL DOKUMEN PPDB (ppdb_documents)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `dokumen_ppdb`;
+CREATE TABLE `dokumen_ppdb` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `file_url` varchar(255) DEFAULT NULL,
+  `file_size` int unsigned NOT NULL DEFAULT '0',
+  `mime_type` varchar(100) DEFAULT 'application/pdf',
+  `download_count` int unsigned NOT NULL DEFAULT '0',
+  `jumlah_unduh` int unsigned NOT NULL DEFAULT '0',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `uploaded_by` bigint unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_ppdb_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 21. TABEL HALAMAN STATIS / PROFIL (pages)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `halaman`;
+CREATE TABLE `halaman` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(100) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `judul` varchar(200) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `isi` mediumtext DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `updated_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `draft_flag` tinyint GENERATED ALWAYS AS (if((`status` = _utf8mb4'draft'),1,NULL)) STORED,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_dka_version` (`butir_id`,`version`),
-  UNIQUE KEY `uq_dka_one_draft` (`butir_id`,`draft_flag`),
-  KEY `idx_dka_butir_status` (`butir_id`,`status`,`version`),
-  KEY `idx_dka_editor` (`updated_by`),
-  CONSTRAINT `fk_dka_butir` FOREIGN KEY (`butir_id`) REFERENCES `butir_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_dka_editor` FOREIGN KEY (`updated_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chk_dka_length` CHECK ((char_length(`content`) <= 1000))
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `entri_dka` WRITE;
-/*!40000 ALTER TABLE `entri_dka`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `entri_dka`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `bukti``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `bukti`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `period_id` bigint unsigned NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `mime_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_size` bigint unsigned DEFAULT NULL,
-  `checksum` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `valid_until` date DEFAULT NULL,
-  `status` enum('draft','valid','expired','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `uploaded_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_evidence_public` (`public_id`),
-  UNIQUE KEY `uq_evidence_checksum` (`period_id`,`checksum`),
-  KEY `idx_evidence_period` (`period_id`,`status`,`created_at`),
-  KEY `idx_evidence_expiry` (`valid_until`,`status`),
-  KEY `idx_evidence_uploader` (`uploaded_by`),
-  KEY `idx_evidence_deleted` (`deleted_at`),
-  CONSTRAINT `fk_evidence_period` FOREIGN KEY (`period_id`) REFERENCES `periode_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_evidence_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chk_evidence_source` CHECK (((`file_path` is not null) or (`external_url` is not null)))
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `bukti` WRITE;
-/*!40000 ALTER TABLE `bukti`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bukti`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `bukti_butir``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `bukti_butir`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `evidence_id` bigint unsigned NOT NULL,
-  `butir_id` bigint unsigned NOT NULL,
-  `linked_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_evidence_butir_pair` (`evidence_id`,`butir_id`),
-  KEY `idx_evidence_butir_lookup` (`butir_id`,`evidence_id`),
-  KEY `fk_evidence_butir_linked_by` (`linked_by`),
-  CONSTRAINT `fk_evidence_butir_butir` FOREIGN KEY (`butir_id`) REFERENCES `butir_akreditasi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_evidence_butir_evidence` FOREIGN KEY (`evidence_id`) REFERENCES `bukti` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_evidence_butir_linked_by` FOREIGN KEY (`linked_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `bukti_butir` WRITE;
-/*!40000 ALTER TABLE `bukti_butir`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bukti_butir`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `fasilitas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `fasilitas`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `image_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `icon` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_facilities_listing` (`is_active`,`sort_order`),
-  KEY `idx_facilities_deleted` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `fasilitas` WRITE;
-/*!40000 ALTER TABLE `fasilitas`` DISABLE KEYS */;
-INSERT INTO `fasilitas`` VALUES (1,'Ruang Kelas','Kelas yang bersih dan terang untuk kegiatan belajar mengajar.',NULL,'classroom',1,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(2,'Perpustakaan','Koleksi buku pelajaran, agama, dan umum untuk menumbuhkan minat baca.',NULL,'book',2,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(3,'Musholla','Pusat kegiatan ibadah, sholat berjamaah, dan pembinaan spiritual.',NULL,'mosque',3,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(4,'Lapangan','Area olahraga dan kegiatan ekstrakurikuler.',NULL,'field',4,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(5,'Laboratorium','Ruang praktik untuk mata pelajaran sains.',NULL,'lab',5,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(6,'Ruang Guru','Ruang kerja dan koordinasi para guru.',NULL,'office',6,1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL);
-/*!40000 ALTER TABLE `fasilitas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `tindak_lanjut``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tindak_lanjut`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `result_id` bigint unsigned NOT NULL,
-  `recommendation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('belum','proses','selesai') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'belum',
-  `due_date` date DEFAULT NULL,
-  `completed_at` datetime DEFAULT NULL,
-  `responsible_id` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_follow_ups_result` (`result_id`,`status`,`due_date`),
-  KEY `idx_follow_ups_open` (`status`,`due_date`),
-  KEY `idx_follow_ups_owner` (`responsible_id`),
-  CONSTRAINT `fk_follow_ups_owner` FOREIGN KEY (`responsible_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_follow_ups_result` FOREIGN KEY (`result_id`) REFERENCES `hasil_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  UNIQUE KEY `uq_halaman_slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `tindak_lanjut` WRITE;
-/*!40000 ALTER TABLE `tindak_lanjut`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tindak_lanjut`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `galeri``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `galeri`` (
+-- --------------------------------------------------------------------------
+-- 22. TABEL PENGATURAN SITUS (settings)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `pengaturan`;
+CREATE TABLE `pengaturan` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `album` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `image_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `caption` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_galleries_listing` (`is_active`,`album`,`sort_order`),
-  KEY `idx_galleries_deleted` (`deleted_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `galeri` WRITE;
-/*!40000 ALTER TABLE `galeri`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `galeri`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pemeriksaan_indikator``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pemeriksaan_indikator`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `butir_id` bigint unsigned NOT NULL,
-  `indicator_id` bigint unsigned NOT NULL,
-  `status` enum('belum','sebagian','sesuai','tidak_sesuai') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'belum',
-  `note` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `checked_by` bigint unsigned DEFAULT NULL,
-  `checked_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_indicator_checks_pair` (`butir_id`,`indicator_id`),
-  KEY `idx_indicator_checks_status` (`butir_id`,`status`),
-  KEY `idx_indicator_checks_indicator` (`indicator_id`),
-  KEY `fk_indicator_checks_by` (`checked_by`),
-  CONSTRAINT `fk_indicator_checks_butir` FOREIGN KEY (`butir_id`) REFERENCES `butir_akreditasi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_indicator_checks_by` FOREIGN KEY (`checked_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_indicator_checks_indicator` FOREIGN KEY (`indicator_id`) REFERENCES `indikator_akreditasi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `pemeriksaan_indikator` WRITE;
-/*!40000 ALTER TABLE `pemeriksaan_indikator`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pemeriksaan_indikator`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `dokumen_utama``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `dokumen_utama`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `period_id` bigint unsigned NOT NULL,
-  `doc_type` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `mime_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_size` bigint unsigned DEFAULT NULL,
-  `status` enum('belum','proses','selesai','revisi') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'belum',
-  `sort_order` int NOT NULL DEFAULT '0',
-  `uploaded_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_main_documents_period` (`period_id`,`doc_type`,`sort_order`),
-  KEY `idx_main_documents_status` (`period_id`,`status`),
-  KEY `fk_main_documents_uploader` (`uploaded_by`),
-  CONSTRAINT `fk_main_documents_period` FOREIGN KEY (`period_id`) REFERENCES `periode_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_main_documents_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `dokumen_utama` WRITE;
-/*!40000 ALTER TABLE `dokumen_utama`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dokumen_utama`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `materi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `materi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `class_subject_id` bigint unsigned NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `external_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_published` tinyint(1) NOT NULL DEFAULT '1',
-  `published_at` datetime DEFAULT NULL,
-  `created_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_materials_class` (`class_subject_id`,`is_published`,`created_at`),
-  KEY `idx_materials_author` (`created_by`),
-  CONSTRAINT `fk_materials_author` FOREIGN KEY (`created_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_materials_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `chk_materials_source` CHECK (((`file_path` is not null) or (`external_url` is not null)))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `materi` WRITE;
-/*!40000 ALTER TABLE `materi`` DISABLE KEYS */;
-INSERT INTO `materi`` VALUES (1,5,'Materi Contoh: Bilangan Bulat','Ringkasan sifat operasi bilangan bulat beserta contoh soal.',NULL,'https://contoh.invalid/materi/bilangan-bulat.pdf',1,'2026-10-05 08:00:00',1,'2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `materi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `media`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `media` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mime_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `extension` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_size` bigint unsigned NOT NULL DEFAULT '0',
-  `checksum` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `width` int unsigned DEFAULT NULL,
-  `height` int unsigned DEFAULT NULL,
-  `alt` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `folder` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'umum',
-  `uploaded_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_media_path` (`path`),
-  KEY `idx_media_checksum` (`checksum`),
-  KEY `idx_media_folder` (`folder`,`created_at`),
-  KEY `idx_media_type` (`mime_type`),
-  KEY `fk_media_uploaded_by` (`uploaded_by`),
-  CONSTRAINT `fk_media_uploaded_by` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `media` WRITE;
-/*!40000 ALTER TABLE `media` DISABLE KEYS */;
-/*!40000 ALTER TABLE `media` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `menu``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menu`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` bigint unsigned DEFAULT NULL,
-  `label` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `target` enum('self','blank') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'self',
-  `location` enum('utama','footer','mobile') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'utama',
-  `sort_order` int NOT NULL DEFAULT '0',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_menus_tree` (`location`,`parent_id`,`sort_order`),
-  KEY `idx_menus_active` (`is_active`,`location`),
-  KEY `fk_menus_parent` (`parent_id`),
-  CONSTRAINT `fk_menus_parent` FOREIGN KEY (`parent_id`) REFERENCES `menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `menu` WRITE;
-/*!40000 ALTER TABLE `menu`` DISABLE KEYS */;
-INSERT INTO `menu`` VALUES (1,NULL,'Beranda','','self','utama',1,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(2,NULL,'Profil','profil','self','utama',2,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(3,NULL,'Akademik','akademik','self','utama',3,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(4,NULL,'Fasilitas','fasilitas','self','utama',4,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(5,NULL,'Galeri','galeri','self','utama',5,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(6,NULL,'Berita','berita','self','utama',6,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(7,NULL,'PPDB','ppdb','self','utama',7,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(8,NULL,'Kontak','kontak','self','utama',8,1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `menu`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `notifikasi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `notifikasi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint unsigned NOT NULL,
-  `title` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `body` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` enum('assignment','grade','attendance','announcement','system') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'system',
-  `dedupe_key` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_read` tinyint(1) NOT NULL DEFAULT '0',
-  `read_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_notifications_dedupe` (`user_id`,`dedupe_key`),
-  KEY `idx_notifications_poll` (`user_id`,`is_read`,`created_at`),
-  KEY `idx_notifications_recent` (`user_id`,`created_at`),
-  KEY `idx_notifications_type` (`type`,`created_at`),
-  CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1534 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `notifikasi` WRITE;
-/*!40000 ALTER TABLE `notifikasi`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `notifikasi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `halaman``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `halaman`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `slug` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `template` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'default',
-  `meta_title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meta_description` varchar(320) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('draft','published') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `sort_order` int NOT NULL DEFAULT '0',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  `slug_live` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if((`deleted_at` is null),`slug`,NULL)) STORED,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_pages_slug_live` (`slug_live`),
-  KEY `idx_pages_slug` (`slug`),
-  KEY `idx_pages_status` (`status`,`sort_order`),
-  KEY `idx_pages_deleted` (`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `halaman` WRITE;
-/*!40000 ALTER TABLE `halaman`` DISABLE KEYS */;
-INSERT INTO `halaman`` (`id`, `slug`, `title`, `content`, `template`, `meta_title`, `meta_description`, `status`, `sort_order`, `created_at`, `updated_at`, `deleted_at`) VALUES (1,'profil','Profil Madrasah','<p>Halaman profil contoh. Ganti dengan profil madrasah yang sebenarnya.</p>','default',NULL,NULL,'published',1,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(2,'akademik','Program Akademik','<p>Halaman akademik contoh.</p>','default',NULL,NULL,'published',2,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL);
-/*!40000 ALTER TABLE `halaman`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `reset_sandi``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `reset_sandi`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint unsigned NOT NULL,
-  `token_hash` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expires_at` datetime NOT NULL,
-  `used_at` datetime DEFAULT NULL,
-  `requested_ip` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_password_resets_token` (`token_hash`),
-  KEY `idx_password_resets_user` (`user_id`,`expires_at`),
-  KEY `idx_password_resets_cleanup` (`expires_at`,`used_at`),
-  CONSTRAINT `fk_password_resets_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `reset_sandi` WRITE;
-/*!40000 ALTER TABLE `reset_sandi`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `reset_sandi`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `berita``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `berita`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `excerpt` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cover_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('draft','published','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
-  `views` int unsigned NOT NULL DEFAULT '0',
-  `author_id` bigint unsigned DEFAULT NULL,
-  `published_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
-  `slug_live` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (if((`deleted_at` is null),`slug`,NULL)) STORED,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_posts_public` (`public_id`),
-  UNIQUE KEY `uq_posts_slug_live` (`slug_live`),
-  KEY `idx_posts_slug` (`slug`),
-  KEY `idx_posts_feed` (`status`,`published_at`),
-  KEY `idx_posts_featured` (`is_featured`,`status`,`published_at`),
-  KEY `idx_posts_author` (`author_id`,`created_at`),
-  KEY `idx_posts_deleted` (`deleted_at`),
-  CONSTRAINT `fk_posts_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1229 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `berita` WRITE;
-/*!40000 ALTER TABLE `berita`` DISABLE KEYS */;
-INSERT INTO `berita`` (`id`, `public_id`, `title`, `slug`, `excerpt`, `content`, `cover_path`, `status`, `is_featured`, `views`, `author_id`, `published_at`, `created_at`, `updated_at`, `deleted_at`) VALUES (1,NULL,'Contoh Berita Pertama','contoh-berita-pertama','Ini paragraf pembuka berita contoh. Ganti dengan berita sungguhan lewat panel admin.','<p>Isi berita contoh. Halaman ini dipakai untuk menguji tampilan daftar dan halaman detail.</p>',NULL,'published',0,0,1,'2026-09-10 08:00:00','2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(2,NULL,'Contoh Berita Kedua','contoh-berita-kedua','Berita contoh kedua, lebih baru dari yang pertama. Dipakai untuk menguji urutan.','<p>Isi berita contoh kedua.</p>',NULL,'published',0,0,1,'2026-10-01 09:30:00','2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(3,NULL,'Contoh Berita Ketiga','contoh-berita-ketiga','Berita contoh ketiga, paling baru. Muncul di urutan pertama halaman berita.','<p>Isi berita contoh ketiga.</p>',NULL,'published',0,3,1,'2026-10-20 14:15:00','2026-10-23 05:48:12','2026-10-23 06:07:51',NULL),(4,NULL,'Contoh Draf Belum Terbit','contoh-draf-belum-terbit','Berita ini berstatus draf. Tidak boleh muncul di halaman publik.','<p>Isi draf.</p>',NULL,'draft',0,0,1,NULL,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL);
-/*!40000 ALTER TABLE `berita`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `dokumen_ppdb``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `dokumen_ppdb`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `category` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'umum',
-  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_size` bigint unsigned DEFAULT NULL,
-  `sort_order` int NOT NULL DEFAULT '0',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `download_count` bigint unsigned NOT NULL DEFAULT '0',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_ppdb_docs_listing` (`is_active`,`category`,`sort_order`),
-  KEY `idx_ppdb_docs_downloads` (`download_count`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `dokumen_ppdb` WRITE;
-/*!40000 ALTER TABLE `dokumen_ppdb`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `dokumen_ppdb`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `batas_akses``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `batas_akses`` (
-  `bucket` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `attempts` int unsigned NOT NULL DEFAULT '0',
-  `expires_at` datetime NOT NULL,
-  PRIMARY KEY (`bucket`),
-  KEY `idx_rate_limits_expiry` (`expires_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `batas_akses` WRITE;
-/*!40000 ALTER TABLE `batas_akses`` DISABLE KEYS */;
-INSERT INTO `batas_akses`` VALUES ('api-login:::1',10,'2026-10-23 06:12:52'),('api-refresh:::1',6,'2026-10-23 06:10:06');
-/*!40000 ALTER TABLE `batas_akses`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `jadwal``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `jadwal`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `class_subject_id` bigint unsigned NOT NULL,
-  `teacher_id` bigint unsigned NOT NULL,
-  `academic_year_id` bigint unsigned NOT NULL,
-  `day_of_week` tinyint unsigned NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL,
-  `room` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_schedules_teacher_slot` (`teacher_id`,`academic_year_id`,`day_of_week`,`start_time`),
-  KEY `idx_schedules_class_day` (`class_subject_id`,`day_of_week`,`start_time`),
-  KEY `idx_schedules_year_day` (`academic_year_id`,`day_of_week`,`start_time`),
-  CONSTRAINT `fk_schedules_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_schedules_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_schedules_year` FOREIGN KEY (`academic_year_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `chk_schedules_day` CHECK ((`day_of_week` between 1 and 7)),
-  CONSTRAINT `chk_schedules_time` CHECK ((`end_time` > `start_time`))
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `jadwal` WRITE;
-/*!40000 ALTER TABLE `jadwal`` DISABLE KEYS */;
-INSERT INTO `jadwal`` VALUES (9,5,5,1,1,'07:30:00','09:00:00','Ruang 7A',1,'2026-10-23 06:03:01','2026-10-23 06:03:01'),(10,5,5,1,3,'09:15:00','10:45:00','Ruang 7A',1,'2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `jadwal`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `schema_migrations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `schema_migrations` (
-  `version` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int unsigned NOT NULL DEFAULT '1',
-  `statements` int unsigned NOT NULL DEFAULT '0',
-  `executed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`version`),
-  KEY `idx_schema_migrations_batch` (`batch`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `schema_migrations` WRITE;
-/*!40000 ALTER TABLE `schema_migrations` DISABLE KEYS */;
-INSERT INTO `schema_migrations` VALUES ('001','foundation',1,3,'2026-10-23 05:48:07'),('002','identity_core',1,3,'2026-10-23 05:48:07'),('003','identity_security',1,3,'2026-10-23 05:48:07'),('004','cms_content',1,6,'2026-10-23 05:48:08'),('005','cms_support',1,4,'2026-10-23 05:48:08'),('006','academic_core',1,5,'2026-10-23 05:48:09'),('007','academic_learning',1,4,'2026-10-23 05:48:09'),('008','teacher_attendance',1,1,'2026-10-23 05:48:10'),('009','notifications',1,1,'2026-10-23 05:48:10'),('010','accreditation_structure',1,4,'2026-10-23 05:48:10'),('011','accreditation_evidence',1,4,'2026-10-23 05:48:11'),('012','accreditation_documents',1,4,'2026-10-23 05:48:11'),('013','api_support',1,1,'2026-10-23 05:48:11'),('014','public_ids',1,2,'2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `schema_migrations` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `schema_seeders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `schema_seeders` (
-  `seeder` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `checksum` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `executed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`seeder`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `schema_seeders` WRITE;
-/*!40000 ALTER TABLE `schema_seeders` DISABLE KEYS */;
-INSERT INTO `schema_seeders` VALUES ('001_settings.sql','7f3b177d69ed22b5ca93c6a51a9247ce888d8a5f4f6e1e6f76492eb48a5a0317','2026-10-23 06:03:01'),('DEMO-002_demo_content.sql','5959e9a808867805ece2f54765acf82e09784f4f070965b0b2ae01d7270cbea7','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `schema_seeders` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pengaturan``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pengaturan`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `setting_key` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `setting_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `value_type` enum('string','text','int','bool','json') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'string',
-  `group_name` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'umum',
-  `label` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `setting_key` varchar(120) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  `value_type` enum('string','text','int','bool','json') NOT NULL DEFAULT 'string',
+  `group_name` varchar(60) NOT NULL DEFAULT 'umum',
+  `label` varchar(160) DEFAULT NULL,
   `is_public` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_settings_key` (`setting_key`),
   KEY `idx_settings_group` (`group_name`,`setting_key`)
-) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `pengaturan` WRITE;
-/*!40000 ALTER TABLE `pengaturan`` DISABLE KEYS */;
-INSERT INTO `pengaturan`` VALUES (1,'site_name','MTs Al-Huda','string','identitas','Nama madrasah',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(2,'site_subtitle','Gondang','string','identitas','Keterangan nama',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(3,'site_full_name','Madrasah Tsanawiyah Al-Huda Gondang','string','identitas','Nama lengkap',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(4,'site_npsn','','string','identitas','NPSN',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(5,'site_foundation','Yayasan Al-Huda Gondang','string','identitas','Nama yayasan',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(6,'accreditation_grade','A','string','identitas','Peringkat akreditasi',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(7,'accreditation_year','','string','identitas','Tahun akreditasi',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(8,'contact_address','Gondang, Kabupaten Tulungagung, Jawa Timur','text','kontak','Alamat lengkap',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(9,'contact_phone','','string','kontak','Telepon',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(10,'contact_whatsapp','','string','kontak','WhatsApp',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(11,'contact_email','info@mts-alhuda.sch.id','string','kontak','Email resmi',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(12,'contact_hours','Senin - Sabtu, 07.00 - 15.10 WIB','string','kontak','Jam operasional',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(13,'contact_map_lat','','string','kontak','Lintang lokasi',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(14,'contact_map_lng','','string','kontak','Bujur lokasi',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(15,'social_facebook','','string','sosial','Facebook',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(16,'social_instagram','','string','sosial','Instagram',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(17,'social_youtube','','string','sosial','YouTube',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(18,'social_tiktok','','string','sosial','TikTok',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(19,'meta_title','MTs Al-Huda Gondang — Madrasah Berakhlak, Berprestasi','string','seo','Meta title',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(20,'meta_description','Madrasah Tsanawiyah Al-Huda Gondang. Membentuk generasi Qur\'ani, berakhlak mulia, dan berprestasi.','text','seo','Meta description',1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(21,'attendance_check_in_time','07:00','string','presensi','Jam masuk',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(22,'attendance_late_tolerance','15','int','presensi','Toleransi terlambat (menit)',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(23,'attendance_check_out_time','15:10','string','presensi','Jam pulang',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(24,'security_max_login_attempts','5','int','keamanan','Batas percobaan login gagal',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(25,'security_lockout_minutes','15','int','keamanan','Durasi kunci akun (menit)',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(26,'security_session_timeout','120','int','keamanan','Sesi web berakhir (menit)',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(27,'security_api_access_ttl','30','int','keamanan','Masa aktif token akses (menit)',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(28,'security_api_refresh_ttl','30','int','keamanan','Masa aktif token refresh (hari)',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(29,'security_force_password_change','1','bool','keamanan','Wajib ganti sandi saat login pertama',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(30,'security_audit_log','1','bool','keamanan','Catat log audit',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(31,'mail_enabled','0','bool','email','Notifikasi email aktif',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(32,'mail_host','','string','email','SMTP host',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(33,'mail_port','587','int','email','SMTP port',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(34,'mail_encryption','tls','string','email','Enkripsi SMTP',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(35,'mail_username','','string','email','SMTP username',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(36,'mail_password','','string','email','SMTP password',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(37,'mail_from_address','','string','email','Alamat pengirim',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(38,'mail_from_name','MTs Al-Huda Gondang','string','email','Nama pengirim',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(39,'mail_on_password_reset','1','bool','email','Kirim email reset sandi',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(40,'mail_on_account_created','1','bool','email','Kirim email akun baru',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(41,'mail_on_new_assignment','1','bool','email','Kirim email tugas baru',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(42,'announcement_active','0','bool','pengumuman','Tampilkan pengumuman',0,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(43,'announcement_text','','text','pengumuman','Isi pengumuman',0,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `pengaturan`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `siswa``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `siswa`` (
+-- --------------------------------------------------------------------------
+-- 23. TABEL MENU NAVIGASI (navigation)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `menu`;
+CREATE TABLE `menu` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_id` bigint unsigned NOT NULL,
-  `nis` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nisn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `class_id` bigint unsigned DEFAULT NULL,
-  `gender` enum('L','P') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
-  `birth_place` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `birth_date` date DEFAULT NULL,
-  `guardian_name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `guardian_phone` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `enrolled_at` date DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_students_user` (`user_id`),
-  UNIQUE KEY `uq_students_nis` (`nis`),
-  UNIQUE KEY `uq_students_nisn` (`nisn`),
-  UNIQUE KEY `uq_students_public` (`public_id`),
-  KEY `idx_students_class_active` (`class_id`,`is_active`),
-  CONSTRAINT `fk_students_class` FOREIGN KEY (`class_id`) REFERENCES `kelas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_students_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `siswa` WRITE;
-/*!40000 ALTER TABLE `siswa`` DISABLE KEYS */;
-INSERT INTO `siswa`` VALUES (5,NULL,414,'2025001',NULL,1,'P',NULL,NULL,NULL,NULL,NULL,'2025-07-01',1,'2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `siswa`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `mata_pelajaran``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mata_pelajaran`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `group_name` enum('agama','umum','muatan_lokal','ekstrakurikuler') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'umum',
+  `parent_id` bigint unsigned DEFAULT NULL,
+  `title` varchar(100) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `target` varchar(20) NOT NULL DEFAULT '_self',
   `sort_order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_subjects_code` (`code`),
-  KEY `idx_subjects_group` (`group_name`,`sort_order`),
-  KEY `idx_subjects_active` (`is_active`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `mata_pelajaran` WRITE;
-/*!40000 ALTER TABLE `mata_pelajaran`` DISABLE KEYS */;
-INSERT INTO `mata_pelajaran`` VALUES (1,'QH','Al-Qur\'an Hadis','agama',1,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(2,'AA','Akidah Akhlak','agama',2,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(3,'FQ','Fikih','agama',3,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(4,'SKI','Sejarah Kebudayaan Islam','agama',4,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(5,'BIN','Bahasa Indonesia','umum',10,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(6,'BIG','Bahasa Inggris','umum',11,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(7,'MTK','Matematika','umum',12,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(8,'IPA','Ilmu Pengetahuan Alam','umum',13,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(9,'IPS','Ilmu Pengetahuan Sosial','umum',14,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(10,'PKN','Pendidikan Pancasila','umum',15,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(11,'SBK','Seni Budaya','umum',16,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(12,'PJOK','Pendidikan Jasmani','umum',17,1,'2026-10-23 05:48:12','2026-10-23 05:48:12'),(13,'BTQ','Baca Tulis Al-Qur\'an','muatan_lokal',20,1,'2026-10-23 05:48:12','2026-10-23 05:48:12');
-/*!40000 ALTER TABLE `mata_pelajaran`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pengumpulan_tugas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pengumpulan_tugas`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `assignment_id` bigint unsigned NOT NULL,
-  `student_id` bigint unsigned NOT NULL,
-  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `submitted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `score` decimal(5,2) DEFAULT NULL,
-  `feedback` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `graded_at` datetime DEFAULT NULL,
-  `graded_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_submissions_pair` (`assignment_id`,`student_id`),
-  UNIQUE KEY `uq_submissions_public` (`public_id`),
-  KEY `idx_submissions_student` (`student_id`,`submitted_at`),
-  KEY `idx_submissions_ungraded` (`assignment_id`,`graded_at`),
-  KEY `idx_submissions_grader` (`graded_by`),
-  CONSTRAINT `fk_submissions_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `tugas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_submissions_grader` FOREIGN KEY (`graded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_submissions_student` FOREIGN KEY (`student_id`) REFERENCES `siswa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `chk_submissions_score` CHECK (((`score` is null) or (`score` >= 0)))
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `pengumpulan_tugas` WRITE;
-/*!40000 ALTER TABLE `pengumpulan_tugas`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pengumpulan_tugas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `agenda_tugas``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `agenda_tugas`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `period_id` bigint unsigned NOT NULL,
-  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `assigned_to` bigint unsigned DEFAULT NULL,
-  `due_date` date DEFAULT NULL,
-  `priority` enum('rendah','sedang','tinggi') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'sedang',
-  `status` enum('belum','proses','selesai','batal') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'belum',
-  `completed_at` datetime DEFAULT NULL,
-  `created_by` bigint unsigned DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_tasks_assignee` (`assigned_to`,`status`,`due_date`),
-  KEY `idx_tasks_period` (`period_id`,`status`,`due_date`),
-  KEY `idx_tasks_overdue` (`due_date`,`status`),
-  KEY `fk_tasks_creator` (`created_by`),
-  CONSTRAINT `fk_tasks_assignee` FOREIGN KEY (`assigned_to`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_tasks_creator` FOREIGN KEY (`created_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_tasks_period` FOREIGN KEY (`period_id`) REFERENCES `periode_akreditasi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  KEY `idx_menu_parent` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `agenda_tugas` WRITE;
-/*!40000 ALTER TABLE `agenda_tugas`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `agenda_tugas`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `presensi_guru``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `presensi_guru`` (
+-- --------------------------------------------------------------------------
+-- 24. TABEL NOTIFIKASI (notifications)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `notifikasi`;
+CREATE TABLE `notifikasi` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `teacher_id` bigint unsigned NOT NULL,
-  `schedule_id` bigint unsigned DEFAULT NULL,
-  `attendance_date` date NOT NULL,
-  `attendance_type` enum('daily','session') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'daily',
-  `check_in_at` datetime DEFAULT NULL,
-  `check_out_at` datetime DEFAULT NULL,
-  `status` enum('hadir','terlambat','izin','sakit','dinas','alpa') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'hadir',
-  `note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `method` enum('self','operator','system') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'self',
-  `verified_by` bigint unsigned DEFAULT NULL,
-  `verified_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `unique_key` varchar(96) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci GENERATED ALWAYS AS (concat(`teacher_id`,_utf8mb4'-',`attendance_date`,_utf8mb4'-',`attendance_type`,_utf8mb4'-',ifnull(`schedule_id`,0))) STORED,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_teacher_attendances_key` (`unique_key`),
-  KEY `idx_attendance_daily` (`attendance_date`,`status`),
-  KEY `idx_attendance_teacher` (`teacher_id`,`attendance_date`),
-  KEY `idx_attendance_schedule` (`schedule_id`,`attendance_date`),
-  KEY `idx_attendance_unverified` (`verified_at`,`attendance_date`),
-  KEY `fk_attendance_verifier` (`verified_by`),
-  CONSTRAINT `fk_attendance_schedule` FOREIGN KEY (`schedule_id`) REFERENCES `jadwal` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `fk_attendance_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `guru` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `fk_attendance_verifier` FOREIGN KEY (`verified_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `chk_attendance_checkout` CHECK (((`check_out_at` is null) or (`check_in_at` is null) or (`check_out_at` >= `check_in_at`))),
-  CONSTRAINT `chk_attendance_type` CHECK ((((`attendance_type` = _utf8mb4'daily') and (`schedule_id` is null)) or ((`attendance_type` = _utf8mb4'session') and (`schedule_id` is not null))))
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-LOCK TABLES `presensi_guru` WRITE;
-/*!40000 ALTER TABLE `presensi_guru`` DISABLE KEYS */;
-/*!40000 ALTER TABLE `presensi_guru`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `guru``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `guru`` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `public_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint unsigned NOT NULL,
-  `nip` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nuptk` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gender` enum('L','P') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
-  `employment_status` enum('pns','pppk','honorer','gtty') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'honorer',
-  `subject_specialty` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `joined_at` date DEFAULT NULL,
+  `title` varchar(150) NOT NULL,
+  `body` text NOT NULL,
+  `type` varchar(50) NOT NULL DEFAULT 'info',
+  `action_url` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_teachers_user` (`user_id`),
-  UNIQUE KEY `uq_teachers_nip` (`nip`),
-  UNIQUE KEY `uq_teachers_nuptk` (`nuptk`),
-  UNIQUE KEY `uq_teachers_public` (`public_id`),
-  KEY `idx_teachers_status` (`employment_status`),
-  CONSTRAINT `fk_teachers_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  KEY `idx_notifikasi_user` (`user_id`,`is_read`),
+  CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `guru` WRITE;
-/*!40000 ALTER TABLE `guru`` DISABLE KEYS */;
-INSERT INTO `guru`` VALUES (5,NULL,2,'198501012010011001',NULL,'L','pns','Matematika','2010-01-01','2026-10-23 06:03:01','2026-10-23 06:03:01');
-/*!40000 ALTER TABLE `guru`` ENABLE KEYS */;
-UNLOCK TABLES;
-DROP TABLE IF EXISTS `pengguna``;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pengguna`` (
+-- --------------------------------------------------------------------------
+-- 25. TABEL TOKEN API (api_tokens)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `token_api`;
+CREATE TABLE `token_api` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(160) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `username` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` enum('admin','operator','kepala','guru','siswa','akreditasi') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'siswa',
-  `role_label` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `must_change_password` tinyint(1) NOT NULL DEFAULT '1',
-  `failed_login_attempts` int unsigned NOT NULL DEFAULT '0',
-  `locked_until` datetime DEFAULT NULL,
-  `last_login_at` datetime DEFAULT NULL,
-  `last_login_ip` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `public_id` char(36) DEFAULT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `device_name` varchar(100) DEFAULT NULL,
+  `platform` varchar(50) DEFAULT 'unknown',
+  `last_used_at` datetime DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_users_email` (`email`),
-  UNIQUE KEY `uq_users_username` (`username`),
-  KEY `idx_users_role_active` (`role`,`is_active`),
-  KEY `idx_users_deleted` (`deleted_at`),
-  KEY `idx_users_locked` (`locked_until`)
-) ENGINE=InnoDB AUTO_INCREMENT=1223 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE KEY `uq_token_hash` (`token_hash`),
+  KEY `idx_token_user` (`user_id`),
+  CONSTRAINT `fk_token_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-LOCK TABLES `pengguna` WRITE;
-/*!40000 ALTER TABLE `pengguna`` DISABLE KEYS */;
-INSERT INTO `pengguna`` VALUES (1,'Operator Contoh','operator@contoh.local','operator','$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK','operator','Operator Madrasah',NULL,NULL,1,1,0,NULL,NULL,NULL,'2026-10-23 05:48:12','2026-10-23 05:48:12',NULL),(2,'Guru Contoh','guru@contoh.local','guru','$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK','guru','Guru',NULL,NULL,1,1,0,NULL,'2026-10-23 06:07:51','::1','2026-10-23 05:48:12','2026-10-23 06:07:51',NULL),(3,'Administrator Madrasah','admin@mts-alhuda.sch.id','admin','$2y$10$.aBNtZkSEV0JKnVdksmgp.8AO922tKcKmYHopbjzsrNKchFRCnGn2','admin','Super Admin',NULL,NULL,1,1,0,NULL,'2026-10-23 06:07:50','::1','2026-10-23 05:48:13','2026-10-23 14:17:11',NULL),(414,'Siswa Contoh','siswa@contoh.local','siswa','$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK','siswa','Siswa',NULL,NULL,1,1,0,NULL,'2026-10-23 06:07:51','::1','2026-10-23 06:03:01','2026-10-23 06:07:51',NULL);
-/*!40000 ALTER TABLE `pengguna`` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+-- --------------------------------------------------------------------------
+-- 26. TABEL LOG AUDIT (activity_logs)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `log_audit`;
+CREATE TABLE `log_audit` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity_type` varchar(60) NOT NULL,
+  `entity_id` bigint unsigned DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_audit_user` (`user_id`),
+  KEY `idx_audit_entity` (`entity_type`,`entity_id`),
+  KEY `idx_audit_action` (`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+-- --------------------------------------------------------------------------
+-- 27. TABEL SESI PENGGUNA (user_sessions)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `sesi_pengguna`;
+CREATE TABLE `sesi_pengguna` (
+  `id` varchar(128) NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` mediumtext NOT NULL,
+  `last_activity` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_sesi_user` (`user_id`),
+  KEY `idx_sesi_activity` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------------------------
+-- 28. TABEL TOKEN RESET SANDI (password_resets)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `token_reset_sandi`;
+CREATE TABLE `token_reset_sandi` (
+  `email` varchar(160) NOT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`token_hash`),
+  KEY `idx_reset_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 29. TABEL BATAS AKSES (rate_limits)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `batas_akses`;
+CREATE TABLE `batas_akses` (
+  `bucket` varchar(191) NOT NULL,
+  `tokens` decimal(8,2) NOT NULL,
+  `last_replenished_at` int unsigned NOT NULL,
+  `expires_at` int unsigned NOT NULL,
+  PRIMARY KEY (`bucket`),
+  KEY `idx_batas_expires` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------------------------
+-- 30. TABEL SCHEMA MIGRATIONS & SEEDERS (Database Tracking)
+-- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `schema_migrations`;
+CREATE TABLE `schema_migrations` (
+  `version` varchar(20) NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `batch` int unsigned NOT NULL DEFAULT '1',
+  `statements` int unsigned NOT NULL DEFAULT '0',
+  `executed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`version`),
+  KEY `idx_schema_migrations_batch` (`batch`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `schema_seeders`;
+CREATE TABLE `schema_seeders` (
+  `seeder` varchar(191) NOT NULL,
+  `checksum` char(64) NOT NULL,
+  `executed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`seeder`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================================================
+-- COMPATIBILITY VIEWS (Transparansi Bahasa Inggris ↔ Semi-Bahasa Indonesia)
+-- ==========================================================================
+CREATE OR REPLACE VIEW `users` AS 
+SELECT `id`, `username`, `email`, `password_hash` AS `password`, `password_hash`, `name`, `nama`, `role`, `is_active`, `created_at`, `updated_at` 
+FROM `pengguna`;
+
+CREATE OR REPLACE VIEW `gurus` AS 
+SELECT `id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `jenis_kelamin`, `gender`, `no_hp`, `phone`, `alamat`, `address`, `foto_url`, `status_kepegawaian`, `bidang_studi`, `kode_jadwal`, `is_active`, `created_at`, `updated_at` 
+FROM `guru`;
+
+CREATE OR REPLACE VIEW `teachers` AS 
+SELECT `id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `gender`, `jenis_kelamin`, `phone` AS `no_hp`, `address` AS `alamat`, `foto_url`, `employment_status`, `subject_specialty`, `is_active`, `created_at`, `updated_at` 
+FROM `guru`;
+
+CREATE OR REPLACE VIEW `classes` AS 
+SELECT `id`, `academic_year_id`, `name`, `nama_kelas`, `level`, `tingkat`, `homeroom_teacher_id` AS `wali_kelas_id`, `room`, `ruangan`, `capacity`, `sort_order`, `is_active`, `created_at`, `updated_at` 
+FROM `kelas`;
+
+CREATE OR REPLACE VIEW `siswas` AS 
+SELECT `id`, `user_id`, `class_id` AS `kelas_id`, `class_id`, `nis`, `nisn`, `nama_lengkap`, `jenis_kelamin`, `gender`, `tempat_lahir`, `tanggal_lahir`, `nama_wali`, `alamat`, `foto_url`, `status`, `created_at`, `updated_at` 
+FROM `siswa`;
+
+CREATE OR REPLACE VIEW `students` AS 
+SELECT `id`, `user_id`, `class_id`, `class_id` AS `kelas_id`, `nis`, `nisn`, `nama_lengkap`, `gender`, `jenis_kelamin`, `birth_place`, `birth_date`, `guardian_name`, `address`, `foto_url`, `enrolled_at`, `status`, `is_active`, `created_at`, `updated_at` 
+FROM `siswa`;
+
+CREATE OR REPLACE VIEW `subjects` AS 
+SELECT `id`, `code` AS `kode_mapel`, `code`, `name` AS `nama_mapel`, `name`, `group_name` AS `kelompok`, `group_name`, `sort_order`, `is_active`, `created_at`, `updated_at` 
+FROM `mata_pelajaran`;
+
+CREATE OR REPLACE VIEW `class_subjects` AS 
+SELECT `id`, `class_id` AS `kelas_id`, `class_id`, `subject_id` AS `mata_pelajaran_id`, `subject_id`, `teacher_id` AS `guru_id`, `teacher_id`, `weekly_hours` AS `jam_mingguan`, `weekly_hours`, `is_active`, `created_at`, `updated_at` 
+FROM `mata_pelajaran_kelas`;
+
+CREATE OR REPLACE VIEW `schedules` AS 
+SELECT `id`, `class_subject_id`, `kelas_id` AS `class_id`, `kelas_id`, `subject_id` AS `mata_pelajaran_id`, `subject_id`, `teacher_id` AS `guru_id`, `teacher_id`, `academic_year_id`, `day_of_week`, `hari`, `start_time` AS `jam_mulai`, `start_time`, `end_time` AS `jam_selesai`, `end_time`, `room` AS `ruangan`, `room`, `is_active`, `created_at`, `updated_at` 
+FROM `jadwal`;
+
+CREATE OR REPLACE VIEW `school_locations` AS 
+SELECT `id`, `nama_lokasi`, `qr_token`, `latitude`, `longitude`, `radius_meter`, `is_active`, `created_at`, `updated_at` 
+FROM `lokasi_sekolah`;
+
+CREATE OR REPLACE VIEW `teacher_attendances` AS 
+SELECT `id`, `teacher_id` AS `guru_id`, `teacher_id`, `attendance_date` AS `tanggal`, `attendance_date`, `attendance_type`, `schedule_id`, `check_in_at`, `jam_masuk`, `check_out_at`, `jam_pulang`, `lat_masuk`, `long_masuk`, `lat_pulang`, `long_pulang`, `status`, `keterangan`, `notes`, `attachment_path` AS `lampiran`, `created_at`, `updated_at` 
+FROM `presensi_guru`;
+
+CREATE OR REPLACE VIEW `materials` AS 
+SELECT `id`, `class_subject_id`, `kelas_id`, `guru_id`, `mata_pelajaran_id`, `title` AS `judul`, `title`, `description` AS `deskripsi`, `description`, `file_path`, `file_url`, `external_url`, `is_published`, `published_at`, `created_by`, `created_at`, `updated_at` 
+FROM `materi`;
+
+CREATE OR REPLACE VIEW `assignments` AS 
+SELECT `id`, `public_id`, `class_subject_id`, `kelas_id`, `guru_id`, `mata_pelajaran_id`, `title` AS `judul`, `title`, `description` AS `instruksi`, `description`, `attachment_path` AS `file_tugas_url`, `attachment_path`, `due_at` AS `deadline`, `due_at`, `max_score`, `is_published`, `created_by`, `created_at`, `updated_at` 
+FROM `tugas`;
+
+CREATE OR REPLACE VIEW `submissions` AS 
+SELECT `id`, `public_id`, `assignment_id`, `assignment_id` AS `tugas_id`, `student_id`, `student_id` AS `siswa_id`, `file_path`, `file_path` AS `file_jawaban_url`, `note` AS `catatan_siswa`, `note`, `submitted_at`, `status`, `score` AS `nilai`, `score`, `feedback` AS `catatan_guru`, `feedback`, `graded_at`, `graded_by`, `created_at`, `updated_at` 
+FROM `pengumpulan_tugas`;
+
+CREATE OR REPLACE VIEW `assignment_submissions` AS 
+SELECT `id`, `public_id`, `assignment_id` AS `tugas_id`, `assignment_id`, `student_id` AS `siswa_id`, `student_id`, `file_jawaban_url`, `catatan_siswa`, `submitted_at`, `status`, `nilai` AS `score`, `nilai`, `catatan_guru` AS `feedback`, `catatan_guru`, `graded_at`, `graded_by`, `created_at`, `updated_at` 
+FROM `pengumpulan_tugas`;
+
+CREATE OR REPLACE VIEW `academic_years` AS 
+SELECT `id`, `name` AS `nama_tahun`, `name`, `semester`, `start_date`, `end_date`, `is_active`, `note`, `created_at`, `updated_at` 
+FROM `tahun_akademik`;
+
+CREATE OR REPLACE VIEW `halaman_profil` AS 
+SELECT `id`, `slug`, `title` AS `judul`, `title`, `content` AS `isi`, `content`, `is_active`, `updated_by`, `created_at`, `updated_at` 
+FROM `halaman`;
+
+CREATE OR REPLACE VIEW `activity_logs` AS 
+SELECT `id`, `user_id`, `action`, `entity_type`, `entity_id`, `details`, `ip_address`, `user_agent`, `created_at` 
+FROM `log_audit`;
+
+-- ==========================================================================
+-- DATA SEEDING (Pengaturan, Akun Inti, Guru, Siswa, Kelas, Mapel, Jadwal)
+-- ==========================================================================
+
+-- 1. Tahun Akademik
+INSERT INTO `tahun_akademik` (`id`, `name`, `nama_tahun`, `semester`, `start_date`, `end_date`, `is_active`, `note`) VALUES
+(1, '2026/2027', '2026/2027', 'ganjil', '2026-07-13', '2026-12-19', 1, 'Semester Ganjil Tahun Ajaran 2026/2027');
+
+-- 2. Akun Administrator & Kepala Madrasah
+INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `name`, `nama`, `role`, `role_label`, `phone`, `telepon`, `is_active`, `must_change_password`, `created_at`) VALUES
+(1, 'admin', 'admin@mts-alhuda.sch.id', '$2y$10$PFKcWfWHTxcIeRj84cBPdumEvGCZuDsC5oIUVd8JEWIMTAgKHQPDO', 'Administrator Madrasah', 'Administrator Madrasah', 'admin', 'Super Admin', '081234567890', '081234567890', 1, 0, NOW()),
+(2, 'operator', 'operator@mts-alhuda.sch.id', '$2y$10$PFKcWfWHTxcIeRj84cBPdumEvGCZuDsC5oIUVd8JEWIMTAgKHQPDO', 'Operator Madrasah', 'Operator Madrasah', 'operator', 'Operator Madrasah', '081234567891', '081234567891', 1, 0, NOW()),
+(3, 'sholihin', 'sholihin@mts-alhuda.sch.id', '$2y$10$PFKcWfWHTxcIeRj84cBPdumEvGCZuDsC5oIUVd8JEWIMTAgKHQPDO', 'Drs. H. M. Sholihin, M.Pd.I', 'Drs. H. M. Sholihin, M.Pd.I', 'kepala', 'Kepala Madrasah', '081234567892', '081234567892', 1, 0, NOW());
+
+-- 3. Guru & Pengguna Guru
+INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `name`, `nama`, `role`, `role_label`, `phone`, `telepon`, `is_active`, `must_change_password`, `created_at`) VALUES
+(10, 'guru_said', 'guru_said@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'Drs. SAID', 'Drs. SAID', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(11, 'guru_sarmin', 'guru_sarmin@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'Drs. SARMIN', 'Drs. SARMIN', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(12, 'guru_mohammadmusthofa', 'guru_mohammadmusthofa@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHAMMAD MUSTHOFA, S.Pd.I', 'MOHAMMAD MUSTHOFA, S.Pd.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(13, 'guru_faridkurniawannovianto', 'guru_faridkurniawannovianto@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FARID KURNIAWAN NOVIANTO, SH', 'FARID KURNIAWAN NOVIANTO, SH', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(14, 'guru_subiyatin', 'guru_subiyatin@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SUBIYATIN, S.Si', 'SUBIYATIN, S.Si', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(15, 'guru_lilikrahmawati', 'guru_lilikrahmawati@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'LILIK RAHMAWATI, S.Pd', 'LILIK RAHMAWATI, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(16, 'guru_agussetiawan', 'guru_agussetiawan@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AGUS SETIAWAN, S.Pd', 'AGUS SETIAWAN, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(17, 'guru_setyojatmiko', 'guru_setyojatmiko@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SETYO JATMIKO, S.Pd', 'SETYO JATMIKO, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(18, 'guru_sodikinmuslimin', 'guru_sodikinmuslimin@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SODIKIN MUSLIMIN, S.Pd', 'SODIKIN MUSLIMIN, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(19, 'guru_ulfatulkhumaydah', 'guru_ulfatulkhumaydah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ULFATUL KHUMAYDAH, S.H.I', 'ULFATUL KHUMAYDAH, S.H.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(20, 'guru_sitiamiroh', 'guru_sitiamiroh@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SITI AMIROH, S.Pd.I', 'SITI AMIROH, S.Pd.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(21, 'guru_agusbudiirawan', 'guru_agusbudiirawan@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AGUS BUDI IRAWAN, S.Pd.', 'AGUS BUDI IRAWAN, S.Pd.', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(22, 'guru_muhammadabdulharisjauhari', 'guru_muhammadabdulharisjauhari@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD ABDUL HARIS JAUHARI, S.Pd.I', 'MUHAMMAD ABDUL HARIS JAUHARI, S.Pd.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(23, 'guru_sitimunfarida', 'guru_sitimunfarida@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SITI MUNFARIDA, S.Pd.I', 'SITI MUNFARIDA, S.Pd.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(24, 'guru_faridatunnimah', 'guru_faridatunnimah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FARIDATUN NI`MAH, S.Pd.I', 'FARIDATUN NI`MAH, S.Pd.I', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(25, 'guru_intanrosianadevi', 'guru_intanrosianadevi@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'INTAN ROSIANA DEVI, S.Pd.', 'INTAN ROSIANA DEVI, S.Pd.', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(26, 'guru_octaviautswatunkhasanah', 'guru_octaviautswatunkhasanah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'OCTAVIA UTSWATUN KHASANAH, S.Pd', 'OCTAVIA UTSWATUN KHASANAH, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(27, 'guru_nurulchofifah', 'guru_nurulchofifah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NURUL CHOFIFAH, S.Pd', 'NURUL CHOFIFAH, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(28, 'guru_mochsyabanwulana', 'guru_mochsyabanwulana@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOCH. SYABAN WULANA, S.Pd', 'MOCH. SYABAN WULANA, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(29, 'guru_windatriyana', 'guru_windatriyana@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'WINDA TRIYANA, S.Pd', 'WINDA TRIYANA, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(30, 'guru_nopipurwanti', 'guru_nopipurwanti@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NOPI PURWANTI, S.Pd', 'NOPI PURWANTI, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(31, 'guru_kumalaazizatullatifah', 'guru_kumalaazizatullatifah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KUMALA AZIZATUL LATIFAH, S.Pd', 'KUMALA AZIZATUL LATIFAH, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(32, 'guru_titikyuliati', 'guru_titikyuliati@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TITIK YULIATI, S.Pd', 'TITIK YULIATI, S.Pd', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(33, 'guru_nurfuad', 'guru_nurfuad@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NUR FUAD, S.H.I, M.A.', 'NUR FUAD, S.H.I, M.A.', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(34, 'guru_sulijadi', 'guru_sulijadi@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SULIJADI, M.M', 'SULIJADI, M.M', 'guru', 'Guru', NULL, NULL, 1, 0, NOW()),
+(35, 'guru_alitadianwahyushalikhah', 'guru_alitadianwahyushalikhah@mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ALITA DIAN WAHYU SHALIKHAH', 'ALITA DIAN WAHYU SHALIKHAH', 'guru', 'Guru', NULL, NULL, 1, 0, NOW());
+
+INSERT INTO `guru` (`id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `gender`, `jenis_kelamin`, `phone`, `no_hp`, `address`, `alamat`, `foto_url`, `employment_status`, `status_kepegawaian`, `subject_specialty`, `bidang_studi`, `kode_jadwal`, `joined_at`, `is_active`, `created_at`) VALUES
+(1, 10, '0838743647200032', '0838743647200032', 'Drs.', 'Drs. SAID', '', 'L', 'L', NULL, NULL, 'Toko Pojok, RT. 004 RW. 002 Pandean, Gondang, Nganjuk 64451', 'Toko Pojok, RT. 004 RW. 002 Pandean, Gondang, Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '02', '2020-01-01', 1, NOW()),
+(2, 11, '3439745645200003', '3439745645200003', 'Drs.', 'Drs. SARMIN', '', 'L', 'L', NULL, NULL, 'RT 01 RW 02 DS. JINTEL KEC. REJOSO KAB. NGANJUK', 'RT 01 RW 02 DS. JINTEL KEC. REJOSO KAB. NGANJUK', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '04', '2020-01-01', 1, NOW()),
+(3, 12, '6553757659200012', '6553757659200012', '', 'MOHAMMAD MUSTHOFA, S.Pd.I', 'S.Pd.I', 'L', 'L', NULL, NULL, 'Jl. Soeprapto 24 RT. 004 RW. 002 Pandean, Gondang, Nganjuk 64451', 'Jl. Soeprapto 24 RT. 004 RW. 002 Pandean, Gondang, Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '05', '2020-01-01', 1, NOW()),
+(4, 13, '0456757659200023', '0456757659200023', '', 'FARID KURNIAWAN NOVIANTO, SH', 'SH', 'L', 'L', NULL, NULL, 'RT/RW 02/02 Dsn Sambong Desa Campur Kecamatan Gondang Kabupaten Nganjuk', 'RT/RW 02/02 Dsn Sambong Desa Campur Kecamatan Gondang Kabupaten Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '06', '2020-01-01', 1, NOW()),
+(5, 14, '7146757658300023', '7146757658300023', '', 'SUBIYATIN, S.Si', 'S.Si', 'P', 'P', NULL, NULL, 'RT/RW 02/02 Dsn Sambong Desa Campur Kecamatan Gondang Kabupaten Nganjuk', 'RT/RW 02/02 Dsn Sambong Desa Campur Kecamatan Gondang Kabupaten Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '07', '2020-01-01', 1, NOW()),
+(6, 15, '5062760661210093', '5062760661210093', '', 'LILIK RAHMAWATI, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'SAMBONG RT.002 RW.005 DESA CAMPUR KECAMATAN GONDANG KABUPATEN NGANJUK', 'SAMBONG RT.002 RW.005 DESA CAMPUR KECAMATAN GONDANG KABUPATEN NGANJUK', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '08', '2020-01-01', 1, NOW()),
+(7, 16, '1354760667200003', '1354760667200003', '', 'AGUS SETIAWAN, S.Pd', 'S.Pd', 'L', 'L', NULL, NULL, 'RT/RW :002/001, Dsn.Sawahan, Ds. Balonggebang, Kec.Gondang, Kab. Nganjuk', 'RT/RW :002/001, Dsn.Sawahan, Ds. Balonggebang, Kec.Gondang, Kab. Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '09', '2020-01-01', 1, NOW()),
+(8, 17, '9261760662200023', '9261760662200023', '', 'SETYO JATMIKO, S.Pd', 'S.Pd', 'L', 'L', NULL, NULL, 'RT/RW 001/002 Desa Karang Tengah Kecamatan Bagor Kab Nganjuk', 'RT/RW 001/002 Desa Karang Tengah Kecamatan Bagor Kab Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '10', '2020-01-01', 1, NOW()),
+(9, 18, '6050763666200003', '6050763666200003', '', 'SODIKIN MUSLIMIN, S.Pd', 'S.Pd', 'L', 'L', NULL, NULL, 'Jln. Mojo Rt 09, Rw 02. Ds Gondangkulon, Kec Gondang', 'Jln. Mojo Rt 09, Rw 02. Ds Gondangkulon, Kec Gondang', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '11', '2020-01-01', 1, NOW()),
+(10, 19, '6852761662300052', '6852761662300052', '', 'ULFATUL KHUMAYDAH, S.H.I', 'S.H.I', 'P', 'P', NULL, NULL, 'UTARA MASJID KAWEDEGAN DSN. KAWEDEGAN DS. BALONGGEBANG KEC. GONDANG KAB. NGANJUK JATIM 64451', 'UTARA MASJID KAWEDEGAN DSN. KAWEDEGAN DS. BALONGGEBANG KEC. GONDANG KAB. NGANJUK JATIM 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '12', '2020-01-01', 1, NOW()),
+(11, 20, '4561760661300033', '4561760661300033', '', 'SITI AMIROH, S.Pd.I', 'S.Pd.I', 'P', 'P', NULL, NULL, 'Dsn. Sambirejo RT 005 RW.005 DS. Katerban Kec.Baron Nganjuk', 'Dsn. Sambirejo RT 005 RW.005 DS. Katerban Kec.Baron Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL / WAKA KURIKULUM', 'GURU MAPEL / WAKA KURIKULUM', '13', '2020-01-01', 1, NOW()),
+(12, 21, '8145755658110013', '8145755658110013', '', 'AGUS BUDI IRAWAN, S.Pd.', 'S.Pd.', 'L', 'L', NULL, NULL, 'RT 01 RW 01 Campur Gondang Nganjuk', 'RT 01 RW 01 Campur Gondang Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '14', '2020-01-01', 1, NOW()),
+(13, 22, '20537588191001', '20537588191001', '', 'MUHAMMAD ABDUL HARIS JAUHARI, S.Pd.I', 'S.Pd.I', 'L', 'L', NULL, NULL, 'Haris Phonecell, Utara MTs Al-Huda Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', 'Haris Phonecell, Utara MTs Al-Huda Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'KEPALA MADRASAH', 'KEPALA MADRASAH', '01', '2020-01-01', 1, NOW()),
+(14, 23, '20537588188001', '20537588188001', '', 'SITI MUNFARIDA, S.Pd.I', 'S.Pd.I', 'P', 'P', NULL, NULL, 'Dsn. Pulo Rt. 004/ Rw. 006 Ds. Campur Kec. Gondang Kab. Nganjuk Kode pos 64451', 'Dsn. Pulo Rt. 004/ Rw. 006 Ds. Campur Kec. Gondang Kab. Nganjuk Kode pos 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '15', '2020-01-01', 1, NOW()),
+(15, 24, '20537588190003', '20537588190003', '', 'FARIDATUN NI`MAH, S.Pd.I', 'S.Pd.I', 'P', 'P', NULL, NULL, 'Haris Phonecell, Utara MTs Al-Huda Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', 'Haris Phonecell, Utara MTs Al-Huda Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '16', '2020-01-01', 1, NOW()),
+(16, 25, '20537588190002', '20537588190002', '', 'INTAN ROSIANA DEVI, S.Pd.', 'S.Pd.', 'P', 'P', NULL, NULL, 'DESA NGUJUNG RT.01 / RW.01, Kel. Ngujung, Kec. Gondang Kab. Nganjuk, Prov. Jawa Timur KODE POS 64451', 'DESA NGUJUNG RT.01 / RW.01, Kel. Ngujung, Kec. Gondang Kab. Nganjuk, Prov. Jawa Timur KODE POS 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '17', '2020-01-01', 1, NOW()),
+(17, 26, '20537588197001', '20537588197001', '', 'OCTAVIA UTSWATUN KHASANAH, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'Ds. Paron RT/RW : 11/03 Kec. Bagor Kab. Nganjuk', 'Ds. Paron RT/RW : 11/03 Kec. Bagor Kab. Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '19', '2020-01-01', 1, NOW()),
+(18, 27, '20537588183001', '20537588183001', '', 'NURUL CHOFIFAH, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'Ds. Senjayan RT 02 RW 04 Kec. Gondang Kab. Nganjuk, 64451', 'Ds. Senjayan RT 02 RW 04 Kec. Gondang Kab. Nganjuk, 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '20', '2020-01-01', 1, NOW()),
+(19, 28, '20537588196001', '20537588196001', '', 'MOCH. SYABAN WULANA, S.Pd', 'S.Pd', 'L', 'L', NULL, NULL, 'Dusun Jatigetih RT 001/RW 005, Desa Sanggrahan Kec. Gondang, Kab. Nganjuk 64451', 'Dusun Jatigetih RT 001/RW 005, Desa Sanggrahan Kec. Gondang, Kab. Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '21', '2020-01-01', 1, NOW()),
+(20, 29, '20537588198001', '20537588198001', '', 'WINDA TRIYANA, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'RT 01 RW 01, DESA JINTEL, KECAMATAN REJOSO, KABUPATEN NGANJUK', 'RT 01 RW 01, DESA JINTEL, KECAMATAN REJOSO, KABUPATEN NGANJUK', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '22', '2020-01-01', 1, NOW()),
+(21, 30, '20537588199002', '20537588199002', '', 'NOPI PURWANTI, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'RT.002/RW.011, DUSUN NGRAMBEK DESA CAMPUR KECAMATAN GONDANG KABUPATEN NGANJUK', 'RT.002/RW.011, DUSUN NGRAMBEK DESA CAMPUR KECAMATAN GONDANG KABUPATEN NGANJUK', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '23', '2020-01-01', 1, NOW()),
+(22, 31, '20537588100001', '20537588100001', '', 'KUMALA AZIZATUL LATIFAH, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'TB. Lancar berkah Jln. Nganjuk Bojonegoro, RT.01 ,RW 01, Dsn Sambikerep, Ds Sambikerep, Kec Rejoso, Kab. Nganjuk', 'TB. Lancar berkah Jln. Nganjuk Bojonegoro, RT.01 ,RW 01, Dsn Sambikerep, Ds Sambikerep, Kec Rejoso, Kab. Nganjuk', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '24', '2020-01-01', 1, NOW()),
+(23, 32, '20537992188001', '20537992188001', '', 'TITIK YULIATI, S.Pd', 'S.Pd', 'P', 'P', NULL, NULL, 'JL. CITARUM II NO.127, RT/RW: 02/04 BEGADUNG - NGANJUK', 'JL. CITARUM II NO.127, RT/RW: 02/04 BEGADUNG - NGANJUK', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '25', '2020-01-01', 1, NOW()),
+(24, 33, '20537507185001', '20537507185001', '', 'NUR FUAD, S.H.I, M.A.', 'S.H.I, M.A.', 'L', 'L', NULL, NULL, 'Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', 'Desa Pandean RT 04/RW 02, Kec. Gondang, Kab. Nganjuk 64451', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '18', '2020-01-01', 1, NOW()),
+(25, 34, NULL, NULL, '', 'SULIJADI, M.M', 'M.M', 'L', 'L', NULL, NULL, 'Gondang Kulon', 'Gondang Kulon', NULL, 'honorer', 'GTT/PTT', 'GURU MAPEL', 'GURU MAPEL', '03', '2020-01-01', 1, NOW()),
+(26, 35, NULL, NULL, '', 'ALITA DIAN WAHYU SHALIKHAH', '', 'P', 'P', NULL, NULL, 'Gondang Kulon', 'Gondang Kulon', NULL, 'honorer', 'GTT/PTT', 'KEPALA TU', 'KEPALA TU', '', '2020-01-01', 1, NOW());
+
+-- 4. Kelas
+INSERT INTO `kelas` (`id`, `academic_year_id`, `name`, `nama_kelas`, `level`, `tingkat`, `homeroom_teacher_id`, `wali_kelas_id`, `room`, `ruangan`, `capacity`, `sort_order`, `is_active`, `created_at`) VALUES
+(1, 1, '7A', '7A', 7, 7, 1, 1, 'Ruang Kelas 7A', 'Ruang Kelas 7A', 32, 1, 1, NOW()),
+(2, 1, '7B', '7B', 7, 7, 2, 2, 'Ruang Kelas 7B', 'Ruang Kelas 7B', 32, 2, 1, NOW()),
+(3, 1, '8A', '8A', 8, 8, 3, 3, 'Ruang Kelas 8A', 'Ruang Kelas 8A', 32, 3, 1, NOW()),
+(4, 1, '8B', '8B', 8, 8, 4, 4, 'Ruang Kelas 8B', 'Ruang Kelas 8B', 32, 4, 1, NOW()),
+(5, 1, '9A', '9A', 9, 9, 5, 5, 'Ruang Kelas 9A', 'Ruang Kelas 9A', 32, 5, 1, NOW()),
+(6, 1, '9B', '9B', 9, 9, 6, 6, 'Ruang Kelas 9B', 'Ruang Kelas 9B', 32, 6, 1, NOW());
+
+-- 5. Mata Pelajaran
+INSERT INTO `mata_pelajaran` (`id`, `code`, `kode_mapel`, `name`, `nama_mapel`, `group_name`, `kelompok`, `sort_order`, `is_active`, `created_at`) VALUES
+(1, 'QH', 'QH', 'Qur\'an Hadits', 'Qur\'an Hadits', 'agama', 'agama', 1, 1, NOW()),
+(2, 'AA', 'AA', 'Akidah Akhlaq', 'Akidah Akhlaq', 'agama', 'agama', 2, 1, NOW()),
+(3, 'FQH', 'FQH', 'Fiqih', 'Fiqih', 'agama', 'agama', 3, 1, NOW()),
+(4, 'SKI', 'SKI', 'SKI', 'SKI', 'agama', 'agama', 4, 1, NOW()),
+(5, 'BAR', 'BAR', 'Bahasa Arab', 'Bahasa Arab', 'agama', 'agama', 5, 1, NOW()),
+(6, 'PPKN', 'PPKN', 'PPKn', 'PPKn', 'umum', 'umum', 6, 1, NOW()),
+(7, 'BIN', 'BIN', 'Bhs. Indonesia', 'Bhs. Indonesia', 'umum', 'umum', 7, 1, NOW()),
+(8, 'IPS', 'IPS', 'IPS Terpadu', 'IPS Terpadu', 'umum', 'umum', 8, 1, NOW()),
+(9, 'IPA', 'IPA', 'IPA Terpadu', 'IPA Terpadu', 'umum', 'umum', 9, 1, NOW()),
+(10, 'MTK', 'MTK', 'Matematika', 'Matematika', 'umum', 'umum', 10, 1, NOW()),
+(11, 'BIG', 'BIG', 'Bahasa Inggris', 'Bahasa Inggris', 'umum', 'umum', 11, 1, NOW()),
+(12, 'PJK', 'PJK', 'Penjaskes', 'Penjaskes', 'umum', 'umum', 12, 1, NOW()),
+(13, 'SBK', 'SBK', 'SBK/Prakarya', 'SBK/Prakarya', 'umum', 'umum', 13, 1, NOW()),
+(14, 'BJW', 'BJW', 'Bahasa Jawa', 'Bahasa Jawa', 'muatan_lokal', 'muatan_lokal', 14, 1, NOW()),
+(15, 'TFZ', 'TFZ', 'Tahfidzul Qur\'an/QH-B', 'Tahfidzul Qur\'an/QH-B', 'agama', 'agama', 15, 1, NOW()),
+(16, 'TIK', 'TIK', 'TIK', 'TIK', 'umum', 'umum', 16, 1, NOW()),
+(17, 'PRK', 'PRK', 'Prakarya/BK', 'Prakarya/BK', 'umum', 'umum', 17, 1, NOW()),
+(18, 'BTA', 'BTA', 'BTA (Baca Tulis Al-Qur\'an)', 'BTA (Baca Tulis Al-Qur\'an)', 'agama', 'agama', 18, 1, NOW()),
+(19, 'TLM', 'TLM', 'Ta\'lim Muta\'alim', 'Ta\'lim Muta\'alim', 'agama', 'agama', 19, 1, NOW()),
+(20, 'ASW', 'ASW', 'Aswaja', 'Aswaja', 'agama', 'agama', 20, 1, NOW()),
+(21, 'MBF', 'MBF', 'Mabadiul Fiqiyah', 'Mabadiul Fiqiyah', 'agama', 'agama', 21, 1, NOW()),
+(22, 'UPC', 'UPC', 'Upacara', 'Upacara', 'umum', 'umum', 22, 1, NOW()),
+(23, 'NRY', 'NRY', 'Nariyahan', 'Nariyahan', 'agama', 'agama', 23, 1, NOW()),
+(24, 'UPC2', 'UPC2', 'Upacara', 'Upacara', 'umum', 'umum', 24, 1, NOW()),
+(25, 'THL', 'THL', 'Tahlilan', 'Tahlilan', 'agama', 'agama', 25, 1, NOW());
+
+-- 6. Mata Pelajaran Kelas & Jadwal Pelajaran (Matriks Lengkap Semester Ganjil 2026/2027)
+-- 7. Data Siswa Riil (154 Siswa dari CSV dapodik MTs Al-Huda)
+INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `name`, `nama`, `role`, `role_label`, `phone`, `telepon`, `is_active`, `must_change_password`, `created_at`) VALUES
+(101, 'siswa_0125256561', 'siswa_0125256561@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AUREL FITRI RAMADANI', 'AUREL FITRI RAMADANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0132181195', 'siswa_0132181195@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AKBAR CAESAR NURFATTAH', 'AKBAR CAESAR NURFATTAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0147986014', 'siswa_0147986014@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AQILA AZZARA ARROZAQ', 'AQILA AZZARA ARROZAQ', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_3122286780', 'siswa_3122286780@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TAUFIQ FIRMANSYAH', 'TAUFIQ FIRMANSYAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_3143394636', 'siswa_3143394636@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FRIZKY JIANDRA MICHELL PRATAMA', 'FRIZKY JIANDRA MICHELL PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0139282971', 'siswa_0139282971@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MAYDINA WINDI ASTARI', 'MAYDINA WINDI ASTARI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_3125657162', 'siswa_3125657162@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ALZATUL ANAFISA', 'ALZATUL ANAFISA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0134199917', 'siswa_0134199917@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AZZAHRA CHAREN BINTANG NOVIANTO', 'AZZAHRA CHAREN BINTANG NOVIANTO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0135161987', 'siswa_0135161987@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOCH ALVA EZA DWI SETIAWAN', 'MOCH ALVA EZA DWI SETIAWAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0138943630', 'siswa_0138943630@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DESTA PRATAMA', 'DESTA PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0134933151', 'siswa_0134933151@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'Iqbal Zairurrofiq Al Munfi\'', 'Iqbal Zairurrofiq Al Munfi\'', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0138325085', 'siswa_0138325085@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SASKIA JENI DWI MAHARANI', 'SASKIA JENI DWI MAHARANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0133759532', 'siswa_0133759532@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MARSAH AULIA ARAFAH', 'MARSAH AULIA ARAFAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0138482337', 'siswa_0138482337@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MICHELIN KANIA PUTRI', 'MICHELIN KANIA PUTRI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0132715066', 'siswa_0132715066@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AHMAD YUDA PRATAMA', 'AHMAD YUDA PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_3120411886', 'siswa_3120411886@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ILHAM NUR FANSAURI', 'ILHAM NUR FANSAURI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(117, 'siswa_0133745552', 'siswa_0133745552@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DINAYA VAYLA RAHMAH', 'DINAYA VAYLA RAHMAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(118, 'siswa_0133146106', 'siswa_0133146106@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KEISHA AFIFAH ZAHRA', 'KEISHA AFIFAH ZAHRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(119, 'siswa_0135092230', 'siswa_0135092230@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANJANI SALMAI KHOLIDA', 'ANJANI SALMAI KHOLIDA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(120, 'siswa_0136486454', 'siswa_0136486454@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD ALIFIANDRA DAVID MUSYAFFA', 'MUHAMMAD ALIFIANDRA DAVID MUSYAFFA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(121, 'siswa_0125978898', 'siswa_0125978898@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KEVIN APRILLIO DWI MUSTOFA', 'KEVIN APRILLIO DWI MUSTOFA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(122, 'siswa_0131516719', 'siswa_0131516719@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ZAHRA DIANTIKA REGINA PUTRI', 'ZAHRA DIANTIKA REGINA PUTRI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(123, 'siswa_3132869202', 'siswa_3132869202@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NURDAFFA ARYA RAMADHAN', 'NURDAFFA ARYA RAMADHAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(124, 'siswa_0136835358', 'siswa_0136835358@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'IRMA RAHMAWATI', 'IRMA RAHMAWATI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_0127662965', 'siswa_0127662965@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AHMAD FAIZ NUR QOLBI ASYARI', 'AHMAD FAIZ NUR QOLBI ASYARI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0122355512', 'siswa_0122355512@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AHMAD JAZULI WIJAYA', 'AHMAD JAZULI WIJAYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_3131460024', 'siswa_3131460024@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AHMADIL FU\'AD AL ALWI', 'AHMADIL FU\'AD AL ALWI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_3123144201', 'siswa_3123144201@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ALLFIN ADITYA KURNIA PUTRA', 'ALLFIN ADITYA KURNIA PUTRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_3125113021', 'siswa_3125113021@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AMANDA FELICIA KUSUMAJAYA', 'AMANDA FELICIA KUSUMAJAYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0123741924', 'siswa_0123741924@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DESTIN NATALIA KUSUMA', 'DESTIN NATALIA KUSUMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_3120286136', 'siswa_3120286136@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DWI SAPUTRA', 'DWI SAPUTRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0136508249', 'siswa_0136508249@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FAIZ MAULANA AZIDAN', 'FAIZ MAULANA AZIDAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0139764423', 'siswa_0139764423@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FAWWAS SALMAN ALIFI', 'FAWWAS SALMAN ALIFI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0129471609', 'siswa_0129471609@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JELITA ANASTASYA', 'JELITA ANASTASYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0128457316', 'siswa_0128457316@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JULIA RAHMAHWATI', 'JULIA RAHMAHWATI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0123738023', 'siswa_0123738023@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KHESHIA MEY AZZAHRA', 'KHESHIA MEY AZZAHRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0125830346', 'siswa_0125830346@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'LUKY AFNAN OKTAVIAN', 'LUKY AFNAN OKTAVIAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0127403990', 'siswa_0127403990@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD ARIS MULYADI', 'MUHAMMAD ARIS MULYADI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0123720553', 'siswa_0123720553@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NAAFIL MUBAROKAH', 'NAAFIL MUBAROKAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_0117578051', 'siswa_0117578051@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOH. FAZDA HAZIQOL MUGHIETSA', 'MOH. FAZDA HAZIQOL MUGHIETSA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_0124560956', 'siswa_0124560956@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'HAFIZ KENZIE ELANO', 'HAFIZ KENZIE ELANO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0138598517', 'siswa_0138598517@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MARISKA AVRIL LUTFIANTI', 'MARISKA AVRIL LUTFIANTI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0124809726', 'siswa_0124809726@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD JAYSON AZKA ALFARIZQI', 'MUHAMMAD JAYSON AZKA ALFARIZQI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_3126950786', 'siswa_3126950786@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NOVELIA QORRY NAZZILA', 'NOVELIA QORRY NAZZILA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_3121182277', 'siswa_3121182277@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'QURROTUN AININ NADIVAH', 'QURROTUN AININ NADIVAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0125388541', 'siswa_0125388541@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'REHAN MAULANA ISHAQ', 'REHAN MAULANA ISHAQ', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0126925173', 'siswa_0126925173@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'YULIANA DWI NUR CHAYANTI', 'YULIANA DWI NUR CHAYANTI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0127039881', 'siswa_0127039881@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AFRIAN ANGGA YUDISTIRA', 'AFRIAN ANGGA YUDISTIRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0122124162', 'siswa_0122124162@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AGIEL PUTRA HERLINO', 'AGIEL PUTRA HERLINO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0122769141', 'siswa_0122769141@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ALFINA KHOLIFAH', 'ALFINA KHOLIFAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_3123980685', 'siswa_3123980685@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ALICA ZAHRA ANGRAINI', 'ALICA ZAHRA ANGRAINI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0122098741', 'siswa_0122098741@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANNISSA DWI NOVITASARI', 'ANNISSA DWI NOVITASARI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0131007102', 'siswa_0131007102@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DARYL AYDINE NUGROHO', 'DARYL AYDINE NUGROHO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0123416714', 'siswa_0123416714@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'DIMAS YONGKY PRAMUDIKA', 'DIMAS YONGKY PRAMUDIKA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0129950827', 'siswa_0129950827@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FARREL RAZQA AL FARIZKY', 'FARREL RAZQA AL FARIZKY', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_0126770938', 'siswa_0126770938@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KIARA LAKSITA RAMADHANI', 'KIARA LAKSITA RAMADHANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(117, 'siswa_0121939595', 'siswa_0121939595@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AZHYFA ALMEDINA WIJAYA', 'AZHYFA ALMEDINA WIJAYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_3120786159', 'siswa_3120786159@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'HALIDA DWI MUKHBITAH', 'HALIDA DWI MUKHBITAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0127456938', 'siswa_0127456938@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'LUKMAN AFFAN OKTAVIAN', 'LUKMAN AFFAN OKTAVIAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0127988378', 'siswa_0127988378@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD HAN AL WAHID', 'MUHAMMAD HAN AL WAHID', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_0122473332', 'siswa_0122473332@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD RIZAL AFFANDI', 'MUHAMMAD RIZAL AFFANDI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_3126201177', 'siswa_3126201177@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NUR SYAFA PUTRI RAMADHANI', 'NUR SYAFA PUTRI RAMADHANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0126619547', 'siswa_0126619547@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'PUTRA PRASETYO ADI PRAYOGO', 'PUTRA PRASETYO ADI PRAYOGO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0127677402', 'siswa_0127677402@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'WISNUTAMA SYAHDHAN', 'WISNUTAMA SYAHDHAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0125494962', 'siswa_0125494962@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'WIWIK BINTI APRELIA', 'WIWIK BINTI APRELIA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0115017731', 'siswa_0115017731@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'YENI AFISSUNANI', 'YENI AFISSUNANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0115914277', 'siswa_0115914277@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KAISAN GREE GHIFFARY', 'KAISAN GREE GHIFFARY', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_3122832734', 'siswa_3122832734@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MEZZALUNA ARSESHA SETIAWAN', 'MEZZALUNA ARSESHA SETIAWAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0123453484', 'siswa_0123453484@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOCH AL NIZAM PUTRA BAHRI', 'MOCH AL NIZAM PUTRA BAHRI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0102224941', 'siswa_0102224941@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MARDIANSYAH ADI SAPUTRA', 'MARDIANSYAH ADI SAPUTRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0113713659', 'siswa_0113713659@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANDHI PUTRA MAULANA', 'ANDHI PUTRA MAULANA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0111114726', 'siswa_0111114726@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANDHIKA PUTRA MAULANA', 'ANDHIKA PUTRA MAULANA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_3128531526', 'siswa_3128531526@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'CHAYRA FAYOLLA NAZHIROH', 'CHAYRA FAYOLLA NAZHIROH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0124350997', 'siswa_0124350997@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JOHAN RIZKI PRATAMA', 'JOHAN RIZKI PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0133962880', 'siswa_0133962880@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'M.FERENDRA YUBI HAIDAR AFIAR YULIANTO', 'M.FERENDRA YUBI HAIDAR AFIAR YULIANTO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_0138152999', 'siswa_0138152999@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHAMAD FAREL DWI ADITYA', 'MOHAMAD FAREL DWI ADITYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_0121869487', 'siswa_0121869487@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHAMAD RIZQI ALDIANSYAH', 'MOHAMAD RIZQI ALDIANSYAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0129929586', 'siswa_0129929586@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHAMMAD ARFI EKO PRASETYO', 'MOHAMMAD ARFI EKO PRASETYO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0122721604', 'siswa_0122721604@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHHAMAD ANDIKA PRATAMA', 'MOHHAMAD ANDIKA PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_3126750130', 'siswa_3126750130@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUCHAMMAD RIZQI PUTRA PRATAMA', 'MUCHAMMAD RIZQI PUTRA PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0125139495', 'siswa_0125139495@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD EKO RIFA\'I', 'MUHAMMAD EKO RIFA\'I', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_3128724594', 'siswa_3128724594@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD SAFI\'I', 'MUHAMMAD SAFI\'I', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0133809735', 'siswa_0133809735@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NABILA PERMATASARI', 'NABILA PERMATASARI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_3122381181', 'siswa_3122381181@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SEPTIA LILA JUARIYAH', 'SEPTIA LILA JUARIYAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0128890869', 'siswa_0128890869@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SINDI CANDRA WINATA', 'SINDI CANDRA WINATA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0122247568', 'siswa_0122247568@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'VERRA ANANDA MEICHA PUTRIATAMA', 'VERRA ANANDA MEICHA PUTRIATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0137782431', 'siswa_0137782431@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'VICKHA DWI WAHYUNI', 'VICKHA DWI WAHYUNI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_0118357022', 'siswa_0118357022@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'CAHAYA GEMILANG', 'CAHAYA GEMILANG', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0115522421', 'siswa_0115522421@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'CANTIKA ENJELISCA AGUSTINA', 'CANTIKA ENJELISCA AGUSTINA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0114135122', 'siswa_0114135122@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FARID HIDAYAT', 'FARID HIDAYAT', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_0118463369', 'siswa_0118463369@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FRISSIL ANGELICA PUTRI', 'FRISSIL ANGELICA PUTRI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_0123521552', 'siswa_0123521552@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'GIZELA AYU ANINDYA', 'GIZELA AYU ANINDYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0122180419', 'siswa_0122180419@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JUVA DERY NAFIANSA', 'JUVA DERY NAFIANSA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0125793283', 'siswa_0125793283@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'M. FADIL IKHSAN THAHIR', 'M. FADIL IKHSAN THAHIR', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0117159158', 'siswa_0117159158@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MEYRZA YOPANA FII`ADZALILA', 'MEYRZA YOPANA FII`ADZALILA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0122084024', 'siswa_0122084024@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MIRZA ADMA PUTRA', 'MIRZA ADMA PUTRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0111605886', 'siswa_0111605886@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOHAMAD MALIK HIDAYATULLOH', 'MOHAMAD MALIK HIDAYATULLOH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0122486854', 'siswa_0122486854@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'REVANITA OKTAVIANI WIBOWO', 'REVANITA OKTAVIANI WIBOWO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0128481369', 'siswa_0128481369@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'RICHARD ALVIANO ZANUAR', 'RICHARD ALVIANO ZANUAR', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0112395460', 'siswa_0112395460@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SIFA\'UL KILA RAMADHANI', 'SIFA\'UL KILA RAMADHANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0113639191', 'siswa_0113639191@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SOFIAN ALBERT FERNANDO', 'SOFIAN ALBERT FERNANDO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_3117406875', 'siswa_3117406875@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SYIFA\'UL KHUMAIROH', 'SYIFA\'UL KHUMAIROH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_0112271627', 'siswa_0112271627@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TARI CINTA SEFIYA', 'TARI CINTA SEFIYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(117, 'siswa_0127043670', 'siswa_0127043670@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TISYA NUR MAULIDA HARSANTY', 'TISYA NUR MAULIDA HARSANTY', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(118, 'siswa_0114862518', 'siswa_0114862518@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TRIAS DESTA SARI', 'TRIAS DESTA SARI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(119, 'siswa_0122423929', 'siswa_0122423929@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'XANCHE KALLISTA BENING SALSABILA', 'XANCHE KALLISTA BENING SALSABILA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(120, 'siswa_0112578982', 'siswa_0112578982@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'RIZQI NUR ANGGRAINI', 'RIZQI NUR ANGGRAINI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(121, 'siswa_0116592410', 'siswa_0116592410@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SENDI JAYA PRATAMA', 'SENDI JAYA PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(122, 'siswa_3110590155', 'siswa_3110590155@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'TEZZA LATIF NAZELA AVRELA TAMA', 'TEZZA LATIF NAZELA AVRELA TAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(123, 'siswa_0117095937', 'siswa_0117095937@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'YONGKI BIWANTORO', 'YONGKI BIWANTORO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(124, 'siswa_0111930479', 'siswa_0111930479@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'YOVI KIA PUTRA ARLYAN', 'YOVI KIA PUTRA ARLYAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_0128144891', 'siswa_0128144891@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANDRIAN ADJI PRATAMA', 'ANDRIAN ADJI PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0115451414', 'siswa_0115451414@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANISA\' NURMAIDA', 'ANISA\' NURMAIDA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0125211601', 'siswa_0125211601@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ASSYAFIRA DIKA MARTASYA', 'ASSYAFIRA DIKA MARTASYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_0127059266', 'siswa_0127059266@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'CANDRA PUTRA KENCANA', 'CANDRA PUTRA KENCANA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_0118609836', 'siswa_0118609836@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FACHRI REZA ALFIANSYAH', 'FACHRI REZA ALFIANSYAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0126143547', 'siswa_0126143547@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'HERLIN DWI WIDYANINGRUM', 'HERLIN DWI WIDYANINGRUM', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0116921911', 'siswa_0116921911@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'INTAN PERMATA', 'INTAN PERMATA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0114152139', 'siswa_0114152139@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'IRFAN FAHREZA', 'IRFAN FAHREZA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0111484929', 'siswa_0111484929@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'KHOIRUL FUAD FACHRUDIN', 'KHOIRUL FUAD FACHRUDIN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0125587125', 'siswa_0125587125@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'M. LUCKY ADI PUTRA', 'M. LUCKY ADI PUTRA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0113640889', 'siswa_0113640889@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOCH. MANDALA PUTRA DWIANTO', 'MOCH. MANDALA PUTRA DWIANTO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_3111579330', 'siswa_3111579330@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOH. KHAMAT PAJAR ARTA HARTAWAN', 'MOH. KHAMAT PAJAR ARTA HARTAWAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0122007443', 'siswa_0122007443@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD ALKHALIFI DZIKRI CANDRA YUDA', 'MUHAMMAD ALKHALIFI DZIKRI CANDRA YUDA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0112328335', 'siswa_0112328335@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD NIZAL IQBAL AL-HADI', 'MUHAMMAD NIZAL IQBAL AL-HADI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0119064628', 'siswa_0119064628@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'REVALINA AYU ANGGRAINI', 'REVALINA AYU ANGGRAINI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_0118975478', 'siswa_0118975478@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'RIDHO PANJI MAULANA', 'RIDHO PANJI MAULANA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(117, 'siswa_0114072167', 'siswa_0114072167@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'NIKO SEPTIAN REVANO', 'NIKO SEPTIAN REVANO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(118, 'siswa_0117270690', 'siswa_0117270690@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'PADHIL ZAEROFI AFIF', 'PADHIL ZAEROFI AFIF', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(119, 'siswa_0112501135', 'siswa_0112501135@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'REYHAN PRATAMA', 'REYHAN PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(120, 'siswa_0102645489', 'siswa_0102645489@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'RISMA AURELLIA AGUSTINA', 'RISMA AURELLIA AGUSTINA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(101, 'siswa_0113014679', 'siswa_0113014679@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'RIF\'ATUL LAYLY AZ\'ZAHRA SARAS', 'RIF\'ATUL LAYLY AZ\'ZAHRA SARAS', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(102, 'siswa_0117526617', 'siswa_0117526617@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SAIFULLOH EKO YUSUF', 'SAIFULLOH EKO YUSUF', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(103, 'siswa_0126350319', 'siswa_0126350319@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'STEFANNIE PUTRI RAGIL ERNAWATI', 'STEFANNIE PUTRI RAGIL ERNAWATI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(104, 'siswa_0115598112', 'siswa_0115598112@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'SYIFA AURA PURNAMA', 'SYIFA AURA PURNAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(105, 'siswa_0116837133', 'siswa_0116837133@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ZAINURIL FERDIANSYAH', 'ZAINURIL FERDIANSYAH', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(106, 'siswa_0116754662', 'siswa_0116754662@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ZHAHIRA ALYA NUR RAHMADHANI', 'ZHAHIRA ALYA NUR RAHMADHANI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(107, 'siswa_0117285048', 'siswa_0117285048@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'AHMAD YUSQI MURTADHO', 'AHMAD YUSQI MURTADHO', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(108, 'siswa_0118580095', 'siswa_0118580095@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ANDRE BACHTIAR', 'ANDRE BACHTIAR', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(109, 'siswa_0108603886', 'siswa_0108603886@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'BINTANG WAHYU OKTAVIAN', 'BINTANG WAHYU OKTAVIAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(110, 'siswa_0117719391', 'siswa_0117719391@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'FADILA ALIFIA ATMAJA', 'FADILA ALIFIA ATMAJA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(111, 'siswa_0118231326', 'siswa_0118231326@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'IRFAN PUTRA ADITYA', 'IRFAN PUTRA ADITYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(112, 'siswa_0116095543', 'siswa_0116095543@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'ISNAENI EKA OKTAVIANA', 'ISNAENI EKA OKTAVIANA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(113, 'siswa_0125432058', 'siswa_0125432058@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JOHAN RIDHO ALMADA', 'JOHAN RIDHO ALMADA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(114, 'siswa_0118114356', 'siswa_0118114356@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'JUNIA SHERIEL ANANDITA', 'JUNIA SHERIEL ANANDITA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(115, 'siswa_0119907158', 'siswa_0119907158@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'LEANDRA PUTRI AYUNINGTYAS', 'LEANDRA PUTRI AYUNINGTYAS', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(116, 'siswa_0119759257', 'siswa_0119759257@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'LUDVI NUR FADLI', 'LUDVI NUR FADLI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(117, 'siswa_0113823266', 'siswa_0113823266@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOCHAMMAD NUR WAHID', 'MOCHAMMAD NUR WAHID', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(118, 'siswa_0115522345', 'siswa_0115522345@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MOH. ADI PRATAMA', 'MOH. ADI PRATAMA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(119, 'siswa_0113846546', 'siswa_0113846546@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD ILHAM HANAFI', 'MUHAMMAD ILHAM HANAFI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(120, 'siswa_0117755815', 'siswa_0117755815@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD KHOIRUL MARZUQI', 'MUHAMMAD KHOIRUL MARZUQI', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(121, 'siswa_0129011176', 'siswa_0129011176@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD NAJIB SETYAWAN', 'MUHAMMAD NAJIB SETYAWAN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(122, 'siswa_0116152712', 'siswa_0116152712@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD NUR KHOIRUDIN', 'MUHAMMAD NUR KHOIRUDIN', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW()),
+(123, 'siswa_0118205624', 'siswa_0118205624@siswa.mts-alhuda.sch.id', '$2y$10$t1FRLlURxZAO64G1bZ7pR.rnf4s.Lh77bKEvbOJUxo437ULA73vp.', 'MUHAMMAD REZA ADITYA', 'MUHAMMAD REZA ADITYA', 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW());
+
+INSERT INTO `siswa` (`id`, `user_id`, `class_id`, `kelas_id`, `nis`, `nisn`, `nama_lengkap`, `gender`, `jenis_kelamin`, `birth_place`, `tempat_lahir`, `birth_date`, `tanggal_lahir`, `guardian_name`, `nama_wali`, `guardian_phone`, `address`, `alamat`, `foto_url`, `enrolled_at`, `tahun_masuk`, `status`, `is_active`, `created_at`) VALUES
+(1, 101, 1, 1, '20260001', '0125256561', 'AUREL FITRI RAMADANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-08-13', '2012-08-13', 'Wali Murid', 'Wali Murid', NULL, 'DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 1, 1, '20260002', '0132181195', 'AKBAR CAESAR NURFATTAH', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-11-05', '2013-11-05', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JINTEL, DS. JINTEL JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. JINTEL, DS. JINTEL JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 1, 1, '20260003', '0147986014', 'AQILA AZZARA ARROZAQ', 'P', 'P', 'NGANJUK', 'NGANJUK', '2014-03-02', '2014-03-02', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGLUMBU, DS. KETAWANG KETAWANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGLUMBU, DS. KETAWANG KETAWANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 1, 1, '20260004', '3122286780', 'TAUFIQ FIRMANSYAH', 'L', 'L', 'Nganjuk', 'Nganjuk', '2012-04-06', '2012-04-06', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 1, 1, '20260005', '3143394636', 'FRIZKY JIANDRA MICHELL PRATAMA', 'L', 'L', 'Nganjuk', 'Nganjuk', '2014-04-17', '2014-04-17', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 1, 1, '20260006', '0139282971', 'MAYDINA WINDI ASTARI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-12-01', '2013-12-01', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 1, 1, '20260007', '3125657162', 'ALZATUL ANAFISA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-12-18', '2012-12-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. GERBONG, DS. DEMANGAN DEMANGAN, TANJUNGANOM, NGANJUK, JAWA TIMUR, 64483', 'DSN. GERBONG, DS. DEMANGAN DEMANGAN, TANJUNGANOM, NGANJUK, JAWA TIMUR, 64483', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 1, 1, '20260008', '0134199917', 'AZZAHRA CHAREN BINTANG NOVIANTO', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-11-18', '2013-11-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 1, 1, '20260009', '0135161987', 'MOCH ALVA EZA DWI SETIAWAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-12-18', '2013-12-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 1, 1, '20260010', '0138943630', 'DESTA PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-12-25', '2013-12-25', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 1, 1, '20260011', '0134933151', 'Iqbal Zairurrofiq Al Munfi\'', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-09-05', '2013-09-05', 'Wali Murid', 'Wali Murid', NULL, 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 1, 1, '20260012', '0138325085', 'SASKIA JENI DWI MAHARANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-01-11', '2013-01-11', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BESUKI, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BESUKI, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 1, 1, '20260013', '0133759532', 'MARSAH AULIA ARAFAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-03-12', '2013-03-12', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGGEBANG, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGGEBANG, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 1, 1, '20260014', '0138482337', 'MICHELIN KANIA PUTRI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-10-22', '2013-10-22', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 1, 1, '20260015', '0132715066', 'AHMAD YUDA PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-06-25', '2013-06-25', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 1, 1, '20260016', '3120411886', 'ILHAM NUR FANSAURI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-11-21', '2012-11-21', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(17, 117, 1, 1, '20260017', '0133745552', 'DINAYA VAYLA RAHMAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-03-03', '2013-03-03', 'Wali Murid', 'Wali Murid', NULL, 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(18, 118, 1, 1, '20260018', '0133146106', 'KEISHA AFIFAH ZAHRA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-10-03', '2013-10-03', 'Wali Murid', 'Wali Murid', NULL, 'DOROGENENG, PEHSERUT PEHSERUT, SUKOMORO, NGANJUK, JAWA TIMUR, 64481', 'DOROGENENG, PEHSERUT PEHSERUT, SUKOMORO, NGANJUK, JAWA TIMUR, 64481', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(19, 119, 1, 1, '20260019', '0135092230', 'ANJANI SALMAI KHOLIDA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-09-06', '2013-09-06', 'Wali Murid', 'Wali Murid', NULL, 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(20, 120, 1, 1, '20260020', '0136486454', 'MUHAMMAD ALIFIANDRA DAVID MUSYAFFA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-12-22', '2013-12-22', 'Wali Murid', 'Wali Murid', NULL, 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. TALUN, DS. TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(21, 121, 1, 1, '20260021', '0125978898', 'KEVIN APRILLIO DWI MUSTOFA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-19', '2012-04-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN. PANDEAN, DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. PANDEAN, DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(22, 122, 1, 1, '20260022', '0131516719', 'ZAHRA DIANTIKA REGINA PUTRI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-01-13', '2013-01-13', 'Wali Murid', 'Wali Murid', NULL, 'DSN PANDEAN DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN PANDEAN DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(23, 123, 1, 1, '20260023', '3132869202', 'NURDAFFA ARYA RAMADHAN', 'L', 'L', 'GRESIK', 'GRESIK', '2013-07-17', '2013-07-17', 'Wali Murid', 'Wali Murid', NULL, 'PERENG SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR', 'PERENG SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(24, 124, 1, 1, '20260024', '0136835358', 'IRMA RAHMAWATI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-06-14', '2013-06-14', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 3, 3, '20260001', '0127662965', 'AHMAD FAIZ NUR QOLBI ASYARI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-03-08', '2012-03-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 3, 3, '20260002', '0122355512', 'AHMAD JAZULI WIJAYA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-11-06', '2012-11-06', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 3, 3, '20260003', '3131460024', 'AHMADIL FU\'AD AL ALWI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-04-05', '2013-04-05', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 3, 3, '20260004', '3123144201', 'ALLFIN ADITYA KURNIA PUTRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-08-24', '2012-08-24', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 3, 3, '20260005', '3125113021', 'AMANDA FELICIA KUSUMAJAYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-11-05', '2012-11-05', 'Wali Murid', 'Wali Murid', NULL, 'DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 3, 3, '20260006', '0123741924', 'DESTIN NATALIA KUSUMA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-12-25', '2012-12-25', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 3, 3, '20260007', '3120286136', 'DWI SAPUTRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-12-19', '2012-12-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 3, 3, '20260008', '0136508249', 'FAIZ MAULANA AZIDAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-03-31', '2013-03-31', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 3, 3, '20260009', '0139764423', 'FAWWAS SALMAN ALIFI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-03-11', '2013-03-11', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 3, 3, '20260010', '0129471609', 'JELITA ANASTASYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-09-22', '2012-09-22', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 3, 3, '20260011', '0128457316', 'JULIA RAHMAHWATI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-07-17', '2012-07-17', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 3, 3, '20260012', '0123738023', 'KHESHIA MEY AZZAHRA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-05-19', '2012-05-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 3, 3, '20260013', '0125830346', 'LUKY AFNAN OKTAVIAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-10-23', '2012-10-23', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 3, 3, '20260014', '0127403990', 'MUHAMMAD ARIS MULYADI', 'L', 'L', 'BALIKPAPAN', 'BALIKPAPAN', '2012-09-23', '2012-09-23', 'Wali Murid', 'Wali Murid', NULL, 'DSN. PANDEAN, DS. GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. PANDEAN, DS. GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 3, 3, '20260015', '0123720553', 'NAAFIL MUBAROKAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-03-22', '2012-03-22', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SAMBONG, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SAMBONG, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 3, 3, '20260016', '0117578051', 'MOH. FAZDA HAZIQOL MUGHIETSA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-09-10', '2011-09-10', 'Wali Murid', 'Wali Murid', NULL, 'CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 4, 4, '20260001', '0124560956', 'HAFIZ KENZIE ELANO', 'L', 'L', 'BATAM', 'BATAM', '2012-04-07', '2012-04-07', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 4, 4, '20260002', '0138598517', 'MARISKA AVRIL LUTFIANTI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-04-10', '2013-04-10', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 4, 4, '20260003', '0124809726', 'MUHAMMAD JAYSON AZKA ALFARIZQI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-12-24', '2012-12-24', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 4, 4, '20260004', '3126950786', 'NOVELIA QORRY NAZZILA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-11-29', '2012-11-29', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 4, 4, '20260005', '3121182277', 'QURROTUN AININ NADIVAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-07-20', '2013-07-20', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SANGGRAHAN, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SANGGRAHAN, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 4, 4, '20260006', '0125388541', 'REHAN MAULANA ISHAQ', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-05-12', '2012-05-12', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 4, 4, '20260007', '0126925173', 'YULIANA DWI NUR CHAYANTI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-07-31', '2012-07-31', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATISARI, DS. NGANGKATAN NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. JATISARI, DS. NGANGKATAN NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 4, 4, '20260008', '0127039881', 'AFRIAN ANGGA YUDISTIRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-12', '2012-04-12', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 4, 4, '20260009', '0122124162', 'AGIEL PUTRA HERLINO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-05-20', '2012-05-20', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 4, 4, '20260010', '0122769141', 'ALFINA KHOLIFAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-12-30', '2012-12-30', 'Wali Murid', 'Wali Murid', NULL, 'DSN KAMPUNG BARU PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN KAMPUNG BARU PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 4, 4, '20260011', '3123980685', 'ALICA ZAHRA ANGRAINI', 'P', 'P', 'TANGERANG', 'TANGERANG', '2012-01-09', '2012-01-09', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KEDUNGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KEDUNGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 4, 4, '20260012', '0122098741', 'ANNISSA DWI NOVITASARI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-11-09', '2012-11-09', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SENGGOWAR, DS. SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SENGGOWAR, DS. SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 4, 4, '20260013', '0131007102', 'DARYL AYDINE NUGROHO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-03-04', '2013-03-04', 'Wali Murid', 'Wali Murid', NULL, 'DS. TALUN, REJOSO TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DS. TALUN, REJOSO TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 4, 4, '20260014', '0123416714', 'DIMAS YONGKY PRAMUDIKA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-03-19', '2012-03-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BESUKI, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BESUKI, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 4, 4, '20260015', '0129950827', 'FARREL RAZQA AL FARIZKY', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-08-28', '2012-08-28', 'Wali Murid', 'Wali Murid', NULL, 'DS. TALUN, REJOSO TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DS. TALUN, REJOSO TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 4, 4, '20260016', '0126770938', 'KIARA LAKSITA RAMADHANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-07-31', '2012-07-31', 'Wali Murid', 'Wali Murid', NULL, 'DSN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(17, 117, 4, 4, '20260017', '0121939595', 'AZHYFA ALMEDINA WIJAYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-10-21', '2012-10-21', 'Wali Murid', 'Wali Murid', NULL, 'DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 1, 1, '20260001', '3120786159', 'HALIDA DWI MUKHBITAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-12-29', '2012-12-29', 'Wali Murid', 'Wali Murid', NULL, 'JL. RAYA GONDANG-NGLUYU KM. 1,7 SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'JL. RAYA GONDANG-NGLUYU KM. 1,7 SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 1, 1, '20260002', '0127456938', 'LUKMAN AFFAN OKTAVIAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-10-23', '2012-10-23', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SUKOREJO, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 1, 1, '20260003', '0127988378', 'MUHAMMAD HAN AL WAHID', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-05-13', '2012-05-13', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGLINGGO, DS. NGLINGGO NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 1, 1, '20260004', '0122473332', 'MUHAMMAD RIZAL AFFANDI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-02-18', '2012-02-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 1, 1, '20260005', '3126201177', 'NUR SYAFA PUTRI RAMADHANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-08-14', '2012-08-14', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 1, 1, '20260006', '0126619547', 'PUTRA PRASETYO ADI PRAYOGO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-12-10', '2012-12-10', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 1, 1, '20260007', '0127677402', 'WISNUTAMA SYAHDHAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-07-16', '2012-07-16', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 1, 1, '20260008', '0125494962', 'WIWIK BINTI APRELIA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-09-18', '2012-09-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 1, 1, '20260009', '0115017731', 'YENI AFISSUNANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-06-19', '2011-06-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SAMBONG, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SAMBONG, DS. GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 1, 1, '20260010', '0115914277', 'KAISAN GREE GHIFFARY', 'L', 'L', 'TANGERANG', 'TANGERANG', '2011-06-06', '2011-06-06', 'Wali Murid', 'Wali Murid', NULL, 'JL. RAYA SUKOMORO-PACE KM. 1 KAPAS, SUKOMORO, NGANJUK, JAWA TIMUR, 64481', 'JL. RAYA SUKOMORO-PACE KM. 1 KAPAS, SUKOMORO, NGANJUK, JAWA TIMUR, 64481', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 1, 1, '20260011', '3122832734', 'MEZZALUNA ARSESHA SETIAWAN', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-06-21', '2012-06-21', 'Wali Murid', 'Wali Murid', NULL, 'DUSUSN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUSN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 1, 1, '20260012', '0123453484', 'MOCH AL NIZAM PUTRA BAHRI', 'L', 'L', 'KEDIRI', 'KEDIRI', '2012-08-06', '2012-08-06', 'Wali Murid', 'Wali Murid', NULL, 'JL. JOYOBOYO II / 12 DUSUN TEPUS DESA SUKOREJO KECAMATAN NGASEM KABUPATEN KEDIRI SUKOREJO, NGASEM, KEDIRI, JAWA TIMUR, 64182', 'JL. JOYOBOYO II / 12 DUSUN TEPUS DESA SUKOREJO KECAMATAN NGASEM KABUPATEN KEDIRI SUKOREJO, NGASEM, KEDIRI, JAWA TIMUR, 64182', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 1, 1, '20260013', '0102224941', 'MARDIANSYAH ADI SAPUTRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2010-03-27', '2010-03-27', 'Wali Murid', 'Wali Murid', NULL, 'DESA BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64452', 'DESA BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 1, 1, '20260014', '0113713659', 'ANDHI PUTRA MAULANA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-02-11', '2011-02-11', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 1, 1, '20260015', '0111114726', 'ANDHIKA PUTRA MAULANA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-02-11', '2011-02-11', 'Wali Murid', 'Wali Murid', NULL, 'DSN JINTEL, REJOSO JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN JINTEL, REJOSO JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 1, 1, '20260001', '3128531526', 'CHAYRA FAYOLLA NAZHIROH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-12-07', '2012-12-07', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 1, 1, '20260002', '0124350997', 'JOHAN RIZKI PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-10-28', '2012-10-28', 'Wali Murid', 'Wali Murid', NULL, 'Dsn Ngrambek Desa Campur Kec. Gondang CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'Dsn Ngrambek Desa Campur Kec. Gondang CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 1, 1, '20260003', '0133962880', 'M.FERENDRA YUBI HAIDAR AFIAR YULIANTO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-02-01', '2013-02-01', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 1, 1, '20260004', '0138152999', 'MOHAMAD FAREL DWI ADITYA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2013-02-28', '2013-02-28', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGASEM, DS. SUMBERJO SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 1, 1, '20260005', '0121869487', 'MOHAMAD RIZQI ALDIANSYAH', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-02-08', '2012-02-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 1, 1, '20260006', '0129929586', 'MOHAMMAD ARFI EKO PRASETYO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-03-08', '2012-03-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SAMBONG, DS. CAMPUR, GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SAMBONG, DS. CAMPUR, GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 1, 1, '20260007', '0122721604', 'MOHHAMAD ANDIKA PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-12-27', '2012-12-27', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 1, 1, '20260008', '3126750130', 'MUCHAMMAD RIZQI PUTRA PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-09-21', '2012-09-21', 'Wali Murid', 'Wali Murid', NULL, 'DSN. PUHKEREP, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. PUHKEREP, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 1, 1, '20260009', '0125139495', 'MUHAMMAD EKO RIFA\'I', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-08-29', '2012-08-29', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 1, 1, '20260010', '3128724594', 'MUHAMMAD SAFI\'I', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-01-20', '2012-01-20', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KAWEDEGAN, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KAWEDEGAN, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 1, 1, '20260011', '0133809735', 'NABILA PERMATASARI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2013-03-12', '2013-03-12', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 1, 1, '20260012', '3122381181', 'SEPTIA LILA JUARIYAH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-06-18', '2012-06-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 1, 1, '20260013', '0128890869', 'SINDI CANDRA WINATA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-08-11', '2012-08-11', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 1, 1, '20260014', '0122247568', 'VERRA ANANDA MEICHA PUTRIATAMA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-05-08', '2012-05-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 1, 1, '20260015', '0137782431', 'VICKHA DWI WAHYUNI', 'P', 'P', 'BINUANG', 'BINUANG', '2013-02-08', '2013-02-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 5, 5, '20260001', '0118357022', 'CAHAYA GEMILANG', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-05-21', '2011-05-21', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN JATISARI NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64452', 'DUSUN JATISARI NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 5, 5, '20260002', '0115522421', 'CANTIKA ENJELISCA AGUSTINA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-08-03', '2011-08-03', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KENTINGAN PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64452', 'DUSUN KENTINGAN PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 5, 5, '20260003', '0114135122', 'FARID HIDAYAT', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-07-25', '2011-07-25', 'Wali Murid', 'Wali Murid', NULL, 'DESA TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DESA TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 5, 5, '20260004', '0118463369', 'FRISSIL ANGELICA PUTRI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-09-14', '2011-09-14', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 5, 5, '20260005', '0123521552', 'GIZELA AYU ANINDYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-03-17', '2012-03-17', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 5, 5, '20260006', '0122180419', 'JUVA DERY NAFIANSA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-09-21', '2012-09-21', 'Wali Murid', 'Wali Murid', NULL, 'DSN BALONGREJO, BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN BALONGREJO, BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 5, 5, '20260007', '0125793283', 'M. FADIL IKHSAN THAHIR', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-18', '2012-04-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 5, 5, '20260008', '0117159158', 'MEYRZA YOPANA FII`ADZALILA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-09-19', '2011-09-19', 'Wali Murid', 'Wali Murid', NULL, 'TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 5, 5, '20260009', '0122084024', 'MIRZA ADMA PUTRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-05-19', '2012-05-19', 'Wali Murid', 'Wali Murid', NULL, 'DSN NGRINGIN JINTEL JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN NGRINGIN JINTEL JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 5, 5, '20260010', '0111605886', 'MOHAMAD MALIK HIDAYATULLOH', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-10-08', '2011-10-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 5, 5, '20260011', '0122486854', 'REVANITA OKTAVIANI WIBOWO', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-10-17', '2012-10-17', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 5, 5, '20260012', '0128481369', 'RICHARD ALVIANO ZANUAR', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-01-10', '2012-01-10', 'Wali Murid', 'Wali Murid', NULL, 'DSN. SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. SENGGOWAR SENGGOWAR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 5, 5, '20260013', '0112395460', 'SIFA\'UL KILA RAMADHANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-08-11', '2011-08-11', 'Wali Murid', 'Wali Murid', NULL, 'DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 5, 5, '20260014', '0113639191', 'SOFIAN ALBERT FERNANDO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-08-29', '2011-08-29', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATIGETIH, DS. SANGGRAHAN, GONDANG SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. JATIGETIH, DS. SANGGRAHAN, GONDANG SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 5, 5, '20260015', '3117406875', 'SYIFA\'UL KHUMAIROH', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-05-11', '2011-05-11', 'Wali Murid', 'Wali Murid', NULL, 'CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'CAMPUR CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 5, 5, '20260016', '0112271627', 'TARI CINTA SEFIYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-09-08', '2011-09-08', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KAWEDEKAN, BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KAWEDEKAN, BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(17, 117, 5, 5, '20260017', '0127043670', 'TISYA NUR MAULIDA HARSANTY', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-01-28', '2012-01-28', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(18, 118, 5, 5, '20260018', '0114862518', 'TRIAS DESTA SARI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-12-23', '2011-12-23', 'Wali Murid', 'Wali Murid', NULL, 'DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(19, 119, 5, 5, '20260019', '0122423929', 'XANCHE KALLISTA BENING SALSABILA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-02-18', '2012-02-18', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BESUKI, DS. NGLINGGO, GONDANG NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BESUKI, DS. NGLINGGO, GONDANG NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(20, 120, 5, 5, '20260020', '0112578982', 'RIZQI NUR ANGGRAINI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-05-24', '2011-05-24', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN SUKOREJO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64452', 'DUSUN SUKOREJO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(21, 121, 5, 5, '20260021', '0116592410', 'SENDI JAYA PRATAMA', 'L', 'L', 'PRINGSEWU', 'PRINGSEWU', '2011-04-11', '2011-04-11', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BALONGGLAGAH CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64452', 'DUSUN BALONGGLAGAH CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(22, 122, 5, 5, '20260022', '3110590155', 'TEZZA LATIF NAZELA AVRELA TAMA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-04-10', '2012-04-10', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(23, 123, 5, 5, '20260023', '0117095937', 'YONGKI BIWANTORO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-10-19', '2011-10-19', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(24, 124, 5, 5, '20260024', '0111930479', 'YOVI KIA PUTRA ARLYAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-07-03', '2011-07-03', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 6, 6, '20260001', '0128144891', 'ANDRIAN ADJI PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-20', '2012-04-20', 'Wali Murid', 'Wali Murid', NULL, 'DS. PANDEAN, GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. PANDEAN, GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 6, 6, '20260002', '0115451414', 'ANISA\' NURMAIDA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-09-23', '2011-09-23', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 6, 6, '20260003', '0125211601', 'ASSYAFIRA DIKA MARTASYA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-03-24', '2012-03-24', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 6, 6, '20260004', '0127059266', 'CANDRA PUTRA KENCANA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-07', '2012-04-07', 'Wali Murid', 'Wali Murid', NULL, 'DS. JINTEL, REJOSO JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DS. JINTEL, REJOSO JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 6, 6, '20260005', '0118609836', 'FACHRI REZA ALFIANSYAH', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-02-07', '2011-02-07', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATISARI, DS. NGANGKATAN, REJOSO NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. JATISARI, DS. NGANGKATAN, REJOSO NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 6, 6, '20260006', '0126143547', 'HERLIN DWI WIDYANINGRUM', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-01-16', '2012-01-16', 'Wali Murid', 'Wali Murid', NULL, 'DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 6, 6, '20260007', '0116921911', 'INTAN PERMATA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-04-02', '2011-04-02', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KEDUNGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. KEDUNGREJO, DS. BALONGGEBANG, GONDANG BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 6, 6, '20260008', '0114152139', 'IRFAN FAHREZA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-07-06', '2011-07-06', 'Wali Murid', 'Wali Murid', NULL, 'DS. PANDEAN, GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DS. PANDEAN, GONDANG PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 6, 6, '20260009', '0111484929', 'KHOIRUL FUAD FACHRUDIN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-06-22', '2011-06-22', 'Wali Murid', 'Wali Murid', NULL, 'DSN. JATISARI, DS. NGANGKATAN, REJOSO NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. JATISARI, DS. NGANGKATAN, REJOSO NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 6, 6, '20260010', '0125587125', 'M. LUCKY ADI PUTRA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-07-03', '2012-07-03', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BALONGGLAGAH, DS. CAMPUR, GONDANG, NGANJUK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BALONGGLAGAH, DS. CAMPUR, GONDANG, NGANJUK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 6, 6, '20260011', '0113640889', 'MOCH. MANDALA PUTRA DWIANTO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-05-09', '2011-05-09', 'Wali Murid', 'Wali Murid', NULL, 'DSN. BORO, DS. SUMBERJO, KEC. GONDANG SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. BORO, DS. SUMBERJO, KEC. GONDANG SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 6, 6, '20260012', '3111579330', 'MOH. KHAMAT PAJAR ARTA HARTAWAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-11-16', '2011-11-16', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 6, 6, '20260013', '0122007443', 'MUHAMMAD ALKHALIFI DZIKRI CANDRA YUDA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-05-20', '2012-05-20', 'Wali Murid', 'Wali Murid', NULL, 'DSN. NGRAMBEK, DS. CAMPUR, GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DSN. NGRAMBEK, DS. CAMPUR, GONDANG CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 6, 6, '20260014', '0112328335', 'MUHAMMAD NIZAL IQBAL AL-HADI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-01-11', '2012-01-11', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 6, 6, '20260015', '0119064628', 'REVALINA AYU ANGGRAINI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-03-14', '2011-03-14', 'Wali Murid', 'Wali Murid', NULL, 'DSN. KENTINGAN, DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DSN. KENTINGAN, DS. PUHKEREP, REJOSO PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 6, 6, '20260016', '0118975478', 'RIDHO PANJI MAULANA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-11-16', '2011-11-16', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(17, 117, 6, 6, '20260017', '0114072167', 'NIKO SEPTIAN REVANO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-09-05', '2011-09-05', 'Wali Murid', 'Wali Murid', NULL, 'DESA PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DESA PANDEAN PANDEAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(18, 118, 6, 6, '20260018', '0117270690', 'PADHIL ZAEROFI AFIF', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-12-26', '2011-12-26', 'Wali Murid', 'Wali Murid', NULL, 'dusun jatigetih SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64452', 'dusun jatigetih SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64452', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(19, 119, 6, 6, '20260019', '0112501135', 'REYHAN PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-12-25', '2011-12-25', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(20, 120, 6, 6, '20260020', '0102645489', 'RISMA AURELLIA AGUSTINA', 'P', 'P', 'KEDIRI', 'KEDIRI', '2010-06-07', '2010-06-07', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN SIDOWALEK KULON SIDOWAREK, PLEMAHAN, KEDIRI, JAWA TIMUR, 64155', 'DUSUN SIDOWALEK KULON SIDOWAREK, PLEMAHAN, KEDIRI, JAWA TIMUR, 64155', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(1, 101, 1, 1, '20260001', '0113014679', 'RIF\'ATUL LAYLY AZ\'ZAHRA SARAS', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-10-02', '2011-10-02', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(2, 102, 1, 1, '20260002', '0117526617', 'SAIFULLOH EKO YUSUF', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-04-26', '2011-04-26', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(3, 103, 1, 1, '20260003', '0126350319', 'STEFANNIE PUTRI RAGIL ERNAWATI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2012-03-20', '2012-03-20', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN BESUKI NGLINGGO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(4, 104, 1, 1, '20260004', '0115598112', 'SYIFA AURA PURNAMA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-12-01', '2011-12-01', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN BALONGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(5, 105, 1, 1, '20260005', '0116837133', 'ZAINURIL FERDIANSYAH', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-06-01', '2011-06-01', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN NGRAMBEK CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(6, 106, 1, 1, '20260006', '0116754662', 'ZHAHIRA ALYA NUR RAHMADHANI', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-12-09', '2011-12-09', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(7, 107, 1, 1, '20260007', '0117285048', 'AHMAD YUSQI MURTADHO', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-03-10', '2011-03-10', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(8, 108, 1, 1, '20260008', '0118580095', 'ANDRE BACHTIAR', 'L', 'L', 'BOYOLALI', 'BOYOLALI', '2011-06-29', '2011-06-29', 'Wali Murid', 'Wali Murid', NULL, 'JL. PAHLAWAN GONDANGKULON, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'JL. PAHLAWAN GONDANGKULON, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(9, 109, 1, 1, '20260009', '0108603886', 'BINTANG WAHYU OKTAVIAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2010-12-03', '2010-12-03', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(10, 110, 1, 1, '20260010', '0117719391', 'FADILA ALIFIA ATMAJA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-06-11', '2011-06-11', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(11, 111, 1, 1, '20260011', '0118231326', 'IRFAN PUTRA ADITYA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-05-12', '2011-05-12', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(12, 112, 1, 1, '20260012', '0116095543', 'ISNAENI EKA OKTAVIANA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-10-03', '2011-10-03', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(13, 113, 1, 1, '20260013', '0125432058', 'JOHAN RIDHO ALMADA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-02-25', '2012-02-25', 'Wali Murid', 'Wali Murid', NULL, 'JATISARI NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'JATISARI NGANGKATAN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(14, 114, 1, 1, '20260014', '0118114356', 'JUNIA SHERIEL ANANDITA', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-06-26', '2011-06-26', 'Wali Murid', 'Wali Murid', NULL, 'DESA TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DESA TALUN TALUN, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(15, 115, 1, 1, '20260015', '0119907158', 'LEANDRA PUTRI AYUNINGTYAS', 'P', 'P', 'NGANJUK', 'NGANJUK', '2011-06-08', '2011-06-08', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN SUKOREJO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN SUKOREJO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(16, 116, 1, 1, '20260016', '0119759257', 'LUDVI NUR FADLI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-12-22', '2011-12-22', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KEDUNGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KEDUNGREJO BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(17, 117, 1, 1, '20260017', '0113823266', 'MOCHAMMAD NUR WAHID', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-05-29', '2011-05-29', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(18, 118, 1, 1, '20260018', '0115522345', 'MOH. ADI PRATAMA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-08-09', '2011-08-09', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN NGASEM SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN NGASEM SUMBERJO, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(19, 119, 1, 1, '20260019', '0113846546', 'MUHAMMAD ILHAM HANAFI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-07-02', '2011-07-02', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PULO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN PULO CAMPUR, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(20, 120, 1, 1, '20260020', '0117755815', 'MUHAMMAD KHOIRUL MARZUQI', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-04-05', '2012-04-05', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN JATIGETIH SANGGRAHAN, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(21, 121, 1, 1, '20260021', '0129011176', 'MUHAMMAD NAJIB SETYAWAN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2012-03-14', '2012-03-14', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN NGRINGIN JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN NGRINGIN JINTEL, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(22, 122, 1, 1, '20260022', '0116152712', 'MUHAMMAD NUR KHOIRUDIN', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-04-29', '2011-04-29', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', 'DUSUN PUHKEREP PUHKEREP, REJOSO, NGANJUK, JAWA TIMUR, 64453', NULL, '2026-07-15', 2026, 'aktif', 1, NOW()),
+(23, 123, 1, 1, '20260023', '0118205624', 'MUHAMMAD REZA ADITYA', 'L', 'L', 'NGANJUK', 'NGANJUK', '2011-06-23', '2011-06-23', 'Wali Murid', 'Wali Murid', NULL, 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', 'DUSUN KAWEDEGAN BALONGGEBANG, GONDANG, NGANJUK, JAWA TIMUR, 64451', NULL, '2026-07-15', 2026, 'aktif', 1, NOW());
+
+-- 8. Lokasi Sekolah untuk Presensi Mobile QR & GPS
+INSERT INTO `lokasi_sekolah` (`id`, `nama_lokasi`, `qr_token`, `latitude`, `longitude`, `radius_meter`, `is_active`, `created_at`) VALUES
+(1, 'Kantor Guru MTs Al-Huda Gondang', 'MTS-ALHUDA-ABSENSI-2026-SECURE', -7.56234500, 111.89012300, 20, 1, NOW());
+
+-- 9. Contoh Presensi Guru
+INSERT INTO `presensi_guru` (`id`, `teacher_id`, `guru_id`, `attendance_date`, `tanggal`, `attendance_type`, `check_in_at`, `jam_masuk`, `status`, `notes`, `keterangan`, `created_at`) VALUES
+(1, 1, 1, CURDATE(), CURDATE(), 'daily', NOW(), '06:45:00', 'hadir', 'Presensi tepat waktu via Mobile App', 'Presensi tepat waktu via Mobile App', NOW()),
+(2, 2, 2, CURDATE(), CURDATE(), 'daily', NOW(), '06:50:00', 'hadir', 'Hadir tepat waktu', 'Hadir tepat waktu', NOW()),
+(3, 3, 3, CURDATE(), CURDATE(), 'daily', NOW(), '06:55:00', 'hadir', 'Hadir tepat waktu', 'Hadir tepat waktu', NOW());
+
+-- 10. Pengaturan Dasar Madrasah
+INSERT INTO `pengaturan` (`setting_key`, `setting_value`, `value_type`, `group_name`, `label`, `is_public`, `created_at`) VALUES
+('site_name', 'MTs Al-Huda', 'string', 'identitas', 'Nama madrasah', 1, NOW()),
+('site_subtitle', 'Gondang', 'string', 'identitas', 'Keterangan nama', 1, NOW()),
+('site_full_name', 'Madrasah Tsanawiyah Al-Huda Gondang', 'string', 'identitas', 'Nama lengkap madrasah', 1, NOW()),
+('site_nsm', '121235180045', 'string', 'identitas', 'Nomor Statistik Madrasah (NSM)', 1, NOW()),
+('site_npsn', '20582234', 'string', 'identitas', 'NPSN', 1, NOW()),
+('site_foundation', 'Yayasan Pendidikan Al-Huda Gondang', 'string', 'identitas', 'Nama yayasan', 1, NOW()),
+('accreditation_grade', 'A', 'string', 'identitas', 'Peringkat akreditasi BAN-S/M', 1, NOW()),
+('accreditation_year', '2024', 'string', 'identitas', 'Tahun akreditasi', 1, NOW()),
+('contact_address', 'Jl. Raya Gondang, Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur 64451', 'text', 'kontak', 'Alamat lengkap', 1, NOW()),
+('contact_phone', '(0358) 771234', 'string', 'kontak', 'Nomor telepon kantor', 1, NOW()),
+('contact_whatsapp', '6281234567890', 'string', 'kontak', 'Nomor WhatsApp resmi', 1, NOW()),
+('contact_email', 'info@mts-alhuda.sch.id', 'string', 'kontak', 'Email resmi madrasah', 1, NOW()),
+('contact_hours', 'Senin - Sabtu, 07.00 - 14.00 WIB', 'string', 'kontak', 'Jam operasional sekolah', 1, NOW()),
+('contact_map_lat', '-7.562345', 'string', 'kontak', 'Latitude lokasi', 1, NOW()),
+('contact_map_lng', '111.890123', 'string', 'kontak', 'Longitude lokasi', 1, NOW()),
+('social_facebook', 'https://facebook.com/mtsalhudagondang', 'string', 'sosial', 'Facebook resmi', 1, NOW()),
+('social_instagram', 'https://instagram.com/mtsalhudagondang', 'string', 'sosial', 'Instagram resmi', 1, NOW()),
+('social_youtube', 'https://youtube.com/@mtsalhudagondang', 'string', 'sosial', 'Channel YouTube', 1, NOW()),
+('social_tiktok', 'https://tiktok.com/@mtsalhudagondang', 'string', 'sosial', 'Akun TikTok', 1, NOW()),
+('meta_title', 'MTs Al-Huda Gondang | Madrasah Berakhlak, Berilmu, dan Berprestasi', 'string', 'seo', 'Judul SEO situs', 1, NOW()),
+('meta_description', 'Situs resmi Madrasah Tsanawiyah Al-Huda Gondang Nganjuk. Menyajikan informasi profil, pendaftaran PPDB, kurikulum terpadu, dan portal akademik Madrasahku.', 'text', 'seo', 'Deskripsi SEO situs', 1, NOW()),
+('attendance_check_in_time', '07:00', 'string', 'presensi', 'Batas jam masuk', 0, NOW()),
+('attendance_late_tolerance', '15', 'int', 'presensi', 'Toleransi keterlambatan (menit)', 0, NOW()),
+('attendance_check_out_time', '14:00', 'string', 'presensi', 'Jam mulai boleh pulang', 0, NOW()),
+('security_max_login_attempts', '5', 'int', 'keamanan', 'Batas percobaan login gagal', 0, NOW()),
+('security_lockout_minutes', '15', 'int', 'keamanan', 'Durasi penguncian akun (menit)', 0, NOW()),
+('security_session_timeout', '120', 'int', 'keamanan', 'Batas waktu sesi web (menit)', 0, NOW()),
+('security_api_access_ttl', '60', 'int', 'keamanan', 'Masa aktif akses token API (menit)', 0, NOW()),
+('ppdb_status', 'buka', 'string', 'ppdb', 'Status Pendaftaran PPDB', 1, NOW()),
+('ppdb_tahun_ajaran', '2026/2027', 'string', 'ppdb', 'Tahun ajaran PPDB dibuka', 1, NOW()),
+('ppdb_kuota', '180', 'int', 'ppdb', 'Total daya tampung PPDB', 1, NOW())
+ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
+
+-- 11. Konten Publik CMS MTs Al-Huda
+INSERT INTO `berita` (`id`, `title`, `judul`, `slug`, `excerpt`, `content`, `isi`, `image_path`, `gambar`, `category`, `kategori`, `status`, `published_at`, `author_id`) VALUES
+(1, 'Peringatan Hari Santri Nasional Berlangsung Khidmat di Lapangan Madrasah', 'Peringatan Hari Santri Nasional Berlangsung Khidmat di Lapangan Madrasah', 'peringatan-hari-santri-nasional-berlangsung-khidmat', 'Seluruh dewan guru, staf, dan ratusan santri MTs Al-Huda Gondang mengikuti apel akbar peringatan Hari Santri Nasional dengan mengenakan busana muslim serba putih.', 'Seluruh dewan guru, karyawan, serta 154 peserta didik MTs Al-Huda Gondang memadati lapangan madrasah pada upacara peringatan Hari Santri Nasional. Bertindak selaku pembina upacara, Kepala Madrasah menekankan pentingnya jihad intelektual, adab santri, serta penguasaan teknologi di era digital. Acara dilanjutkan dengan penampilan paduan suara madrasah dan doa bersama untuk bangsa.', 'Seluruh dewan guru, karyawan, serta 154 peserta didik MTs Al-Huda Gondang memadati lapangan madrasah pada upacara peringatan Hari Santri Nasional. Bertindak selaku pembina upacara, Kepala Madrasah menekankan pentingnya jihad intelektual, adab santri, serta penguasaan teknologi di era digital. Acara dilanjutkan dengan penampilan paduan suara madrasah dan doa bersama untuk bangsa.', 'images/berita/hari-santri.jpg', 'images/berita/hari-santri.jpg', 'Kegiatan', 'Kegiatan', 'published', NOW(), 1),
+(2, 'Siswa MTs Al-Huda Raih Medali Emas Olimpiade Sains Madrasah Tingkat Kabupaten', 'Siswa MTs Al-Huda Raih Medali Emas Olimpiade Sains Madrasah Tingkat Kabupaten', 'siswa-mts-al-huda-raih-medali-emas-olimpiade-sains', 'Prestasi membanggakan kembali ditorehkan ananda peserta didik MTs Al-Huda dalam ajang Kompetisi Sains Madrasah (KSM) bidang Matematika dan IPA Terpadu.', 'Prestasi membanggakan kembali ditorehkan oleh santri binaan MTs Al-Huda Gondang dalam ajang Kompetisi Sains Madrasah (KSM) tingkat kabupaten. Melalui bimbingan intensif dewan guru MIPA, perwakilan madrasah berhasil membawa pulang Medali Emas dan berhak melaju ke tingkat provinsi. Kepala madrasah menyampaikan apresiasi setinggi-tingginya kepada pembina dan peserta didik.', 'Prestasi membanggakan kembali ditorehkan oleh santri binaan MTs Al-Huda Gondang dalam ajang Kompetisi Sains Madrasah (KSM) tingkat kabupaten. Melalui bimbingan intensif dewan guru MIPA, perwakilan madrasah berhasil membawa pulang Medali Emas dan berhak melaju ke tingkat provinsi. Kepala madrasah menyampaikan apresiasi setinggi-tingginya kepada pembina dan peserta didik.', 'images/berita/prestasi-ksm.jpg', 'images/berita/prestasi-ksm.jpg', 'Prestasi', 'Prestasi', 'published', NOW(), 1);
+
+INSERT INTO `fasilitas` (`id`, `name`, `nama_fasilitas`, `slug`, `category`, `description`, `deskripsi`, `image_path`, `gambar`, `condition`, `kondisi`, `quantity`, `jumlah`, `sort_order`, `is_active`) VALUES
+(1, 'Laboratorium Komputer & Multimedia', 'Laboratorium Komputer & Multimedia', 'laboratorium-komputer-multimedia', 'Sarana Pembelajaran', 'Ruang lab komputer berpendingin udara (AC) dengan 36 unit komputer personal generasi mutakhir, jaringan serat optik kecepatan tinggi, dan proyektor interaktif untuk pembelajaran TIK dan Asesmen Nasional.', 'Ruang lab komputer berpendingin udara (AC) dengan 36 unit komputer personal generasi mutakhir, jaringan serat optik kecepatan tinggi, dan proyektor interaktif untuk pembelajaran TIK dan Asesmen Nasional.', 'images/fasilitas/lab-komputer.jpg', 'images/fasilitas/lab-komputer.jpg', 'sangat_baik', 'sangat_baik', 36, 36, 1, 1),
+(2, 'Perpustakaan Khazanah Ilmu', 'Perpustakaan Khazanah Ilmu', 'perpustakaan-khazanah-ilmu', 'Sarana Literasi', 'Koleksi ribuan buku pelajaran, kitab kuning, ensiklopedia sains, novel sastra, serta area baca lesehan yang hening dan nyaman bagi santri.', 'Koleksi ribuan buku pelajaran, kitab kuning, ensiklopedia sains, novel sastra, serta area baca lesehan yang hening dan nyaman bagi santri.', 'images/fasilitas/perpustakaan.jpg', 'images/fasilitas/perpustakaan.jpg', 'baik', 'baik', 1, 1, 2, 1),
+(3, 'Masjid Jami Al-Huda', 'Masjid Jami Al-Huda', 'masjid-jami-al-huda', 'Sarana Ibadah', 'Pusat pembinaan spiritual madrasah untuk pelaksanaan shalat Dhuha berjamaah, dhuhur berjamaah, pembacaan ratibul haddad, serta kajian kitab akhlak santri.', 'Pusat pembinaan spiritual madrasah untuk pelaksanaan shalat Dhuha berjamaah, dhuhur berjamaah, pembacaan ratibul haddad, serta kajian kitab akhlak santri.', 'images/fasilitas/masjid.jpg', 'images/fasilitas/masjid.jpg', 'sangat_baik', 'sangat_baik', 1, 1, 3, 1),
+(4, 'Laboratorium IPA Terpadu', 'Laboratorium IPA Terpadu', 'laboratorium-ipa-terpadu', 'Sarana Pembelajaran', 'Fasilitas eksperimen Fisika, Biologi, dan Kimia dasar lengkap dengan mikroskop binokuler, alat peraga anatomi manusia, dan reagen praktikum aman.', 'Fasilitas eksperimen Fisika, Biologi, dan Kimia dasar lengkap dengan mikroskop binokuler, alat peraga anatomi manusia, dan reagen praktikum aman.', 'images/fasilitas/lab-ipa.jpg', 'images/fasilitas/lab-ipa.jpg', 'baik', 'baik', 1, 1, 4, 1);
+
+INSERT INTO `galeri` (`id`, `album`, `title`, `judul`, `caption`, `keterangan`, `image_path`, `gambar`, `sort_order`, `is_active`, `uploaded_by`) VALUES
+(1, 'Kegiatan Santri', 'Shalat Dhuha Berjamaah Pagi Hari', 'Shalat Dhuha Berjamaah Pagi Hari', 'Rutinitas pembiasaan shalat Dhuha berjamaah setiap pagi sebelum memulai jam pelajaran pertama.', 'Rutinitas pembiasaan shalat Dhuha berjamaah setiap pagi sebelum memulai jam pelajaran pertama.', 'images/galeri/dhuha-pagi.jpg', 'images/galeri/dhuha-pagi.jpg', 1, 1, 1),
+(2, 'Ekstrakurikuler', 'Latihan Regu Pramuka MTs Al-Huda', 'Latihan Regu Pramuka MTs Al-Huda', 'Latihan semaphore, tali temali, dan baris berbaris regu penggalang pramuka madrasah.', 'Latihan semaphore, tali temali, dan baris berbaris regu penggalang pramuka madrasah.', 'images/galeri/pramuka.jpg', 'images/galeri/pramuka.jpg', 2, 1, 1),
+(3, 'Pembelajaran', 'Praktikum Sains di Laboratorium', 'Praktikum Sains di Laboratorium', 'Antusiasme santri mengamati spesimen biologi sel tumbuhan menggunakan mikroskop.', 'Antusiasme santri mengamati spesimen biologi sel tumbuhan menggunakan mikroskop.', 'images/galeri/praktikum.jpg', 'images/galeri/praktikum.jpg', 3, 1, 1);
+
+INSERT INTO `pengumuman` (`id`, `title`, `judul`, `slug`, `content`, `isi`, `is_pinned`, `status`, `published_at`, `author_id`) VALUES
+(1, 'Penerimaan Peserta Didik Baru (PPDB) Jalur Prestasi dan Reguler Telah Dibuka', 'Penerimaan Peserta Didik Baru (PPDB) Jalur Prestasi dan Reguler Telah Dibuka', 'ppdb-2026-2027-telah-dibuka', 'Diberitahukan kepada seluruh calon wali murid bahwa pendaftaran siswa baru MTs Al-Huda Gondang untuk Tahun Ajaran 2026/2027 telah resmi dibuka secara online maupun langsung di kantor sekretariat madrasah.', 'Diberitahukan kepada seluruh calon wali murid bahwa pendaftaran siswa baru MTs Al-Huda Gondang untuk Tahun Ajaran 2026/2027 telah resmi dibuka secara online maupun langsung di kantor sekretariat madrasah.', 1, 'published', NOW(), 1),
+(2, 'Jadwal Penilaian Akhir Semester (PAS) Ganjil Tahun Ajaran 2026/2027', 'Jadwal Penilaian Akhir Semester (PAS) Ganjil Tahun Ajaran 2026/2027', 'jadwal-penilaian-akhir-semester-ganjil', 'Penilaian Akhir Semester (PAS) Ganjil akan dilaksanakan mulai tanggal 1 Desember 2026. Santri diharapkan melunasi administrasi dan mempersiapkan kartu ujian.', 'Penilaian Akhir Semester (PAS) Ganjil akan dilaksanakan mulai tanggal 1 Desember 2026. Santri diharapkan melunasi administrasi dan mempersiapkan kartu ujian.', 0, 'published', NOW(), 1);
+
+INSERT INTO `agenda` (`id`, `title`, `judul`, `description`, `deskripsi`, `location`, `lokasi`, `start_at`, `tgl_mulai`, `end_at`, `tgl_selesai`, `all_day`, `status`, `author_id`) VALUES
+(1, 'Penilaian Akhir Semester (PAS) Ganjil', 'Penilaian Akhir Semester (PAS) Ganjil', 'Ujian evaluasi hasil belajar semester ganjil untuk seluruh jenjang kelas 7, 8, dan 9.', 'Ujian evaluasi hasil belajar semester ganjil untuk seluruh jenjang kelas 7, 8, dan 9.', 'Ruang Ujian MTs Al-Huda', 'Ruang Ujian MTs Al-Huda', '2026-12-01 07:00:00', '2026-12-01 07:00:00', '2026-12-08 12:30:00', '2026-12-08 12:30:00', 0, 'published', 1),
+(2, 'Pondok Ramadhan & Bakti Sosial Santri', 'Pondok Ramadhan & Bakti Sosial Santri', 'Kajian intensif fikih puasa, tadarus 30 juz, serta pembagian paket sembako kepada dhuafa di lingkungan sekitar madrasah.', 'Kajian intensif fikih puasa, tadarus 30 juz, serta pembagian paket sembako kepada dhuafa di lingkungan sekitar madrasah.', 'Masjid Al-Huda & Lingkungan Desa', 'Masjid Al-Huda & Lingkungan Desa', '2027-03-15 08:00:00', '2027-03-15 08:00:00', '2027-03-20 16:00:00', '2027-03-20 16:00:00', 0, 'published', 1);
+
+INSERT INTO `dokumen_ppdb` (`id`, `title`, `judul`, `description`, `file_path`, `file_url`, `file_size`, `mime_type`, `download_count`, `jumlah_unduh`, `sort_order`, `is_active`, `uploaded_by`) VALUES
+(1, 'Brosur & Panduan Pendaftaran PPDB 2026/2027', 'Brosur & Panduan Pendaftaran PPDB 2026/2027', 'Informasi alur pendaftaran, syarat berkas, seragam, dan program beasiswa tahfidz.', 'uploads/ppdb/brosur-ppdb-2026.pdf', 'uploads/ppdb/brosur-ppdb-2026.pdf', 1450000, 'application/pdf', 128, 128, 1, 1, 1),
+(2, 'Formulir Registrasi Siswa Baru (Format Cetak)', 'Formulir Registrasi Siswa Baru (Format Cetak)', 'Formulir biodata santri dan surat pernyataan kesanggupan tata tertib bermaterai.', 'uploads/ppdb/formulir-pendaftaran-2026.pdf', 'uploads/ppdb/formulir-pendaftaran-2026.pdf', 850000, 'application/pdf', 74, 74, 2, 1, 1);
+
+INSERT INTO `pesan_kontak` (`id`, `nama`, `email`, `telepon`, `subjek`, `pesan`, `status`, `balasan`, `created_at`) VALUES
+(1, 'Budi Santoso', 'budisantoso@gmail.com', '081298765432', 'Tanya Syarat PPDB Jalur Prestasi', 'Assalamu alaikum. Apakah untuk santri yang memiliki hafalan Al-Quran 3 Juz mendapatkan beasiswa SPP bebas hingga lulus? Mohon informasinya, terima kasih.', 'baru', NULL, NOW()),
+(2, 'Siti Rahmawati', 'rahmawatisiti@yahoo.com', '085712348901', 'Konfirmasi Biaya Seragam Santri Putri', 'Selamat pagi pihak tata usaha MTs Al-Huda. Untuk rincian seragam santri putri apakah sudah termasuk jilbab madrasah?', 'dibaca', NULL, NOW());
+
+INSERT INTO `menu` (`id`, `parent_id`, `title`, `url`, `target`, `sort_order`, `is_active`) VALUES
+(1, NULL, 'Beranda', '/', '_self', 1, 1),
+(2, NULL, 'Profil', '/profil', '_self', 2, 1),
+(3, NULL, 'Akademik', '/akademik', '_self', 3, 1),
+(4, NULL, 'Berita', '/berita', '_self', 4, 1),
+(5, NULL, 'Fasilitas', '/fasilitas', '_self', 5, 1),
+(6, NULL, 'Galeri', '/galeri', '_self', 6, 1),
+(7, NULL, 'PPDB', '/ppdb', '_self', 7, 1),
+(8, NULL, 'Kontak', '/kontak', '_self', 8, 1);
+
+INSERT INTO `schema_migrations` (`version`, `name`, `batch`, `statements`, `executed_at`) VALUES
+('001', 'foundation', 1, 3, NOW()),
+('002', 'identity_core', 1, 3, NOW()),
+('003', 'identity_security', 1, 4, NOW()),
+('004', 'cms_content', 1, 5, NOW()),
+('005', 'cms_support', 1, 5, NOW()),
+('006', 'academic_core', 1, 4, NOW()),
+('007', 'academic_learning', 1, 4, NOW()),
+('008', 'teacher_attendance', 1, 2, NOW()),
+('009', 'notifications', 1, 1, NOW()),
+('013', 'api_support', 1, 2, NOW()),
+('014', 'public_ids', 1, 2, NOW()),
+('015', 'madrasahku_integration', 1, 12, NOW()),
+('016', 'madrasahku_full_schema', 1, 35, NOW());
+
+SET FOREIGN_KEY_CHECKS = 1;
+-- ==========================================================================
+-- AKHIR DUMP MASTER DATABASE MTs AL-HUDA GONDANG
+-- Total Pengguna : 183 akun
+-- Total Guru     : 26 guru riil
+-- Total Siswa    : 154 santri riil
+-- Total Mapel    : 25 mata pelajaran
+-- ==========================================================================

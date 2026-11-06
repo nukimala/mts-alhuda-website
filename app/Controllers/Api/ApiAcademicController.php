@@ -70,13 +70,13 @@ class ApiAcademicController
                     sub.code AS subject_code, sub.name AS subject_name,
                     y.name AS year_name,
                     tu.name AS teacher_name
-             FROM schedules s
-             JOIN class_subjects cs ON cs.id = s.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
-             JOIN subjects sub      ON sub.id = cs.subject_id
-             JOIN academic_years y  ON y.id = s.academic_year_id
-             LEFT JOIN teachers t   ON t.id = s.teacher_id
-             LEFT JOIN users tu     ON tu.id = t.user_id
+             FROM jadwal s
+             JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
+             JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
+             JOIN tahun_akademik y  ON y.id = s.academic_year_id
+             LEFT JOIN guru t       ON t.id = s.teacher_id
+             LEFT JOIN pengguna tu  ON tu.id = t.user_id
              WHERE {$whereSql}
              ORDER BY s.day_of_week ASC, s.start_time ASC, c.name ASC"
         );
@@ -172,9 +172,9 @@ class ApiAcademicController
 
         $countStmt = $pdo->prepare(
             "SELECT COUNT(*)
-             FROM assignments a
-             JOIN class_subjects cs ON cs.id = a.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
+             FROM tugas a
+             JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
              WHERE {$whereSql}"
         );
         $countStmt->execute($args);
@@ -184,11 +184,11 @@ class ApiAcademicController
         // berguna adalah ringkasan berapa yang sudah masuk.
         $studentJoin = '';
         $studentArgs = [];
-        $summarySelect = '(SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id) AS submission_count,
-                          (SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id AND s.graded_at IS NULL) AS ungraded_count';
+        $summarySelect = '(SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id) AS submission_count,
+                          (SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id AND s.graded_at IS NULL) AS ungraded_count';
 
         if ($scope['type'] === 'student') {
-            $studentJoin = 'LEFT JOIN submissions my ON my.assignment_id = a.id AND my.student_id = ?';
+            $studentJoin = 'LEFT JOIN pengumpulan_tugas my ON my.assignment_id = a.id AND my.student_id = ?';
             $studentArgs[] = $scope['student_id'];
             $summarySelect = 'my.submitted_at AS my_submitted_at, my.score AS my_score,
                               my.graded_at AS my_graded_at,
@@ -204,10 +204,10 @@ class ApiAcademicController
                     c.id AS class_id, c.name AS class_name, c.level,
                     sub.code AS subject_code, sub.name AS subject_name,
                     {$summarySelect}
-             FROM assignments a
-             JOIN class_subjects cs ON cs.id = a.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
-             JOIN subjects sub      ON sub.id = cs.subject_id
+             FROM tugas a
+             JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
+             JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
              {$studentJoin}
              WHERE {$whereSql}
              ORDER BY (a.due_at IS NULL) ASC, a.due_at DESC, a.id DESC
@@ -280,7 +280,7 @@ class ApiAcademicController
         $selectArgs = [];
 
         if ($scope['type'] === 'student') {
-            $studentJoin = 'LEFT JOIN submissions my ON my.assignment_id = a.id AND my.student_id = ?';
+            $studentJoin = 'LEFT JOIN pengumpulan_tugas my ON my.assignment_id = a.id AND my.student_id = ?';
             $studentSelect = ', my.submitted_at AS my_submitted_at, my.score AS my_score,
                               my.graded_at AS my_graded_at, (my.id IS NOT NULL) AS my_submitted,
                               my.feedback AS my_feedback, my.file_path AS my_file_path,
@@ -293,13 +293,13 @@ class ApiAcademicController
                     a.due_at, a.max_score, a.is_published, a.created_at,
                     c.id AS class_id, c.name AS class_name, c.level,
                     sub.code AS subject_code, sub.name AS subject_name,
-                    (SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id) AS submission_count,
-                    (SELECT COUNT(*) FROM submissions s WHERE s.assignment_id = a.id AND s.graded_at IS NULL) AS ungraded_count
+                    (SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id) AS submission_count,
+                    (SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id AND s.graded_at IS NULL) AS ungraded_count
                     {$studentSelect}
-             FROM assignments a
-             JOIN class_subjects cs ON cs.id = a.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
-             JOIN subjects sub      ON sub.id = cs.subject_id
+             FROM tugas a
+             JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
+             JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
              {$studentJoin}
              WHERE " . implode(' AND ', $where) . '
              LIMIT 1'
@@ -358,9 +358,9 @@ class ApiAcademicController
 
         $countStmt = $pdo->prepare(
             "SELECT COUNT(*)
-             FROM materials m
-             JOIN class_subjects cs ON cs.id = m.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
+             FROM materi m
+             JOIN mata_pelajaran_kelas cs ON cs.id = m.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
              WHERE {$whereSql}"
         );
         $countStmt->execute($args);
@@ -371,11 +371,11 @@ class ApiAcademicController
                     c.id AS class_id, c.name AS class_name,
                     sub.code AS subject_code, sub.name AS subject_name,
                     u.name AS author_name
-             FROM materials m
-             JOIN class_subjects cs ON cs.id = m.class_subject_id
-             JOIN classes c         ON c.id = cs.class_id
-             JOIN subjects sub      ON sub.id = cs.subject_id
-             LEFT JOIN users u      ON u.id = m.created_by
+             FROM materi m
+             JOIN mata_pelajaran_kelas cs ON cs.id = m.class_subject_id
+             JOIN kelas c         ON c.id = cs.class_id
+             JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
+             LEFT JOIN pengguna u      ON u.id = m.created_by
              WHERE {$whereSql}
              ORDER BY m.published_at DESC, m.id DESC
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
@@ -444,7 +444,7 @@ class ApiAcademicController
         $pdo = Database::connection();
 
         if ($role === 'guru') {
-            $stmt = $pdo->prepare('SELECT id FROM teachers WHERE user_id = ? LIMIT 1');
+            $stmt = $pdo->prepare('SELECT id FROM guru WHERE user_id = ? LIMIT 1');
             $stmt->execute([(int) $user['id']]);
             $teacherId = $stmt->fetchColumn();
 
@@ -461,7 +461,7 @@ class ApiAcademicController
         }
 
         if ($role === 'siswa') {
-            $stmt = $pdo->prepare('SELECT id, class_id FROM students WHERE user_id = ? LIMIT 1');
+            $stmt = $pdo->prepare('SELECT id, kelas_id AS class_id FROM siswa WHERE user_id = ? LIMIT 1');
             $stmt->execute([(int) $user['id']]);
             $row = $stmt->fetch();
 
