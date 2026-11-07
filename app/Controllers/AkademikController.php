@@ -43,6 +43,7 @@ class AkademikController
             'classes' => $classes,
             'selected_class_id' => $selectedClassId,
             'schedules' => $schedules,
+            'settings' => $pdo->query("SELECT setting_key, setting_value FROM pengaturan WHERE is_public = 1")->fetchAll(PDO::FETCH_KEY_PAIR),
         ];
 
         require_once __DIR__ . '/../Views/akademik/index.php';

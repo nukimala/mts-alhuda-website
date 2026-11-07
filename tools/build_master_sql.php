@@ -589,7 +589,6 @@ CREATE TABLE `fasilitas` (
   `jumlah` smallint unsigned NOT NULL DEFAULT '1',
   `sort_order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `deleted_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime DEFAULT NULL,
@@ -979,9 +978,9 @@ $sql .= "-- 2. Akun Administrator & Kepala Madrasah\n";
 $sql .= "INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `name`, `nama`, `role`, `role_label`, `phone`, `telepon`, `is_active`, `must_change_password`, `created_at`) VALUES\n";
 $sql .= "(1, 'admin', 'admin@mts-alhuda.sch.id', '{$adminPasswordHash}', 'Administrator Madrasah', 'Administrator Madrasah', 'admin', 'Super Admin', '081234567890', '081234567890', 1, 0, NOW()),\n";
 $sql .= "(2, 'operator', 'operator@mts-alhuda.sch.id', '{$adminPasswordHash}', 'Operator Madrasah', 'Operator Madrasah', 'operator', 'Operator Madrasah', '081234567891', '081234567891', 1, 0, NOW()),\n";
-$sql .= "(3, 'sholihin', 'sholihin@mts-alhuda.sch.id', '{$adminPasswordHash}', 'Drs. H. M. Sholihin, M.Pd.I', 'Drs. H. M. Sholihin, M.Pd.I', 'kepala', 'Kepala Madrasah', '081234567892', '081234567892', 1, 0, NOW());\n\n";
+$sql .= "(3, 'harisjauhari', 'harisjauhari@mts-alhuda.sch.id', '{$adminPasswordHash}', 'M. Abdul Haris Jauhari, S.Pd.I', 'M. Abdul Haris Jauhari, S.Pd.I', 'kepala', 'Kepala Madrasah', '081234567892', '081234567892', 1, 0, NOW());\n\n";
 
-// 3. Data Guru (22 Guru) & Akun Guru di Pengguna
+// 3. Data Guru (26 Guru & Tendik) & Akun Guru di Pengguna
 $sql .= "-- 3. Guru & Pengguna Guru\n";
 $teacherUserValues = [];
 $teacherValues = [];
@@ -992,7 +991,9 @@ foreach ($dataGuru as $g) {
     $userId = $nextUserId++;
     $guruId = (int)$g['no'];
     $kodeJadwal = $g['kode_jadwal'];
-    $teacherMap[$kodeJadwal] = $guruId;
+    if (!empty($kodeJadwal)) {
+        $teacherMap[$kodeJadwal] = $guruId;
+    }
 
     $username = 'guru_' . strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $g['nama']));
     if (strlen($username) > 30) $username = substr($username, 0, 30);
@@ -1009,31 +1010,41 @@ $sql .= "INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `na
 
 $sql .= "INSERT INTO `guru` (`id`, `user_id`, `nip`, `nuptk`, `gelar_depan`, `nama_lengkap`, `gelar_belakang`, `gender`, `jenis_kelamin`, `phone`, `no_hp`, `address`, `alamat`, `foto_url`, `employment_status`, `status_kepegawaian`, `subject_specialty`, `bidang_studi`, `kode_jadwal`, `joined_at`, `is_active`, `created_at`) VALUES\n" . implode(",\n", $teacherValues) . ";\n\n";
 
-// 4. Kelas (7A, 7B, 8A, 8B, 9A, 9B)
+// 4. Kelas (7, 8A, 8B, 8C, 8D, 9A, 9B, 9C)
 $sql .= "-- 4. Kelas\n";
 $classesDef = [
-    1 => ['name' => '7A', 'level' => 7, 'wali_kode' => '02'],
-    2 => ['name' => '7B', 'level' => 7, 'wali_kode' => '04'],
-    3 => ['name' => '8A', 'level' => 8, 'wali_kode' => '05'],
-    4 => ['name' => '8B', 'level' => 8, 'wali_kode' => '06'],
-    5 => ['name' => '9A', 'level' => 9, 'wali_kode' => '07'],
-    6 => ['name' => '9B', 'level' => 9, 'wali_kode' => '08'],
+    1 => ['name' => '7', 'nama_kelas' => 'Kelas 7', 'level' => 7, 'wali_kode' => '02'],
+    2 => ['name' => '8A', 'nama_kelas' => 'Kelas 8A', 'level' => 8, 'wali_kode' => '05'],
+    3 => ['name' => '8B', 'nama_kelas' => 'Kelas 8B', 'level' => 8, 'wali_kode' => '06'],
+    4 => ['name' => '8C', 'nama_kelas' => 'Kelas 8C', 'level' => 8, 'wali_kode' => '07'],
+    5 => ['name' => '8D', 'nama_kelas' => 'Kelas 8D', 'level' => 8, 'wali_kode' => '08'],
+    6 => ['name' => '9A', 'nama_kelas' => 'Kelas 9A', 'level' => 9, 'wali_kode' => '09'],
+    7 => ['name' => '9B', 'nama_kelas' => 'Kelas 9B', 'level' => 9, 'wali_kode' => '10'],
+    8 => ['name' => '9C', 'nama_kelas' => 'Kelas 9C', 'level' => 9, 'wali_kode' => '11'],
 ];
 $classValues = [];
-$classIdMap = []; // '7A' -> 1
+$classIdMap = [
+    '7' => 1, '7A' => 1, 'Kelas 7' => 1,
+    '8A' => 2, 'Kelas 8 - 8A' => 2,
+    '8B' => 3, 'Kelas 8 - 8B' => 3,
+    '8C' => 4, 'Kelas 8 - 8C' => 4,
+    '8D' => 5, 'Kelas 8 - 8D' => 5,
+    '9A' => 6, 'Kelas 9 - 9A' => 6, '9' => 6,
+    '9B' => 7, 'Kelas 9 - 9B' => 7,
+    '9C' => 8, 'Kelas 9 - 9C' => 8,
+];
 foreach ($classesDef as $cid => $c) {
-    $classIdMap[$c['name']] = $cid;
     $waliId = $teacherMap[$c['wali_kode']] ?? 1;
     $room = 'Ruang Kelas ' . $c['name'];
-    $classValues[] = "({$cid}, 1, '{$c['name']}', '{$c['name']}', {$c['level']}, {$c['level']}, {$waliId}, {$waliId}, '{$room}', '{$room}', 32, {$cid}, 1, NOW())";
+    $classValues[] = "({$cid}, 1, '{$c['name']}', '{$c['nama_kelas']}', {$c['level']}, {$c['level']}, {$waliId}, {$waliId}, '{$room}', '{$room}', 32, {$cid}, 1, NOW())";
 }
 $sql .= "INSERT INTO `kelas` (`id`, `academic_year_id`, `name`, `nama_kelas`, `level`, `tingkat`, `homeroom_teacher_id`, `wali_kelas_id`, `room`, `ruangan`, `capacity`, `sort_order`, `is_active`, `created_at`) VALUES\n" . implode(",\n", $classValues) . ";\n\n";
 
-// 5. Mata Pelajaran (18 Mapel)
+// 5. Mata Pelajaran (Kode A s/d Y)
 $sql .= "-- 5. Mata Pelajaran\n";
 $mapelList = $dataJadwal['mapel'];
 $mapelValues = [];
-$mapelIdMap = []; // 'A' -> 1, 'QH' -> 1
+$mapelIdMap = [];
 $mId = 1;
 foreach ($mapelList as $letter => $m) {
     $code = $m['code'];
@@ -1047,65 +1058,133 @@ foreach ($mapelList as $letter => $m) {
 }
 $sql .= "INSERT INTO `mata_pelajaran` (`id`, `code`, `kode_mapel`, `name`, `nama_mapel`, `group_name`, `kelompok`, `sort_order`, `is_active`, `created_at`) VALUES\n" . implode(",\n", $mapelValues) . ";\n\n";
 
-// 6. Mata Pelajaran Kelas & Matriks Jadwal
+// 6. Mata Pelajaran Kelas & Matriks Jadwal Pelajaran Riil (406 slot jadwal dari PDF)
 $sql .= "-- 6. Mata Pelajaran Kelas & Jadwal Pelajaran (Matriks Lengkap Semester Ganjil 2026/2027)\n";
-$mpkValues = [];
-$jadwalValues = [];
-$mpkId = 1;
-$jadwalId = 1;
-$mpkLookup = []; // "classId_subjectId" -> mpkId
 
-$dayMap = [
-    'SENIN' => ['num' => 1, 'nama' => 'Senin'],
-    'SELASA' => ['num' => 2, 'nama' => 'Selasa'],
-    'RABU' => ['num' => 3, 'nama' => 'Rabu'],
-    'KAMIS' => ['num' => 4, 'nama' => 'Kamis'],
-    'JUMAT' => ['num' => 5, 'nama' => 'Jumat'],
-    'SABTU' => ['num' => 6, 'nama' => 'Sabtu'],
+function getScheduleTimes(int $day, $jam): array {
+    if ($day === 1) { // Senin
+        $times = [
+            0 => ['06:45:00', '07:00:00'],
+            'UPC' => ['07:00:00', '07:30:00'],
+            1 => ['07:30:00', '08:00:00'],
+            2 => ['08:00:00', '08:30:00'],
+            3 => ['08:45:00', '09:15:00'],
+            4 => ['09:15:00', '09:45:00'],
+            5 => ['10:05:00', '10:35:00'],
+            6 => ['10:35:00', '11:05:00'],
+            7 => ['11:05:00', '11:35:00'],
+            8 => ['11:35:00', '12:05:00'],
+            9 => ['12:35:00', '13:05:00'],
+        ];
+    } elseif ($day >= 2 && $day <= 4) { // Selasa, Rabu, Kamis
+        $times = [
+            0 => ['06:45:00', '07:00:00'],
+            1 => ['07:00:00', '07:30:00'],
+            2 => ['07:30:00', '08:00:00'],
+            3 => ['08:15:00', '08:45:00'],
+            4 => ['08:45:00', '09:15:00'],
+            5 => ['09:35:00', '10:05:00'],
+            6 => ['10:05:00', '10:35:00'],
+            7 => ['10:35:00', '11:05:00'],
+            8 => ['11:05:00', '11:35:00'],
+            9 => ['11:35:00', '12:05:00'],
+            10 => ['12:35:00', '13:05:00'],
+        ];
+    } elseif ($day === 5) { // Jumat
+        $times = [
+            0 => ['06:45:00', '07:00:00'],
+            'THL' => ['07:00:00', '07:15:00'],
+            1 => ['07:15:00', '07:45:00'],
+            2 => ['07:45:00', '08:15:00'],
+            3 => ['08:30:00', '09:00:00'],
+            4 => ['09:00:00', '09:30:00'],
+            5 => ['09:50:00', '10:20:00'],
+            6 => ['10:20:00', '10:50:00'],
+        ];
+    } else { // Sabtu
+        $times = [
+            0 => ['06:45:00', '07:00:00'],
+            1 => ['07:00:00', '07:30:00'],
+            2 => ['07:30:00', '08:00:00'],
+            3 => ['08:00:00', '08:30:00'],
+            4 => ['08:30:00', '09:00:00'],
+            5 => ['09:00:00', '09:30:00'],
+            6 => ['10:05:00', '10:35:00'],
+            7 => ['10:35:00', '11:05:00'],
+            8 => ['11:05:00', '11:35:00'],
+            9 => ['11:35:00', '12:05:00'],
+        ];
+    }
+    return $times[$jam] ?? ['07:00:00', '07:40:00'];
+}
+
+$grid = $dataJadwal['grid'] ?? [];
+$classKeyToId = [
+    '7' => 1, '7A' => 1,
+    '8A' => 2,
+    '8B' => 3,
+    '8C' => 4,
+    '9A' => 6,
+    '9B' => 7,
+    '9C' => 8,
+];
+$dayNames = [
+    1 => 'Senin',
+    2 => 'Selasa',
+    3 => 'Rabu',
+    4 => 'Kamis',
+    5 => 'Jumat',
+    6 => 'Sabtu',
 ];
 
-if (isset($dataJadwal['jadwal']) && is_array($dataJadwal['jadwal'])) {
-    foreach ($dataJadwal['jadwal'] as $hariKey => $slots) {
-        $hariInfo = $dayMap[$hariKey] ?? ['num' => 1, 'nama' => 'Senin'];
+$mpkValues = [];
+$jadwalValues = [];
+$mpkLookup = [];
+$mpkId = 1;
+$jadwalId = 1;
 
-        foreach ($slots as $slot) {
-            $jamMulai = $slot['jam_mulai'] . ':00';
-            $jamSelesai = $slot['jam_selesai'] . ':00';
+foreach ($grid as $row) {
+    $dayNum = $row['day'];
+    $jam = $row['jam'];
+    [$jamMulai, $jamSelesai] = getScheduleTimes($dayNum, $jam);
+    $hariNama = $dayNames[$dayNum];
 
-            foreach ($slot['kelas'] as $className => $kode) {
-                if (empty($kode) || $kode === 'UPACARA' || $kode === 'ISTIRAHAT') {
-                    continue;
-                }
+    foreach ($row['slots'] as $className => $slotData) {
+        $mapelLetter = $slotData[0] ?? '';
+        $guruKode = $slotData[1] ?? '';
 
-                // Format kode: misal "02A" -> guru 02, mapel A
-                $guruKode = substr($kode, 0, 2);
-                $mapelLetter = substr($kode, 2);
+        $cId = $classKeyToId[$className] ?? null;
+        $sId = $mapelIdMap[$mapelLetter] ?? null;
 
-                if (!isset($mapelIdMap[$mapelLetter]) || !isset($teacherMap[$guruKode])) {
-                    continue;
-                }
+        $firstTeacherKode = explode(',', $guruKode)[0];
+        $tId = $teacherMap[$firstTeacherKode] ?? 1;
 
-                $cId = $classIdMap[$className] ?? null;
-                $sId = $mapelIdMap[$mapelLetter];
-                $tId = $teacherMap[$guruKode];
+        if (!$cId || !$sId) continue;
 
-                if (!$cId) continue;
-
-                $mpkKey = "{$cId}_{$sId}";
-                if (!isset($mpkLookup[$mpkKey])) {
-                    $mpkLookup[$mpkKey] = $mpkId;
-                    $mpkValues[] = "({$mpkId}, {$cId}, {$cId}, {$sId}, {$sId}, {$tId}, {$tId}, 2, 2, 1, NOW())";
-                    $mpkId++;
-                }
-
-                $curMpkId = $mpkLookup[$mpkKey];
-                $room = 'Ruang Kelas ' . $className;
-
-                $jadwalValues[] = "({$jadwalId}, {$curMpkId}, {$cId}, {$sId}, {$sId}, {$tId}, {$tId}, 1, {$hariInfo['num']}, '{$hariInfo['nama']}', '{$jamMulai}', '{$jamMulai}', '{$jamSelesai}', '{$jamSelesai}', '{$room}', '{$room}', 1, NOW())";
-                $jadwalId++;
-            }
+        $mpkKey = "{$cId}_{$sId}";
+        if (!isset($mpkLookup[$mpkKey])) {
+            $mpkLookup[$mpkKey] = [
+                'id' => $mpkId,
+                'cId' => $cId,
+                'sId' => $sId,
+                'tId' => $tId,
+                'hours' => 0,
+            ];
+            $mpkId++;
         }
+        $mpkLookup[$mpkKey]['hours']++;
+
+        $curMpkId = $mpkLookup[$mpkKey]['id'];
+        $room = 'Ruang Kelas ' . ($className === '7A' ? '7' : $className);
+
+        $jadwalValues[] = "({$jadwalId}, {$curMpkId}, {$cId}, {$sId}, {$sId}, {$tId}, {$tId}, 1, {$dayNum}, '{$hariNama}', '{$jamMulai}', '{$jamMulai}', '{$jamSelesai}', '{$jamSelesai}', '{$room}', '{$room}', 1, NOW())";
+        $jadwalId++;
     }
+}
+
+foreach ($mpkLookup as $m) {
+    $hours = max(1, $m['hours']);
+    $mpkValues[] = "({$m['id']}, {$m['cId']}, {$m['cId']}, {$m['sId']}, {$m['sId']}, {$m['tId']}, {$m['tId']}, {$hours}, {$hours}, 1, NOW())";
 }
 
 if (!empty($mpkValues)) {
@@ -1179,12 +1258,21 @@ $settingsData = [
     ['site_logo', 'assets/images/LOGO_MTS 1.png', 'string', 'identitas', 'Logo resmi madrasah', 1],
     ['site_favicon', 'assets/images/LOGO_MTS 1.png', 'string', 'identitas', 'Favicon situs', 1],
     ['site_hero_image', 'assets/images/Senam Bersama.jpg', 'string', 'identitas', 'Foto utama beranda madrasah', 1],
-    ['site_nsm', '121235180045', 'string', 'identitas', 'Nomor Statistik Madrasah (NSM)', 1],
+    ['site_nsm', '121235180039', 'string', 'identitas', 'Nomor Statistik Madrasah (NSM)', 1],
     ['site_npsn', '20582234', 'string', 'identitas', 'NPSN', 1],
     ['site_foundation', 'Yayasan Pendidikan Al-Huda Gondang', 'string', 'identitas', 'Nama yayasan', 1],
+    ['headmaster_name', 'M. ABDUL HARIS JAUHARI, S.Pd.I', 'string', 'identitas', 'Kepala Madrasah', 1],
+    ['curriculum_head_name', 'SITI AMIROH, S.Pd.I', 'string', 'identitas', 'Waka Kurikulum', 1],
     ['accreditation_grade', 'A', 'string', 'identitas', 'Peringkat akreditasi BAN-S/M', 1],
     ['accreditation_year', '2024', 'string', 'identitas', 'Tahun akreditasi', 1],
-    ['contact_address', 'Jl. Raya Gondang, Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur 64451', 'text', 'kontak', 'Alamat lengkap', 1],
+    ['contact_address', 'Jln. Letjen Soeprapto No.16 Ds. Pandean Kec. Gondang Kab. Nganjuk', 'text', 'kontak', 'Alamat lengkap', 1],
+    ['schedule_effective_date', '2 November 2026', 'string', 'akademik', 'Tanggal Berlaku Jadwal', 1],
+    ['schedule_piket_senin', '07 (Subiyatin, S.Si.), 09 (Agus Setiawan, S.Pd.), 11 (Sodikin Muslimin, S.Pd.)', 'string', 'akademik', 'Guru Piket Senin', 1],
+    ['schedule_piket_selasa', '06 (Farid Kurniawan N, SH), 08 (Lilik Rahmawati, S.Pd.), 09 (Agus Setiawan, S.Pd.)', 'string', 'akademik', 'Guru Piket Selasa', 1],
+    ['schedule_piket_rabu', '04 (Drs. Sarmin), 09 (Agus Setiawan, S.Pd.), 14 (Agus Budi Irawan, S.Pd.)', 'string', 'akademik', 'Guru Piket Rabu', 1],
+    ['schedule_piket_kamis', '09 (Agus Setiawan, S.Pd.), 12 (Ulfatul Khumaydah, S.H.I), 14 (Agus Budi Irawan, S.Pd.)', 'string', 'akademik', 'Guru Piket Kamis', 1],
+    ['schedule_piket_jumat', '05 (M. Musthofa, S.Pd.I), 06 (Farid Kurniawan N, SH), 13 (Siti Amiroh, S.Pd.I)', 'string', 'akademik', 'Guru Piket Jumat', 1],
+    ['schedule_piket_sabtu', '10 (Setyo Jatmiko, S.Pd.), 11 (Sodikin Muslimin, S.Pd.), 14 (Agus Budi Irawan, S.Pd.)', 'string', 'akademik', 'Guru Piket Sabtu', 1],
     ['contact_phone', '(0358) 771234', 'string', 'kontak', 'Nomor telepon kantor', 1],
     ['contact_whatsapp', '6281234567890', 'string', 'kontak', 'Nomor WhatsApp resmi', 1],
     ['contact_email', 'info@mts-alhuda.sch.id', 'string', 'kontak', 'Email resmi madrasah', 1],

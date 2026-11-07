@@ -155,6 +155,66 @@ foreach ($schedules as $s) {
                     </div>
                 <?php endif; ?>
             </div>
+
+            <!-- GURU PIKET & PEMBIASAAN PAGI RESMI -->
+            <div style="margin-top: 36px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+                <!-- Card Guru Piket -->
+                <div style="background: #FFFFFF; border-radius: 14px; border: 1px solid var(--border); padding: 24px 28px; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                        <span style="font-size: 20px;">📋</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0F172A;">Jadwal Guru Piket Mingguan</h3>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 13.5px; display: flex; flex-direction: column; gap: 10px;">
+                        <li style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #E2E8F0;">
+                            <strong style="color: #15803D; width: 80px;">Senin:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">Subiyatin, S.Si. &bull; Agus Setiawan, S.Pd. &bull; Sodikin Muslimin, S.Pd.</span>
+                        </li>
+                        <li style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #E2E8F0;">
+                            <strong style="color: #15803D; width: 80px;">Selasa:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">Farid Kurniawan N, SH &bull; Lilik Rahmawati, S.Pd. &bull; Agus Setiawan, S.Pd.</span>
+                        </li>
+                        <li style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #E2E8F0;">
+                            <strong style="color: #15803D; width: 80px;">Rabu:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">Drs. Sarmin &bull; Agus Setiawan, S.Pd. &bull; Agus Budi Irawan, S.Pd.</span>
+                        </li>
+                        <li style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #E2E8F0;">
+                            <strong style="color: #15803D; width: 80px;">Kamis:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">Agus Setiawan, S.Pd. &bull; Ulfatul Khumaydah, S.H.I &bull; Agus Budi Irawan, S.Pd.</span>
+                        </li>
+                        <li style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #E2E8F0;">
+                            <strong style="color: #15803D; width: 80px;">Jum'at:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">M. Musthofa, S.Pd.I &bull; Farid Kurniawan N, SH &bull; Siti Amiroh, S.Pd.I</span>
+                        </li>
+                        <li style="display: flex; justify-content: space-between;">
+                            <strong style="color: #15803D; width: 80px;">Sabtu:</strong>
+                            <span style="color: #334155; text-align: right; flex: 1;">Setyo Jatmiko, S.Pd. &bull; Sodikin Muslimin, S.Pd. &bull; Agus Budi Irawan, S.Pd.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card Pembiasaan Karakter & Tata Tertib -->
+                <div style="background: #FFFFFF; border-radius: 14px; border: 1px solid var(--border); padding: 24px 28px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                            <span style="font-size: 20px;">🕌</span>
+                            <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #0F172A;">Pembiasaan Harian Santri</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; color: #475569;">
+                            <div style="background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border-left: 3px solid #15803D;">
+                                <strong style="color: #0F172A; display: block; margin-bottom: 2px;">Jam ke-0 (06.45 - 07.00 WIB)</strong>
+                                Pembiasaan Sholawat Nariyah dan Asmaul Husna setiap pagi bersama guru jam pertama.
+                            </div>
+                            <div style="background: #F8FAFC; padding: 12px 14px; border-radius: 8px; border-left: 3px solid #0284C7;">
+                                <strong style="color: #0F172A; display: block; margin-bottom: 2px;">Jum'at Berkah &amp; Sabtu Sehat</strong>
+                                Pembacaan Tahlil &amp; Surat Yasin setiap Jum'at pagi; Senam Kebugaran Jasmani dan Shalat Dhuha berjamaah setiap Sabtu pagi.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #E2E8F0; font-size: 12px; color: #64748B;">
+                        Berlaku efektif mulai tanggal <strong>2 November 2026</strong> &middot; Mengetahui: Kepala Madrasah <strong>M. Abdul Haris Jauhari, S.Pd.I</strong> &amp; Waka Kurikulum <strong>Siti Amiroh, S.Pd.I</strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </main>
