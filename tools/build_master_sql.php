@@ -151,6 +151,7 @@ CREATE TABLE `guru` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_guru_user` (`user_id`),
   UNIQUE KEY `uq_guru_nip` (`nip`),
@@ -175,6 +176,7 @@ CREATE TABLE `tahun_akademik` (
   `active_flag` tinyint GENERATED ALWAYS AS (IF(`is_active` = 1, 1, NULL)) STORED,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tahun_name_sem` (`name`, `semester`),
   UNIQUE KEY `uq_tahun_active` (`active_flag`)
@@ -200,6 +202,7 @@ CREATE TABLE `kelas` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_kelas_year_name` (`academic_year_id`,`name`),
   KEY `idx_kelas_level` (`level`),
@@ -238,6 +241,7 @@ CREATE TABLE `siswa` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_siswa_user` (`user_id`),
   UNIQUE KEY `uq_siswa_nis` (`nis`),
@@ -264,6 +268,7 @@ CREATE TABLE `mata_pelajaran` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mapel_code` (`code`),
   KEY `idx_mapel_group` (`group_name`),
@@ -287,6 +292,7 @@ CREATE TABLE `mata_pelajaran_kelas` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mpk_class_subject` (`class_id`,`subject_id`),
   KEY `idx_mpk_teacher` (`teacher_id`),
@@ -320,6 +326,7 @@ CREATE TABLE `jadwal` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_jadwal_teacher` (`teacher_id`,`academic_year_id`,`day_of_week`,`start_time`),
   KEY `idx_jadwal_class` (`kelas_id`,`day_of_week`,`start_time`),
@@ -343,6 +350,7 @@ CREATE TABLE `lokasi_sekolah` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_lokasi_qr` (`qr_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -375,6 +383,7 @@ CREATE TABLE `presensi_guru` (
   `verified_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_presensi_daily` (`teacher_id`,`attendance_date`,`attendance_type`),
   KEY `idx_presensi_date` (`attendance_date`,`status`),
@@ -404,6 +413,7 @@ CREATE TABLE `materi` (
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_materi_class_subject` (`class_subject_id`),
   CONSTRAINT `fk_materi_class_subject` FOREIGN KEY (`class_subject_id`) REFERENCES `mata_pelajaran_kelas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -434,6 +444,7 @@ CREATE TABLE `tugas` (
   `created_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tugas_public` (`public_id`),
   KEY `idx_tugas_class` (`class_subject_id`),
@@ -466,6 +477,7 @@ CREATE TABLE `pengumpulan_tugas` (
   `graded_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_pengumpulan_public` (`public_id`),
   UNIQUE KEY `uq_pengumpulan_pair` (`assignment_id`,`student_id`),
@@ -494,6 +506,7 @@ CREATE TABLE `pesan_kontak` (
   `user_agent` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_kontak_status` (`status`),
   KEY `idx_kontak_created` (`created_at`)
@@ -505,6 +518,7 @@ CREATE TABLE `pesan_kontak` (
 DROP TABLE IF EXISTS `berita`;
 CREATE TABLE `berita` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `public_id` char(36) DEFAULT NULL,
   `title` varchar(200) NOT NULL,
   `judul` varchar(200) NOT NULL,
   `slug` varchar(220) NOT NULL,
@@ -512,16 +526,19 @@ CREATE TABLE `berita` (
   `content` mediumtext NOT NULL,
   `isi` mediumtext DEFAULT NULL,
   `image_path` varchar(255) DEFAULT NULL,
+  `cover_path` varchar(255) DEFAULT NULL,
   `gambar` varchar(255) DEFAULT NULL,
   `category` varchar(50) NOT NULL DEFAULT 'Kegiatan',
   `kategori` varchar(50) NOT NULL DEFAULT 'Kegiatan',
   `tags` varchar(255) DEFAULT NULL,
   `status` enum('draft','published','archived') NOT NULL DEFAULT 'published',
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
   `published_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `views_count` int unsigned NOT NULL DEFAULT '0',
   `author_id` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_berita_slug` (`slug`),
   KEY `idx_berita_status_date` (`status`,`published_at`),
@@ -546,6 +563,7 @@ CREATE TABLE `galeri` (
   `uploaded_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_galeri_album` (`album`),
   CONSTRAINT `fk_galeri_user` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -574,6 +592,7 @@ CREATE TABLE `fasilitas` (
   `deleted_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fasilitas_slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -596,6 +615,7 @@ CREATE TABLE `pengumuman` (
   `author_id` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_pengumuman_slug` (`slug`),
   KEY `idx_pengumuman_status` (`status`,`published_at`),
@@ -623,6 +643,7 @@ CREATE TABLE `agenda` (
   `author_id` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_agenda_upcoming` (`status`,`start_at`),
   CONSTRAINT `fk_agenda_author` FOREIGN KEY (`author_id`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -648,6 +669,7 @@ CREATE TABLE `dokumen_ppdb` (
   `uploaded_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_ppdb_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `pengguna` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -667,6 +689,7 @@ CREATE TABLE `halaman` (
   `updated_by` bigint unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_halaman_slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -685,6 +708,7 @@ CREATE TABLE `pengaturan` (
   `is_public` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_settings_key` (`setting_key`),
   KEY `idx_settings_group` (`group_name`,`setting_key`)
@@ -698,12 +722,15 @@ CREATE TABLE `menu` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` bigint unsigned DEFAULT NULL,
   `title` varchar(100) NOT NULL,
+  `label` varchar(100) DEFAULT NULL,
   `url` varchar(255) NOT NULL,
   `target` varchar(20) NOT NULL DEFAULT '_self',
+  `location` varchar(50) NOT NULL DEFAULT 'header',
   `sort_order` int NOT NULL DEFAULT '0',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_menu_parent` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -722,6 +749,7 @@ CREATE TABLE `notifikasi` (
   `is_read` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_notifikasi_user` (`user_id`,`is_read`),
   CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -734,22 +762,48 @@ DROP TABLE IF EXISTS `token_api`;
 CREATE TABLE `token_api` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `public_id` char(36) DEFAULT NULL,
-  `token_hash` varchar(64) NOT NULL,
-  `device_name` varchar(100) DEFAULT NULL,
+  `access_token_hash` char(64) DEFAULT NULL,
+  `refresh_token_hash` char(64) DEFAULT NULL,
+  `token_hash` varchar(64) DEFAULT NULL,
+  `device_name` varchar(120) DEFAULT NULL,
   `platform` varchar(50) DEFAULT 'unknown',
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `access_expires_at` datetime DEFAULT NULL,
+  `refresh_expires_at` datetime DEFAULT NULL,
   `last_used_at` datetime DEFAULT NULL,
-  `expires_at` datetime DEFAULT NULL,
+  `revoked_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_token_hash` (`token_hash`),
-  KEY `idx_token_user` (`user_id`),
+  UNIQUE KEY `uq_token_api_access` (`access_token_hash`),
+  UNIQUE KEY `uq_token_api_refresh` (`refresh_token_hash`),
+  KEY `idx_token_api_user_live` (`user_id`,`revoked_at`,`refresh_expires_at`),
   CONSTRAINT `fk_token_user` FOREIGN KEY (`user_id`) REFERENCES `pengguna` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------------------------
--- 26. TABEL LOG AUDIT (activity_logs)
+-- 26. TABEL LOG AKTIVITAS / AUDIT (activity_logs)
 -- --------------------------------------------------------------------------
+DROP TABLE IF EXISTS `log_aktivitas`;
+CREATE TABLE `log_aktivitas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity` varchar(60) DEFAULT NULL,
+  `entity_type` varchar(60) DEFAULT NULL,
+  `entity_id` bigint unsigned DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_log_user` (`user_id`),
+  KEY `idx_log_action` (`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 DROP TABLE IF EXISTS `log_audit`;
 CREATE TABLE `log_audit` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
