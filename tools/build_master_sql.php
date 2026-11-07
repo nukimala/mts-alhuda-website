@@ -1077,7 +1077,11 @@ foreach ($siswaCsv as $line) {
     }
     if (empty($row[0])) continue;
 
-    $sNo = (int)$row[0];
+    $sCount++;
+    $siswaId = $sCount;
+    $sUserId = 100 + $sCount;
+    $sNis = '2026' . str_pad((string)$sCount, 4, '0', STR_PAD_LEFT);
+
     $sNama = trim($row[1]);
     $sNisn = trim($row[2]);
     $sTempat = trim($row[3]);
@@ -1087,16 +1091,13 @@ foreach ($siswaCsv as $line) {
     $sAlamat = trim($row[7]);
 
     $cId = $classIdMap[$sKelasName] ?? 1;
-    $sUserId = 100 + $sNo;
-    $sNis = '2026' . str_pad((string)$sNo, 4, '0', STR_PAD_LEFT);
 
     $username = 'siswa_' . ($sNisn ?: $sNis);
     $email = $username . '@siswa.mts-alhuda.sch.id';
 
     $siswaUserValues[] = "({$sUserId}, " . esc($username) . ", " . esc($email) . ", '{$defaultPasswordHash}', " . esc($sNama) . ", " . esc($sNama) . ", 'siswa', 'Siswa', NULL, NULL, 1, 0, NOW())";
 
-    $siswaValues[] = "({$sNo}, {$sUserId}, {$cId}, {$cId}, " . esc($sNis) . ", " . esc($sNisn) . ", " . esc($sNama) . ", '{$sJk}', '{$sJk}', " . esc($sTempat) . ", " . esc($sTempat) . ", " . esc($sTgl) . ", " . esc($sTgl) . ", 'Wali Murid', 'Wali Murid', NULL, " . esc($sAlamat) . ", " . esc($sAlamat) . ", NULL, '2026-07-15', 2026, 'aktif', 1, NOW())";
-    $sCount++;
+    $siswaValues[] = "({$siswaId}, {$sUserId}, {$cId}, {$cId}, " . esc($sNis) . ", " . esc($sNisn) . ", " . esc($sNama) . ", '{$sJk}', '{$sJk}', " . esc($sTempat) . ", " . esc($sTempat) . ", " . esc($sTgl) . ", " . esc($sTgl) . ", 'Wali Murid', 'Wali Murid', NULL, " . esc($sAlamat) . ", " . esc($sAlamat) . ", NULL, '2026-07-15', 2026, 'aktif', 1, NOW())";
 }
 
 $sql .= "INSERT INTO `pengguna` (`id`, `username`, `email`, `password_hash`, `name`, `nama`, `role`, `role_label`, `phone`, `telepon`, `is_active`, `must_change_password`, `created_at`) VALUES\n" . implode(",\n", $siswaUserValues) . ";\n\n";
