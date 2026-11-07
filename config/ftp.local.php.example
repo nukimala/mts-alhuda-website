@@ -1,0 +1,17 @@
+<?php
+/**
+ * Konfigurasi Akun FTP untuk Deployment ke Server cPanel.
+ * Salin berkas ini ke config/ftp.local.php dan isi kata sandi.
+ * Berkas ftp.local.php diabaikan oleh git agar sandi aman.
+ */
+
+return [
+    'host'     => 'ftp.shulkhimaulana.my.id',
+    'port'     => 21,
+    'username' => 'admin@shulkhimaulana.my.id',
+    'password' => '', // Masukkan password FTP di sini
+    'ssl'      => true, // Explicit FTPS
+    'passive'  => true,
+    'remote_dir' => '/public_html', // Sesuaikan jika direktori target berbeda (misal /public_html atau /)
+    'timeout'  => 30,
+];

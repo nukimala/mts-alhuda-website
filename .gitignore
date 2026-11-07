@@ -1,5 +1,7 @@
 # Kredensial & konfigurasi lokal
 config/database.local.php
+config/ftp.local.php
+config/*.local.php
 .env
 .env.*
 
