@@ -20,7 +20,7 @@ $otherPosts = $data['other_posts'] ?? [];
                 <span>•</span>
                 <span>✍️ Oleh <?= htmlspecialchars($post['author_name'] ?? 'Humas MTs Al-Huda', ENT_QUOTES, 'UTF-8') ?></span>
                 <span>•</span>
-                <span>👁️ <?= (int) ($post['views'] ?? 0) ?> Kali Dilihat</span>
+                <span>👁️ <?= (int) ($post['views'] ?? $post['views_count'] ?? 0) ?> Kali Dilihat</span>
             </div>
         </div>
     </section>

@@ -71,7 +71,11 @@ class BeritaController
         }
 
         // Tambah view counter
-        $pdo->prepare("UPDATE berita SET views = views + 1 WHERE id = ?")->execute([$post['id']]);
+        try {
+            $pdo->prepare("UPDATE berita SET views_count = views_count + 1, views = views + 1 WHERE id = ?")->execute([$post['id']]);
+        } catch (Throwable $e) {
+            $pdo->prepare("UPDATE berita SET views_count = views_count + 1 WHERE id = ?")->execute([$post['id']]);
+        }
 
         // Berita terbaru lainnya
         $otherStmt = $pdo->prepare("SELECT * FROM berita WHERE id != ? AND status = 'published' AND deleted_at IS NULL ORDER BY published_at DESC LIMIT 3");
