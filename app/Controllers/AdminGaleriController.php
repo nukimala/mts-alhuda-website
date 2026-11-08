@@ -7,13 +7,13 @@ class AdminGaleriController
         Auth::start();
         if (!Auth::check()) {
             header('Location: ' . base_url('admin/login'));
-            exit;
+            exit();
         }
 
         $user = Auth::user();
         if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
             header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
+            exit();
         }
 
         return $user;
@@ -44,7 +44,9 @@ class AdminGaleriController
 
         $whereSql = implode(' AND ', $where);
 
-        $albums = $pdo->query("SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $albums = $pdo->query(
+            "SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC",
+        )->fetchAll(PDO::FETCH_COLUMN);
 
         $stmt = $pdo->prepare("SELECT * FROM galeri WHERE {$whereSql} ORDER BY sort_order ASC, created_at DESC");
         $stmt->execute($params);
@@ -73,7 +75,9 @@ class AdminGaleriController
         $user = $this->guard();
         $pdo = Database::connection();
 
-        $albums = $pdo->query("SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $albums = $pdo->query(
+            "SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC",
+        )->fetchAll(PDO::FETCH_COLUMN);
 
         $data = [
             'title' => 'Tambah Foto Galeri | Panel Admin MTs Al-Huda',
@@ -137,9 +141,11 @@ class AdminGaleriController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("INSERT INTO galeri (album, title, image_path, caption, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt = $pdo->prepare('INSERT INTO galeri (album, title, judul, image_path, caption, sort_order, is_active, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())');
         $stmt->execute([
-            $album !== '' ? $album : null,
+            $album !== '' ? $album : 'Kegiatan Madrasah',
+            $title,
             $title,
             $imagePath,
             $caption !== '' ? $caption : null,
@@ -147,7 +153,13 @@ class AdminGaleriController
             $isActive,
         ]);
 
-        AuditLog::write('galeri.create', 'galeri', (int) $pdo->lastInsertId(), "Menambah foto galeri: {$title}");
+        AuditLog::write(
+            Auth::id(),
+            'galeri.create',
+            'galeri',
+            (int) $pdo->lastInsertId(),
+            "Menambah foto galeri: {$title}",
+        );
 
         $_SESSION['_flash_success'] = 'Foto berhasil ditambahkan ke galeri.';
         header('Location: ' . base_url('admin/galeri'));
@@ -158,17 +170,20 @@ class AdminGaleriController
         $user = $this->guard();
         $pdo = Database::connection();
 
-        $stmt = $pdo->prepare("SELECT * FROM galeri WHERE id = ? AND deleted_at IS NULL");
+        $stmt = $pdo->prepare('SELECT * FROM galeri WHERE id = ? AND deleted_at IS NULL');
         $stmt->execute([$id]);
         $item = $stmt->fetch();
 
         if (!$item) {
             http_response_code(404);
-            (new ErrorController())->notFound();
+            $errorController = new ErrorController();
+            $errorController->notFound();
             return;
         }
 
-        $albums = $pdo->query("SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $albums = $pdo->query(
+            "SELECT DISTINCT album FROM galeri WHERE deleted_at IS NULL AND album IS NOT NULL AND album != '' ORDER BY album ASC",
+        )->fetchAll(PDO::FETCH_COLUMN);
 
         $data = [
             'title' => 'Edit Foto Galeri | Panel Admin MTs Al-Huda',
@@ -197,13 +212,14 @@ class AdminGaleriController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT * FROM galeri WHERE id = ? AND deleted_at IS NULL");
+        $stmt = $pdo->prepare('SELECT * FROM galeri WHERE id = ? AND deleted_at IS NULL');
         $stmt->execute([$id]);
         $item = $stmt->fetch();
 
         if (!$item) {
             http_response_code(404);
-            (new ErrorController())->notFound();
+            $errorController = new ErrorController();
+            $errorController->notFound();
             return;
         }
 
@@ -215,7 +231,7 @@ class AdminGaleriController
         $caption = trim((string) ($_POST['caption'] ?? ''));
         $sortOrder = (int) ($_POST['sort_order'] ?? 0);
         $isActive = isset($_POST['is_active']) ? 1 : 0;
-        $imagePath = trim((string) ($_POST['image_path'] ?? ($item['image_path'] ?? '')));
+        $imagePath = trim((string) ($_POST['image_path'] ?? $item['image_path'] ?? ''));
 
         if ($title === '') {
             $_SESSION['_flash_error'] = 'Judul foto wajib diisi.';
@@ -237,7 +253,9 @@ class AdminGaleriController
             }
         }
 
-        $updateStmt = $pdo->prepare("UPDATE galeri SET album = ?, title = ?, image_path = ?, caption = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+        $updateStmt = $pdo->prepare(
+            'UPDATE galeri SET album = ?, title = ?, image_path = ?, caption = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?',
+        );
         $updateStmt->execute([
             $album !== '' ? $album : null,
             $title,
@@ -248,7 +266,7 @@ class AdminGaleriController
             $id,
         ]);
 
-        AuditLog::write('galeri.update', 'galeri', $id, "Memperbarui foto galeri: {$title}");
+        AuditLog::write(Auth::id(), 'galeri.update', 'galeri', $id, "Memperbarui foto galeri: {$title}");
 
         $_SESSION['_flash_success'] = 'Perubahan foto galeri berhasil disimpan.';
         header('Location: ' . base_url('admin/galeri'));
@@ -265,10 +283,10 @@ class AdminGaleriController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("UPDATE galeri SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
+        $stmt = $pdo->prepare('UPDATE galeri SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL');
         $stmt->execute([$id]);
 
-        AuditLog::write('galeri.delete', 'galeri', $id, "Menghapus foto galeri ID {$id}");
+        AuditLog::write(Auth::id(), 'galeri.delete', 'galeri', $id, "Menghapus foto galeri ID {$id}");
 
         $_SESSION['_flash_success'] = 'Foto berhasil dihapus dari galeri.';
         header('Location: ' . base_url('admin/galeri'));
