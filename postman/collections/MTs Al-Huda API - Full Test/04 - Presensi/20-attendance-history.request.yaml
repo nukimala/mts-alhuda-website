@@ -1,0 +1,32 @@
+$kind: http-request
+name: '20. Riwayat presensi'
+method: GET
+url: '{{baseUrl}}/attendance/history?month=2026-11&type=all'
+order: 2000
+queryParams:
+  - key: month
+    value: '2026-11'
+  - key: type
+    value: all
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      const now = new Date();
+      const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      pm.request.url.query.upsert({ key: 'month', value: month });
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const role = pm.collectionVariables.get('userRole');
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      if (!role) {
+        pm.test('Dilewati: role belum diketahui', () => pm.expect(true).to.eql(true));
+      } else if (role === 'guru') {
+        pm.test('Status 200 untuk guru', () => pm.response.to.have.status(200));
+        pm.test('summary ada', () => pm.expect(body.data && body.data.summary).to.be.an('object'));
+        pm.test('items array', () => pm.expect(body.data && body.data.items).to.be.an('array'));
+      } else {
+        pm.test('Status 403 untuk non-guru', () => pm.response.to.have.status(403));
+      }

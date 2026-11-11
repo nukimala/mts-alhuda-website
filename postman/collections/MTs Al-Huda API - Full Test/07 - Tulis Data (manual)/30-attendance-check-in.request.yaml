@@ -1,0 +1,37 @@
+$kind: http-request
+name: '30. Presensi masuk (menulis data)'
+method: POST
+url: '{{baseUrl}}/attendance/check-in'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "type": "daily",
+      "latitude": -7.562345,
+      "longitude": 111.890123,
+      "note": "Uji Postman - hapus jika tidak dipakai"
+    }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (pm.environment.get('allowWrites') !== 'true') {
+        pm.test('Dilewati: allowWrites=false', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('201 dibuat atau 422 sudah check-in', () => pm.expect([201, 422]).to.include(pm.response.code));
+      if (pm.response.code === 201) {
+        pm.test('status hadir/terlambat', () => pm.expect(['hadir', 'terlambat']).to.include(body.data.status));
+        pm.test('method self', () => pm.expect(body.data.method).to.eql('self'));
+      } else {
+        pm.test('kode ALREADY_CHECKED_IN', () => pm.expect(body.error && body.error.code).to.eql('ALREADY_CHECKED_IN'));
+      }

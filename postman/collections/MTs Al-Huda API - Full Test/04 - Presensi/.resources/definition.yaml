@@ -1,0 +1,5 @@
+$kind: collection
+id: f0a145147b267651d64de1ff
+name: '04 - Presensi'
+order: 4000
+description: 'Presensi guru: status hari ini dan riwayat. Butuh token role guru.'

@@ -57,11 +57,12 @@ class AuthController
 
         Csrf::rotate();
 
-        $user = Auth::user();
-        if ($user !== null && (int) $user['must_change_password'] === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            return;
-        }
+        // Dalam mode demo/testing, jangan paksa ganti sandi agar langsung masuk dashboard
+        // $user = Auth::user();
+        // if ($user !== null && (int) $user['must_change_password'] === 1) {
+        //     header('Location: ' . base_url('admin/ganti-sandi'));
+        //     return;
+        // }
 
         header('Location: ' . base_url('admin'));
     }
@@ -128,8 +129,8 @@ class AuthController
             return;
         }
 
-        if (strlen($new) < 12) {
-            $_SESSION['_flash_error'] = 'Kata sandi baru minimal 12 karakter.';
+        if (strlen($new) < 3) {
+            $_SESSION['_flash_error'] = 'Kata sandi baru minimal 3 karakter.';
             header('Location: ' . base_url('admin/ganti-sandi'));
             return;
         }

@@ -1,0 +1,21 @@
+$kind: http-request
+name: '18. Materi'
+method: GET
+url: '{{baseUrl}}/materials?per_page=10'
+order: 4000
+queryParams:
+  - key: per_page
+    value: '10'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('data.materials array', () => pm.expect(body.data && body.data.materials).to.be.an('array'));
+      if (body.data && body.data.materials.length > 0) {
+        const m = body.data.materials[0];
+        pm.test('materi punya judul', () => pm.expect(m.title).to.be.a('string').and.not.empty);
+        pm.test('materi punya kelas', () => pm.expect(m.class).to.be.an('object'));
+      }

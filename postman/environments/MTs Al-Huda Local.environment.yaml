@@ -1,0 +1,22 @@
+name: MTs Al-Huda Local
+values:
+  - key: baseUrl
+    value: 'http://localhost/mts-alhuda-website/api/v1'
+    enabled: true
+    type: default
+    description: Base URL API server lokal (Laragon).
+  - key: username
+    value: 'guru'
+    enabled: true
+    type: default
+    description: Akun demo lokal (guru/siswa/operator).
+  - key: password
+    value: '123'
+    enabled: true
+    type: secret
+    description: Password akun demo lokal.
+  - key: allowWrites
+    value: 'false'
+    enabled: true
+    type: default
+    description: Set 'true' hanya jika ingin menjalankan folder 07 (menulis data lokal).

@@ -119,7 +119,7 @@ $ppdbContact = $settings['ppdb_contact'] ?? '(0358) 123456 / 0812-3456-7890';
                                         <?= htmlspecialchars($doc['title']) ?>
                                     </strong>
                                     <span style="font-size: 12px; color: #64748B;">
-                                        <?= htmlspecialchars($doc['category'] ?? 'Dokumen Resmi') ?> &middot; <?= (int) ($doc['download_count'] ?? 0) ?>x diunduh
+                                        <?= htmlspecialchars($doc['mime_type'] ?? 'Dokumen Resmi') ?> &middot; <?= (int) ($doc['download_count'] ?? 0) ?>x diunduh
                                     </span>
                                 </div>
                                 <a href="<?= base_url($doc['file_path']) ?>" target="_blank" download class="btn btn-secondary" style="min-height: 38px; padding: 6px 14px; font-size: 12.5px; white-space: nowrap;">

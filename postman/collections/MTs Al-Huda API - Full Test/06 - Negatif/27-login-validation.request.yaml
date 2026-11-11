@@ -1,0 +1,25 @@
+$kind: http-request
+name: '27. Login body kosong (422)'
+method: POST
+url: '{{baseUrl}}/auth/login'
+order: 4000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: '{}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 422', () => pm.response.to.have.status(422));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode VALIDATION_ERROR', () => pm.expect(body.error && body.error.code).to.eql('VALIDATION_ERROR'));
+      pm.test('detail identifier dan password', () => {
+        pm.expect(body.error.details).to.have.property('identifier');
+        pm.expect(body.error.details).to.have.property('password');
+      });

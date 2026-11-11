@@ -49,7 +49,8 @@ class AdminController
             'siswa'           => $this->count($pdo, 'pengguna', "role = 'siswa' AND deleted_at IS NULL"),
             'berita'          => $this->count($pdo, 'berita', "status = 'published'"),
             'presensi'        => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE()"),
-            'presensi_mobile' => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE() AND method = 'self'"),
+            // Kolom `method` tidak ada di skema produksi; presensi mandiri (mobile) ditandai verified_by NULL.
+            'presensi_mobile' => $this->count($pdo, 'presensi_guru', "attendance_date = CURDATE() AND verified_by IS NULL"),
             'jadwal'          => $this->count($pdo, 'jadwal', "is_active = 1"),
             'tugas'           => $this->count($pdo, 'tugas', "is_published = 1"),
             'tokens'          => $this->count($pdo, 'token_api', "revoked_at IS NULL"),

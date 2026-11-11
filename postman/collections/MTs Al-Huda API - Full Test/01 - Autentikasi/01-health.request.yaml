@@ -1,0 +1,20 @@
+$kind: http-request
+name: '01. Health check'
+method: GET
+url: '{{baseUrl}}/health'
+order: 1000
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('success true', () => pm.expect(body.success).to.eql(true));
+      if (body.data) {
+        pm.test('status server ok', () => pm.expect(body.data.status).to.eql('ok'));
+        pm.test('database terhubung', () => pm.expect(body.data.database).to.eql('terhubung'));
+        pm.test('versi migrasi terbaca', () => pm.expect(body.data.migrasi).to.be.a('number'));
+      }

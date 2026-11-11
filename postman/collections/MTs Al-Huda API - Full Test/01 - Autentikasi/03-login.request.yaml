@@ -1,0 +1,50 @@
+$kind: http-request
+name: '03. Login (simpan token)'
+method: POST
+url: '{{baseUrl}}/auth/login'
+order: 3000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "identifier": "{{username}}",
+      "password": "{{password}}",
+      "device_name": "Postman - Full Test",
+      "platform": "android"
+    }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      const u = pm.environment.get('username');
+      const p = pm.environment.get('password');
+      pm.test('username terisi di environment', () => pm.expect(u, 'Isi username di environment').to.be.a('string').and.not.empty);
+      pm.test('password terisi di environment', () => pm.expect(p, 'Isi password di environment').to.be.a('string').and.not.empty);
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Login sukses (200)', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('success true', () => pm.expect(body.success).to.eql(true));
+      const tokens = body.data && body.data.tokens ? body.data.tokens : null;
+      pm.test('pasangan token diterbitkan', () => {
+        pm.expect(tokens).to.be.an('object');
+        pm.expect(tokens.access_token).to.be.a('string').and.not.empty;
+        pm.expect(tokens.refresh_token).to.be.a('string').and.not.empty;
+        pm.expect(tokens.token_type).to.eql('Bearer');
+      });
+      if (tokens) {
+        pm.collectionVariables.set('accessToken', tokens.access_token);
+        pm.collectionVariables.set('refreshToken', tokens.refresh_token);
+      }
+      if (body.data && body.data.user) {
+        pm.collectionVariables.set('userRole', body.data.user.role);
+        pm.test('role pengguna terisi', () => pm.expect(body.data.user.role).to.be.a('string').and.not.empty);
+        pm.test('must_change_password berupa boolean', () => pm.expect(body.data.user.must_change_password).to.be.a('boolean'));
+      }

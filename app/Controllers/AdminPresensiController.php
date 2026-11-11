@@ -139,29 +139,50 @@ class AdminPresensiController
 
         $pdo = Database::connection();
 
-        $stmt = $pdo->prepare("INSERT INTO presensi_guru (teacher_id, schedule_id, attendance_date, attendance_type, check_in_at, check_out_at, status, note, method, verified_by, verified_at, created_at, updated_at) 
-                               VALUES (?, NULL, ?, 'daily', ?, ?, ?, ?, 'operator', ?, NOW(), NOW(), NOW())
-                               ON DUPLICATE KEY UPDATE 
-                               check_in_at = VALUES(check_in_at), 
-                               check_out_at = VALUES(check_out_at), 
-                               status = VALUES(status), 
-                               note = VALUES(note), 
-                               method = 'operator', 
-                               verified_by = VALUES(verified_by), 
-                               verified_at = NOW(), 
-                               updated_at = NOW()");
+        // Skema produksi: `notes` (bukan `note`), tidak ada `method`/`verified_at`.
+        $jamMasuk = $checkInTime !== '' ? $checkInTime . ':00' : null;
+        $jamPulang = $checkOutTime !== '' ? $checkOutTime . ':00' : null;
+        $noteValue = $note !== '' ? $note : null;
+        $verifiedBy = $currentUser['id'] ?? null;
 
-        $stmt->execute([
-            $teacherId,
-            $date,
-            $checkInAt,
-            $checkOutAt,
-            $status,
-            $note !== '' ? $note : null,
-            $currentUser['id'] ?? null,
-        ]);
+        $existingStmt = $pdo->prepare("SELECT id FROM presensi_guru WHERE teacher_id = ? AND attendance_date = ? AND attendance_type = 'daily' AND deleted_at IS NULL LIMIT 1");
+        $existingStmt->execute([$teacherId, $date]);
+        $existingId = $existingStmt->fetchColumn();
 
-        AuditLog::write('attendance.correct', 'presensi_guru', $teacherId, "Koreksi manual presensi guru ID {$teacherId} tanggal {$date} ({$status})");
+        if ($existingId) {
+            $stmt = $pdo->prepare("UPDATE presensi_guru SET guru_id = ?, tanggal = ?, check_in_at = ?, jam_masuk = ?, check_out_at = ?, jam_pulang = ?, status = ?, notes = ?, keterangan = ?, verified_by = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([
+                $teacherId,
+                $date,
+                $checkInAt,
+                $jamMasuk,
+                $checkOutAt,
+                $jamPulang,
+                $status,
+                $noteValue,
+                $noteValue,
+                $verifiedBy,
+                $existingId,
+            ]);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO presensi_guru (teacher_id, guru_id, attendance_date, tanggal, attendance_type, check_in_at, jam_masuk, check_out_at, jam_pulang, status, notes, keterangan, verified_by, created_at, updated_at) VALUES (?, ?, ?, ?, 'daily', ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            $stmt->execute([
+                $teacherId,
+                $teacherId,
+                $date,
+                $date,
+                $checkInAt,
+                $jamMasuk,
+                $checkOutAt,
+                $jamPulang,
+                $status,
+                $noteValue,
+                $noteValue,
+                $verifiedBy,
+            ]);
+        }
+
+        Auth::log('attendance.correct', 'presensi_guru', $teacherId, "Koreksi manual presensi guru ID {$teacherId} tanggal {$date} ({$status})");
 
         $_SESSION['_flash_success'] = 'Data presensi berhasil dicatat/diperbarui.';
         header('Location: ' . base_url('admin/presensi?date=' . $date));

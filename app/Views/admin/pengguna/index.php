@@ -216,7 +216,6 @@ $classes = $data['classes'] ?? [];
                         <option value="siswa">Siswa (Aplikasi MADRASAHKU)</option>
                         <option value="operator">Operator Madrasah (Web Admin)</option>
                         <option value="kepala">Kepala Madrasah (Web Admin)</option>
-                        <option value="akreditasi">Tim Akreditasi IA2024</option>
                         <option value="admin">Administrator (Super Admin)</option>
                     </select>
                 </div>

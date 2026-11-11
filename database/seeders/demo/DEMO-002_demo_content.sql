@@ -20,16 +20,15 @@
 -- @UP
 
 -- --- Pengguna contoh -------------------------------------------------------
--- Sandi kedua akun di bawah: Contoh#AlHuda2026
--- must_change_password = 1 — wajib diganti sebelum dipakai sungguhan.
+-- Sandi semua akun demo: 123
 INSERT INTO `pengguna` (name, email, username, password_hash, role, role_label, is_active, must_change_password)
 VALUES
     ('Operator Contoh', 'operator@contoh.local', 'operator',
-     '$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK',
-     'operator', 'Operator Madrasah', 1, 1),
+     '$2y$10$9dqguLxZXHpljGbpJxsRvONLl/UWk2lutMBSfARhaNd7.CRWi/lcO',
+     'operator', 'Operator Madrasah', 1, 0),
     ('Guru Contoh', 'guru@contoh.local', 'guru',
-     '$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK',
-     'guru', 'Guru', 1, 1)
+     '$2y$10$9dqguLxZXHpljGbpJxsRvONLl/UWk2lutMBSfARhaNd7.CRWi/lcO',
+     'guru', 'Guru', 1, 0)
 ON DUPLICATE KEY UPDATE name = VALUES(name), role = VALUES(role);
 
 -- --- Tahun ajaran & kelas contoh ------------------------------------------
@@ -78,12 +77,12 @@ FROM `pengguna` u
 WHERE u.username = 'guru'
   AND NOT EXISTS (SELECT 1 FROM `guru` t WHERE t.user_id = u.id);
 
--- Akun siswa contoh. Sandi sama dengan akun contoh lain.
+-- Akun siswa contoh. Sandi: 123
 INSERT INTO `pengguna` (name, email, username, password_hash, role, role_label, is_active, must_change_password)
 VALUES
     ('Siswa Contoh', 'siswa@contoh.local', 'siswa',
-     '$2y$10$f.KFnsTga..ZEw2LIIebXuY4TeZ/hKuuyDNc93i1JaIkCOtdFU.UK',
-     'siswa', 'Siswa', 1, 1)
+     '$2y$10$9dqguLxZXHpljGbpJxsRvONLl/UWk2lutMBSfARhaNd7.CRWi/lcO',
+     'siswa', 'Siswa', 1, 0)
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 INSERT INTO `siswa` (user_id, nis, gender, class_id, enrolled_at, is_active)

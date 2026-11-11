@@ -1,0 +1,18 @@
+$kind: http-request
+name: '25. /me token palsu (401)'
+method: GET
+url: '{{baseUrl}}/me'
+order: 2000
+auth:
+  type: noauth
+headers:
+  - key: Authorization
+    value: 'Bearer token-palsu-1234567890'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 401', () => pm.response.to.have.status(401));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode UNAUTHORIZED', () => pm.expect(body.error && body.error.code).to.eql('UNAUTHORIZED'));

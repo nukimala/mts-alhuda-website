@@ -154,7 +154,7 @@ $inactiveFac = $totalFac - $activeFac;
                 <!-- Body Content -->
                 <div style="padding:16px 18px;flex:1;display:flex;flex-direction:column">
                     <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">
-                        <?= htmlspecialchars($fac['icon'] ?? 'Gedung / Sarpras', ENT_QUOTES, 'UTF-8') ?>
+                        <?= htmlspecialchars($fac['category'] ?? $fac['icon'] ?? 'Gedung / Sarpras', ENT_QUOTES, 'UTF-8') ?>
                     </div>
                     <h3 style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.35">
                         <?= htmlspecialchars($fac['name'], ENT_QUOTES, 'UTF-8') ?>
@@ -224,7 +224,7 @@ $inactiveFac = $totalFac - $activeFac;
                                 </div>
                             </div>
                         </td>
-                        <td><span class="pill gray plain"><?= htmlspecialchars($fac['icon'] ?? 'Gedung', ENT_QUOTES, 'UTF-8') ?></span></td>
+                        <td><span class="pill gray plain"><?= htmlspecialchars($fac['category'] ?? $fac['icon'] ?? 'Gedung', ENT_QUOTES, 'UTF-8') ?></span></td>
                         <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="<?= htmlspecialchars($fac['description'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                             <?= htmlspecialchars($fac['description'] ?? '-', ENT_QUOTES, 'UTF-8') ?>
                         </td>

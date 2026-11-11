@@ -1,0 +1,5 @@
+$kind: collection
+id: 6400f4be27deba62ff1b52fb
+name: '06 - Negatif'
+order: 6000
+description: 'Uji 401, 404, 405, 422. Tidak menulis data.'

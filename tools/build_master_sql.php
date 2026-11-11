@@ -22,10 +22,9 @@ $dataGuru = require $ROOT . '/tools/data_guru_list.php';
 $dataJadwal = require $ROOT . '/tools/data_jadwal_matrix.php';
 $siswaCsv = file($ROOT . '/tools/data_siswa_list.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-// Password default untuk guru & siswa: 'MtsAlhuda#2026'
-$defaultPasswordHash = password_hash('MtsAlhuda#2026', PASSWORD_BCRYPT);
-// Password admin: 'Admin#2026'
-$adminPasswordHash = password_hash('Admin#2026', PASSWORD_BCRYPT);
+// Password default untuk guru, siswa, admin: '123' (hash BCrypt untuk testing/demo)
+$defaultPasswordHash = '$2y$10$9dqguLxZXHpljGbpJxsRvONLl/UWk2lutMBSfARhaNd7.CRWi/lcO';
+$adminPasswordHash = '$2y$10$9dqguLxZXHpljGbpJxsRvONLl/UWk2lutMBSfARhaNd7.CRWi/lcO';
 
 function esc($str): string {
     if ($str === null) return "NULL";

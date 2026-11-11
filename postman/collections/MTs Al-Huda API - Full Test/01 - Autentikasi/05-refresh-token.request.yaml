@@ -1,0 +1,38 @@
+$kind: http-request
+name: '05. Refresh token (rotasi)'
+method: POST
+url: '{{baseUrl}}/auth/refresh'
+order: 5000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    { "refresh_token": "{{refreshToken}}" }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      pm.collectionVariables.set('oldRefreshToken', pm.collectionVariables.get('refreshToken') || '');
+      pm.test('refresh token tersedia', () => pm.expect(pm.collectionVariables.get('refreshToken'), 'Jalankan Login dulu').to.be.a('string').and.not.empty);
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      const tokens = body.data && body.data.tokens ? body.data.tokens : null;
+      pm.test('token baru diterbitkan', () => {
+        pm.expect(tokens).to.be.an('object');
+        pm.expect(tokens.access_token).to.be.a('string').and.not.empty;
+        pm.expect(tokens.refresh_token).to.be.a('string').and.not.empty;
+      });
+      if (tokens) {
+        pm.test('access token berubah', () => pm.expect(tokens.access_token).to.not.eql(pm.collectionVariables.get('accessToken')));
+        pm.test('refresh token berubah', () => pm.expect(tokens.refresh_token).to.not.eql(pm.collectionVariables.get('oldRefreshToken')));
+        pm.collectionVariables.set('accessToken', tokens.access_token);
+        pm.collectionVariables.set('refreshToken', tokens.refresh_token);
+      }

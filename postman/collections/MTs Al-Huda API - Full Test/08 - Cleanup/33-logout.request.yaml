@@ -1,0 +1,19 @@
+$kind: http-request
+name: '33. Logout'
+method: POST
+url: '{{baseUrl}}/auth/logout'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: '{}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('pesan keluar', () => pm.expect(body.data && body.data.message).to.be.a('string').and.not.empty);

@@ -203,10 +203,10 @@ cmd /c "mysql -u root -p < database/mts_alhuda.sql"
 
 | Akun | Username | Sandi |
 |---|---|---|
-| Admin | `admin` | `Admin#AlHuda2026` — wajib diganti saat login pertama |
-| Operator | `operator` | `Contoh#AlHuda2026` |
-| Guru | `guru` | `Contoh#AlHuda2026` |
-| Siswa | `siswa` | `Contoh#AlHuda2026` |
+| Admin | `admin` | `123` (semua akun demo disederhanakan ke `123`) |
+| Operator | `operator` | `123` |
+| Guru | `guru` | `123` |
+| Siswa | `siswa` | `123` |
 
 Kalau `config/database.php` Anda memakai nama database lain, ubah baris `USE`
 di berkas itu sebelum impor.
@@ -230,8 +230,8 @@ sederhana: `seed` dipakai juga di server sungguhan, dan data contoh di sana buka
 berisik — bisa tertukar dengan data asli. Halaman berita yang berisi "Contoh Berita Pertama"
 di website madrasah yang sudah jalan adalah kesalahan yang sulit ditarik kembali.
 
-Akun contoh (`operator`, `guru`, sandi `Contoh#AlHuda2026`) semuanya
-`must_change_password = 1`.
+Akun contoh (`admin`, `operator`, `guru`, `siswa`, sandi `123`) semuanya
+sudah siap pakai langsung tanpa paksaan ganti kata sandi.
 
 ### Seeder hanya menjalankan bagian `@UP`
 

@@ -18,39 +18,46 @@ class RateLimiter
     {
         try {
             $pdo = Database::connection();
+            $now = time();
 
-            $pdo->prepare(
-                'DELETE FROM batas_akses WHERE expires_at < NOW() LIMIT 500'
-            )->execute();
+            // Kolom waktu di `batas_akses` produksi bertipe INT (epoch Unix),
+            // bukan DATETIME. Membandingkan dengan NOW() akan error.
+            $pdo->exec('DELETE FROM batas_akses WHERE expires_at < ' . (int) $now . ' LIMIT 500');
 
+            // Skema produksi memakai `tokens`/`last_replenished_at`, bukan `attempts`.
             $stmt = $pdo->prepare(
-                'SELECT attempts, expires_at FROM batas_akses WHERE bucket = ? LIMIT 1'
+                'SELECT tokens, expires_at FROM batas_akses WHERE bucket = ? LIMIT 1'
             );
             $stmt->execute([$key]);
             $row = $stmt->fetch();
 
+            $remaining = max(0, $maxAttempts - 1);
+
             if ($row === false) {
                 $pdo->prepare(
-                    'INSERT INTO batas_akses (bucket, attempts, expires_at)
-                     VALUES (?, 1, DATE_ADD(NOW(), INTERVAL ? SECOND))
-                     ON DUPLICATE KEY UPDATE attempts = 1, expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)'
-                )->execute([$key, $windowSeconds, $windowSeconds]);
+                    'INSERT INTO batas_akses (bucket, tokens, last_replenished_at, expires_at)
+                     VALUES (?, ?, ?, ?)
+                     ON DUPLICATE KEY UPDATE tokens = VALUES(tokens), last_replenished_at = VALUES(last_replenished_at), expires_at = VALUES(expires_at)'
+                )->execute([$key, $remaining, $now, $now + $windowSeconds]);
 
-                return ['allowed' => true, 'remaining' => $maxAttempts - 1, 'retry_after' => 0];
+                return ['allowed' => true, 'remaining' => $remaining, 'retry_after' => 0];
             }
 
-            if ((int) $row['attempts'] >= $maxAttempts) {
-                $retry = max(0, (int) (strtotime((string) $row['expires_at']) - time()));
-
-                return ['allowed' => false, 'remaining' => 0, 'retry_after' => $retry];
+            if ((float) $row['tokens'] <= 0) {
+                return [
+                    'allowed'     => false,
+                    'remaining'   => 0,
+                    'retry_after' => max(0, (int) $row['expires_at'] - $now),
+                ];
             }
 
-            $pdo->prepare('UPDATE batas_akses SET attempts = attempts + 1 WHERE bucket = ?')
-                ->execute([$key]);
+            $pdo->prepare(
+                'UPDATE batas_akses SET tokens = GREATEST(tokens - 1, 0), last_replenished_at = ? WHERE bucket = ?'
+            )->execute([$now, $key]);
 
             return [
                 'allowed'     => true,
-                'remaining'   => max(0, $maxAttempts - (int) $row['attempts'] - 1),
+                'remaining'   => max(0, (int) $row['tokens'] - 1),
                 'retry_after' => 0,
             ];
         } catch (PDOException $e) {

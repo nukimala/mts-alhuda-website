@@ -1,0 +1,5 @@
+$kind: collection
+id: f2439ebf2363c48e5bbd4eac
+name: '05 - Notifikasi'
+order: 5000
+description: 'Daftar notifikasi dan penandaan dibaca. Butuh token.'

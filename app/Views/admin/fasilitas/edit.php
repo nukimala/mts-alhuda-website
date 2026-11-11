@@ -36,7 +36,7 @@ $old = $data['old'] ?? [];
 
         <div class="field">
             <label for="icon">Ikon / Kategori</label>
-            <input type="text" id="icon" name="icon" value="<?= htmlspecialchars($old['icon'] ?? $facility['icon'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            <input type="text" id="icon" name="icon" value="<?= htmlspecialchars($old['icon'] ?? $facility['category'] ?? $facility['icon'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
             <div class="hint">Nama penanda ikon atau kelompok ruangan</div>
         </div>
 

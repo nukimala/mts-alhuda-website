@@ -1,0 +1,27 @@
+$kind: http-request
+name: '09. Detail berita'
+method: GET
+url: '{{baseUrl}}/posts/{{postSlug}}'
+order: 2000
+auth:
+  type: noauth
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (!pm.collectionVariables.get('postSlug')) {
+        pm.test('Dilewati: belum ada slug berita', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      const post = body.data ? body.data.post : null;
+      pm.test('post ada', () => pm.expect(post).to.be.an('object'));
+      if (post) {
+        pm.test('slug sesuai', () => pm.expect(post.slug).to.eql(pm.collectionVariables.get('postSlug')));
+        pm.test('content terisi', () => pm.expect(post.content).to.be.a('string').and.not.empty);
+      }

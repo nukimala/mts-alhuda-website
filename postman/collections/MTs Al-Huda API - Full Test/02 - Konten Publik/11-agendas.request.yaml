@@ -1,0 +1,19 @@
+$kind: http-request
+name: '11. Agenda'
+method: GET
+url: '{{baseUrl}}/agendas?per_page=5'
+order: 4000
+queryParams:
+  - key: per_page
+    value: '5'
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('data.agenda array', () => pm.expect(body.data && body.data.agenda).to.be.an('array'));
+      pm.test('meta total angka', () => pm.expect(body.meta && body.meta.total).to.be.a('number'));

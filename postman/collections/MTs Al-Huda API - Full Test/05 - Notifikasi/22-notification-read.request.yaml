@@ -1,0 +1,30 @@
+$kind: http-request
+name: '22. Tandai satu notifikasi dibaca'
+method: POST
+url: '{{baseUrl}}/notifications/{{notificationId}}/read'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: '{}'
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (pm.environment.get('allowWrites') !== 'true') {
+        pm.test('Dilewati: allowWrites=false', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+      if (!pm.collectionVariables.get('notificationId')) {
+        pm.test('Dilewati: tidak ada notifikasi', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('pesan sukses', () => pm.expect(body.data && body.data.message).to.be.a('string').and.not.empty);

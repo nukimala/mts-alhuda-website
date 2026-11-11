@@ -1,0 +1,13 @@
+$kind: http-request
+name: '06. /me setelah refresh'
+method: GET
+url: '{{baseUrl}}/me'
+order: 6000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Access token baru berlaku (200)', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('user terbaca', () => pm.expect(body.data && body.data.user).to.be.an('object'));

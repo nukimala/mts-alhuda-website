@@ -89,7 +89,7 @@ class ApiAttendanceController
 
         // 2. Presensi Harian Hari Ini
         $dailyStmt = $pdo->prepare(
-            "SELECT id, attendance_date, attendance_type, check_in_at, check_out_at, status, note, method
+            "SELECT id, attendance_date, attendance_type, check_in_at, check_out_at, status, notes
              FROM presensi_guru
              WHERE teacher_id = ? AND attendance_date = ? AND attendance_type = 'daily'
              LIMIT 1"
@@ -105,8 +105,8 @@ class ApiAttendanceController
                 'check_in_at'  => ApiFormat::iso($dailyRecord['check_in_at']),
                 'check_out_at' => ApiFormat::iso($dailyRecord['check_out_at']),
                 'status'       => $dailyRecord['status'],
-                'method'       => $dailyRecord['method'],
-                'note'         => $dailyRecord['note'],
+                'method'       => 'self',
+                'note'         => $dailyRecord['notes'],
                 'has_checked_in'  => !empty($dailyRecord['check_in_at']),
                 'has_checked_out' => !empty($dailyRecord['check_out_at']),
             ];
@@ -117,7 +117,7 @@ class ApiAttendanceController
             "SELECT s.id, s.start_time, s.end_time, s.room,
                     c.name AS class_name, c.level AS class_level,
                     sub.code AS subject_code, sub.name AS subject_name,
-                    p.id AS attendance_id, p.check_in_at, p.status AS attendance_status, p.note AS attendance_note
+                    p.id AS attendance_id, p.check_in_at, p.status AS attendance_status, p.notes AS attendance_note
              FROM jadwal s
              JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
              JOIN kelas c ON c.id = cs.class_id
@@ -246,8 +246,8 @@ class ApiAttendanceController
 
             $insertStmt = $pdo->prepare(
                 "INSERT INTO presensi_guru
-                    (teacher_id, schedule_id, attendance_date, attendance_type, check_in_at, status, note, method, created_at, updated_at)
-                 VALUES (?, NULL, ?, 'daily', ?, ?, ?, 'self', NOW(), NOW())"
+                    (teacher_id, schedule_id, attendance_date, attendance_type, check_in_at, status, notes, created_at, updated_at)
+                 VALUES (?, NULL, ?, 'daily', ?, ?, ?, NOW(), NOW())"
             );
             $insertStmt->execute([
                 $teacherId,
@@ -327,8 +327,8 @@ class ApiAttendanceController
 
         $insertStmt = $pdo->prepare(
             "INSERT INTO presensi_guru
-                (teacher_id, schedule_id, attendance_date, attendance_type, check_in_at, status, note, method, created_at, updated_at)
-             VALUES (?, ?, ?, 'session', ?, ?, ?, 'self', NOW(), NOW())"
+                (teacher_id, schedule_id, attendance_date, attendance_type, check_in_at, status, notes, created_at, updated_at)
+             VALUES (?, ?, ?, 'session', ?, ?, ?, NOW(), NOW())"
         );
         $insertStmt->execute([
             $teacherId,
@@ -473,7 +473,7 @@ class ApiAttendanceController
         $page = ApiFormat::paginate();
         $listStmt = $pdo->prepare(
             "SELECT p.id, p.attendance_date, p.attendance_type, p.check_in_at, p.check_out_at,
-                    p.status, p.note, p.method,
+                    p.status, p.notes,
                     s.start_time, s.end_time, s.room,
                     sub.name AS subject_name, c.name AS class_name
              FROM presensi_guru p
@@ -497,8 +497,8 @@ class ApiAttendanceController
                 'check_in_at'     => ApiFormat::iso($r['check_in_at']),
                 'check_out_at'    => ApiFormat::iso($r['check_out_at']),
                 'status'          => $r['status'],
-                'method'          => $r['method'],
-                'note'            => $r['note'],
+                'method'          => 'self',
+                'note'            => $r['notes'],
                 'schedule'        => $r['attendance_type'] === 'session' ? [
                     'subject'    => $r['subject_name'],
                     'class'      => $r['class_name'],

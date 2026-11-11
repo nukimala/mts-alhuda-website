@@ -132,18 +132,24 @@ class AdminPenggunaController
             return;
         }
 
-        if (!in_array($role, ['admin', 'operator', 'kepala', 'guru', 'siswa', 'akreditasi'], true)) {
+        // Enum `pengguna.role` di produksi hanya: admin, operator, kepala, guru, siswa.
+        // 'akreditasi' tidak ada di enum, jadi dipetakan ke operator agar INSERT tidak ditolak.
+        if ($role === 'akreditasi') {
+            $role = 'operator';
+        }
+
+        if (!in_array($role, ['admin', 'operator', 'kepala', 'guru', 'siswa'], true)) {
             $role = 'guru';
         }
 
         if ($password === '') {
-            $password = 'Contoh#AlHuda2026';
+            $password = '123';
         }
 
         $pdo = Database::connection();
 
-        // Cek keunikan email
-        $check = $pdo->prepare("SELECT COUNT(*) FROM pengguna WHERE email = ? AND deleted_at IS NULL");
+        // `uq_pengguna_email` berlaku untuk semua baris (termasuk yang di-soft-delete).
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pengguna WHERE email = ?");
         $check->execute([$email]);
         if ((int) $check->fetchColumn() > 0) {
             $_SESSION['_flash_error'] = 'Email sudah digunakan oleh pengguna lain.';
@@ -153,7 +159,7 @@ class AdminPenggunaController
 
         // Cek keunikan username jika diisi
         if ($username !== '') {
-            $checkU = $pdo->prepare("SELECT COUNT(*) FROM pengguna WHERE username = ? AND deleted_at IS NULL");
+            $checkU = $pdo->prepare("SELECT COUNT(*) FROM pengguna WHERE username = ?");
             $checkU->execute([$username]);
             if ((int) $checkU->fetchColumn() > 0) {
                 $_SESSION['_flash_error'] = 'Nama pengguna (username) sudah digunakan.';
@@ -166,11 +172,22 @@ class AdminPenggunaController
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
+        $gender = in_array($_POST['gender'] ?? 'L', ['L', 'P'], true) ? (string) $_POST['gender'] : 'L';
+        $classId = !empty($_POST['class_id']) && (int) $_POST['class_id'] > 0 ? (int) $_POST['class_id'] : null;
+
+        // Siswa wajib punya kelas (kolom siswa.class_id NOT NULL di skema produksi).
+        if ($role === 'siswa' && $classId === null) {
+            $_SESSION['_flash_error'] = 'Kelas wajib dipilih untuk akun siswa.';
+            header('Location: ' . base_url('admin/pengguna'));
+            return;
+        }
+
         $pdo->beginTransaction();
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO pengguna (name, email, username, password_hash, role, is_active, must_change_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, 1, NOW(), NOW())");
+            $stmt = $pdo->prepare("INSERT INTO pengguna (name, nama, email, username, password_hash, role, is_active, must_change_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 1, 0, NOW(), NOW())");
             $stmt->execute([
+                $name,
                 $name,
                 $email,
                 $username,
@@ -180,40 +197,28 @@ class AdminPenggunaController
 
             $newUserId = (int) $pdo->lastInsertId();
 
-            // Generator public_id UUID v4
-            $uuid = sprintf(
-                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-                mt_rand(0, 0xffff),
-                mt_rand(0, 0x0fff) | 0x4000,
-                mt_rand(0, 0x3fff) | 0x8000,
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-            );
-
             // Jika role Guru, buat record di tabel guru
             if ($role === 'guru') {
                 $nip = !empty($_POST['nip']) ? trim((string) $_POST['nip']) : null;
                 $nuptk = !empty($_POST['nuptk']) ? trim((string) $_POST['nuptk']) : null;
                 $specialty = !empty($_POST['subject_specialty']) ? trim((string) $_POST['subject_specialty']) : null;
 
-                $tStmt = $pdo->prepare("INSERT INTO guru (user_id, public_id, nip, nuptk, subject_specialty, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
-                $tStmt->execute([$newUserId, $uuid, $nip, $nuptk, $specialty]);
+                $tStmt = $pdo->prepare("INSERT INTO guru (user_id, nama_lengkap, nip, nuptk, gender, jenis_kelamin, subject_specialty, bidang_studi, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+                $tStmt->execute([$newUserId, $name, $nip, $nuptk, $gender, $gender, $specialty, $specialty]);
             }
 
             // Jika role Siswa, buat record di tabel siswa
             if ($role === 'siswa') {
                 $nis = !empty($_POST['nis']) ? trim((string) $_POST['nis']) : ('S' . date('Y') . sprintf('%04d', rand(1, 9999)));
                 $nisn = !empty($_POST['nisn']) ? trim((string) $_POST['nisn']) : null;
-                $classId = !empty($_POST['class_id']) && (int) $_POST['class_id'] > 0 ? (int) $_POST['class_id'] : null;
-                $gender = in_array($_POST['gender'] ?? 'L', ['L', 'P'], true) ? $_POST['gender'] : 'L';
 
-                $sStmt = $pdo->prepare("INSERT INTO siswa (user_id, public_id, nis, nisn, class_id, gender, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
-                $sStmt->execute([$newUserId, $uuid, $nis, $nisn, $classId, $gender]);
+                $sStmt = $pdo->prepare("INSERT INTO siswa (user_id, nama_lengkap, nis, nisn, class_id, kelas_id, gender, jenis_kelamin, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
+                $sStmt->execute([$newUserId, $name, $nis, $nisn, $classId, $classId, $gender, $gender]);
             }
 
             $pdo->commit();
 
-            AuditLog::write('pengguna.create', 'pengguna', $newUserId, "Membuat akun pengguna: {$email} ({$role})");
+            Auth::log('pengguna.create', 'pengguna', $newUserId, "Membuat akun pengguna: {$email} ({$role})");
 
             $_SESSION['_flash_success'] = "Pengguna '{$name}' ({$role}) berhasil dibuat. Sandi awal: {$password}";
         } catch (Throwable $e) {
@@ -235,15 +240,15 @@ class AdminPenggunaController
         }
 
         $pdo = Database::connection();
-        $tempPassword = 'Reset#' . rand(1000, 9999);
+        $tempPassword = '123';
         $passwordHash = password_hash($tempPassword, PASSWORD_BCRYPT);
 
-        $stmt = $pdo->prepare("UPDATE pengguna SET password_hash = ?, must_change_password = 1, failed_login_attempts = 0, locked_until = NULL, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL");
+        $stmt = $pdo->prepare("UPDATE pengguna SET password_hash = ?, must_change_password = 0, failed_login_attempts = 0, locked_until = NULL, updated_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$passwordHash, $id]);
 
-        AuditLog::write('pengguna.reset_password', 'pengguna', $id, "Mereset kata sandi pengguna ID {$id}");
+        Auth::log('pengguna.reset_password', 'pengguna', $id, "Mereset kata sandi pengguna ID {$id}");
 
-        $_SESSION['_flash_success'] = "Kata sandi berhasil direset menjadi: {$tempPassword} (Pengguna wajib ganti sandi saat login).";
+        $_SESSION['_flash_success'] = "Kata sandi berhasil direset menjadi: 123";
         header('Location: ' . base_url('admin/pengguna'));
     }
 
@@ -267,7 +272,7 @@ class AdminPenggunaController
         $stmt = $pdo->prepare("UPDATE pengguna SET is_active = IF(is_active = 1, 0, 1), updated_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$id]);
 
-        AuditLog::write('pengguna.toggle_status', 'pengguna', $id, "Mengubah status aktif pengguna ID {$id}");
+        Auth::log('pengguna.toggle_status', 'pengguna', $id, "Mengubah status aktif pengguna ID {$id}");
 
         $_SESSION['_flash_success'] = 'Status aktif pengguna berhasil diubah.';
         header('Location: ' . base_url('admin/pengguna'));
@@ -293,7 +298,7 @@ class AdminPenggunaController
         $stmt = $pdo->prepare("UPDATE pengguna SET deleted_at = NOW(), is_active = 0 WHERE id = ?");
         $stmt->execute([$id]);
 
-        AuditLog::write('pengguna.delete', 'pengguna', $id, "Menghapus (soft delete) pengguna ID {$id}");
+        Auth::log('pengguna.delete', 'pengguna', $id, "Menghapus (soft delete) pengguna ID {$id}");
 
         $_SESSION['_flash_success'] = 'Pengguna berhasil dihapus.';
         header('Location: ' . base_url('admin/pengguna'));

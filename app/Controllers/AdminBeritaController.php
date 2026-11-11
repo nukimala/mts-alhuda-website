@@ -166,8 +166,9 @@ class AdminBeritaController
 
         $pdo = Database::connection();
 
-        // Check unique slug among live posts
-        $check = $pdo->prepare("SELECT COUNT(*) FROM berita WHERE slug = ? AND deleted_at IS NULL");
+        // `uq_berita_slug` berlaku untuk semua baris (termasuk yang di-soft-delete),
+        // jadi pengecekan juga harus menghitung baris terhapus.
+        $check = $pdo->prepare("SELECT COUNT(*) FROM berita WHERE slug = ?");
         $check->execute([$slug]);
         if ((int) $check->fetchColumn() > 0) {
             $slug .= '-' . time();
@@ -178,21 +179,29 @@ class AdminBeritaController
 
         $publishedAt = $status === 'published' ? date('Y-m-d H:i:s') : null;
 
-        $stmt = $pdo->prepare("INSERT INTO berita (public_id, title, slug, excerpt, content, cover_path, status, is_featured, author_id, published_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        // Skema produksi menyimpan kolom kembar (Inggris + Indonesia).
+        // Keduanya wajib diisi agar admin dan aplikasi mobile membaca data yang sama.
+        $coverValue = $coverPath !== '' ? $coverPath : null;
+
+        $stmt = $pdo->prepare("INSERT INTO berita (public_id, title, judul, slug, excerpt, content, isi, cover_path, image_path, gambar, status, is_featured, author_id, published_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $publicId,
+            $title,
             $title,
             $slug,
             $excerpt !== '' ? $excerpt : null,
             $content,
-            $coverPath !== '' ? $coverPath : null,
+            $content,
+            $coverValue,
+            $coverValue,
+            $coverValue,
             $status,
             $isFeatured,
             $user['id'] ?? null,
             $publishedAt,
         ]);
 
-        AuditLog::write('berita.create', 'berita', (int) $pdo->lastInsertId(), "Membuat berita: {$title}");
+        Auth::log('berita.create', 'berita', (int) $pdo->lastInsertId(), "Membuat berita: {$title}");
 
         $_SESSION['_flash_success'] = 'Berita berhasil disimpan.';
         header('Location: ' . base_url('admin/berita'));
@@ -267,8 +276,9 @@ class AdminBeritaController
             $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title), '-'));
         }
 
-        // Check slug conflict with other posts
-        $check = $pdo->prepare("SELECT COUNT(*) FROM berita WHERE slug = ? AND id != ? AND deleted_at IS NULL");
+        // Check slug conflict with other posts (termasuk yang sudah di-soft-delete,
+        // karena unique index `uq_berita_slug` tetap menyimpan nilainya)
+        $check = $pdo->prepare("SELECT COUNT(*) FROM berita WHERE slug = ? AND id != ?");
         $check->execute([$slug, $id]);
         if ((int) $check->fetchColumn() > 0) {
             $slug .= '-' . time();
@@ -294,20 +304,26 @@ class AdminBeritaController
             $publishedAt = date('Y-m-d H:i:s');
         }
 
-        $updateStmt = $pdo->prepare("UPDATE berita SET title = ?, slug = ?, excerpt = ?, content = ?, cover_path = ?, status = ?, is_featured = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
+        $coverValue = $coverPath !== '' ? $coverPath : null;
+
+        $updateStmt = $pdo->prepare("UPDATE berita SET title = ?, judul = ?, slug = ?, excerpt = ?, content = ?, isi = ?, cover_path = ?, image_path = ?, gambar = ?, status = ?, is_featured = ?, published_at = ?, updated_at = NOW() WHERE id = ?");
         $updateStmt->execute([
+            $title,
             $title,
             $slug,
             $excerpt !== '' ? $excerpt : null,
             $content,
-            $coverPath !== '' ? $coverPath : null,
+            $content,
+            $coverValue,
+            $coverValue,
+            $coverValue,
             $status,
             $isFeatured,
             $publishedAt,
             $id,
         ]);
 
-        AuditLog::write('berita.update', 'berita', $id, "Memperbarui berita: {$title}");
+        Auth::log('berita.update', 'berita', $id, "Memperbarui berita: {$title}");
 
         $_SESSION['_flash_success'] = 'Perubahan berita berhasil disimpan.';
         header('Location: ' . base_url('admin/berita'));
@@ -327,7 +343,7 @@ class AdminBeritaController
         $stmt = $pdo->prepare("UPDATE berita SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$id]);
 
-        AuditLog::write('berita.delete', 'berita', $id, "Menghapus berita ID {$id}");
+        Auth::log('berita.delete', 'berita', $id, "Menghapus berita ID {$id}");
 
         $_SESSION['_flash_success'] = 'Berita berhasil dihapus.';
         header('Location: ' . base_url('admin/berita'));

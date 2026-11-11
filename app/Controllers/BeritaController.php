@@ -70,11 +70,11 @@ class BeritaController
             return;
         }
 
-        // Tambah view counter
+        // Tambah view counter. Skema produksi hanya punya `views_count`.
         try {
-            $pdo->prepare("UPDATE berita SET views_count = views_count + 1, views = views + 1 WHERE id = ?")->execute([$post['id']]);
-        } catch (Throwable $e) {
             $pdo->prepare("UPDATE berita SET views_count = views_count + 1 WHERE id = ?")->execute([$post['id']]);
+        } catch (Throwable $e) {
+            // Penghitung tampilan tidak boleh menggagalkan halaman.
         }
 
         // Berita terbaru lainnya

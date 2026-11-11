@@ -51,7 +51,7 @@ class AdminKontakController
         }
 
         if ($q !== '') {
-            $where[] = "(name LIKE :q OR email LIKE :q OR phone LIKE :q OR subject LIKE :q OR message LIKE :q)";
+            $where[] = "(nama LIKE :q OR email LIKE :q OR telepon LIKE :q OR subjek LIKE :q OR pesan LIKE :q)";
             $params[':q'] = "%$q%";
         }
 
@@ -67,7 +67,7 @@ class AdminKontakController
         $stmt = $pdo->prepare("
             SELECT p.*, u.name as replied_by_name 
             FROM pesan_kontak p
-            LEFT JOIN pengguna u ON u.id = p.replied_by
+            LEFT JOIN pengguna u ON u.id = p.dibalas_oleh
             $whereSql
             ORDER BY (p.status = 'baru') DESC, p.created_at DESC
             LIMIT :limit OFFSET :offset
@@ -131,7 +131,7 @@ class AdminKontakController
         $pdo = Database::connection();
         $stmt = $pdo->prepare("
             UPDATE pesan_kontak 
-            SET status = 'dibalas', replied_at = NOW(), replied_by = :uid, updated_at = NOW() 
+            SET status = 'dibalas', dibalas_pada = NOW(), dibalas_oleh = :uid, updated_at = NOW() 
             WHERE id = :id
         ");
         $stmt->execute([

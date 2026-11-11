@@ -162,14 +162,14 @@ class AdminMenuController
         }
 
         $stmt = $pdo->prepare(
-            "INSERT INTO menu (label, url, parent_id, location, sort_order, target, is_active, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())"
+            "INSERT INTO menu (title, label, url, parent_id, location, sort_order, target, is_active, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())"
         );
-        $stmt->execute([$label, $url, $parentId !== 0 ? (int) $parentId : null, $location, $sortOrder, $target, $isActive]);
+        $stmt->execute([$label, $label, $url, $parentId !== 0 ? (int) $parentId : null, $location, $sortOrder, $target, $isActive]);
 
         $menuId = (int) $pdo->lastInsertId();
 
-        AuditLog::write('menu.create', 'menu', $menuId, "Menambah menu: {$label} (url: {$url})");
+        Auth::log('menu.create', 'menu', $menuId, "Menambah menu: {$label} (url: {$url})");
 
         $_SESSION['_flash_success'] = 'Menu berhasil ditambahkan.';
         header('Location: ' . base_url('admin/menu'));
@@ -272,11 +272,11 @@ class AdminMenuController
         }
 
         $stmt = $pdo->prepare(
-            "UPDATE menu SET label = ?, url = ?, parent_id = ?, location = ?, sort_order = ?, target = ?, is_active = ?, updated_at = NOW() WHERE id = ?"
+            "UPDATE menu SET title = ?, label = ?, url = ?, parent_id = ?, location = ?, sort_order = ?, target = ?, is_active = ?, updated_at = NOW() WHERE id = ?"
         );
-        $stmt->execute([$label, $url, $parentId !== 0 ? (int) $parentId : null, $location, $sortOrder, $target, $isActive, $id]);
+        $stmt->execute([$label, $label, $url, $parentId !== 0 ? (int) $parentId : null, $location, $sortOrder, $target, $isActive, $id]);
 
-        AuditLog::write('menu.update', 'menu', $id, "Memperbarui menu: {$label} (url: {$url})");
+        Auth::log('menu.update', 'menu', $id, "Memperbarui menu: {$label} (url: {$url})");
 
         $_SESSION['_flash_success'] = 'Menu berhasil diperbarui.';
         header('Location: ' . base_url('admin/menu'));
@@ -306,7 +306,7 @@ class AdminMenuController
         $stmt = $pdo->prepare("UPDATE menu SET deleted_at = NOW(), is_active = 0, updated_at = NOW() WHERE id = ?");
         $stmt->execute([$id]);
 
-        AuditLog::write('menu.delete', 'menu', $id, "Menghapus menu ID {$id}");
+        Auth::log('menu.delete', 'menu', $id, "Menghapus menu ID {$id}");
 
         $_SESSION['_flash_success'] = 'Menu berhasil dihapus.';
         header('Location: ' . base_url('admin/menu'));

@@ -2,6 +2,10 @@
 config/database.local.php
 config/ftp.local.php
 config/*.local.php
+tools/deploy_*.php
+tools/cleanup_*.php
+tools/upload_*.php
+tools/temp_*.php
 .env
 .env.*
 

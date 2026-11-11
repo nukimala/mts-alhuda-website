@@ -1,0 +1,32 @@
+$kind: http-request
+name: '32. Kumpulkan tugas (menulis data)'
+method: POST
+url: '{{baseUrl}}/assignments/{{assignmentPublicId}}/submit'
+order: 3000
+body:
+  type: formdata
+  content:
+    - key: note
+      type: text
+      value: 'Uji Postman - hapus jika tidak dipakai'
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (pm.environment.get('allowWrites') !== 'true') {
+        pm.test('Dilewati: allowWrites=false', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+      if (!pm.collectionVariables.get('assignmentPublicId')) {
+        pm.test('Dilewati: tidak ada tugas', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('200 berhasil, 403 bukan siswa, atau 422 validasi', () => pm.expect([200, 403, 422]).to.include(pm.response.code));
+      if (pm.response.code === 200) {
+        pm.test('submitted_at ada', () => pm.expect(body.data.submitted_at).to.be.a('string').and.not.empty);
+      }

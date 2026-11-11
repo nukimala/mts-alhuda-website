@@ -78,7 +78,7 @@ class AdminPpdbController
             $stmt->execute([$k, $v]);
         }
 
-        AuditLog::write('pengaturan.update_ppdb', 'pengaturan', null, "Memperbarui informasi halaman PPDB");
+        Auth::log('pengaturan.update_ppdb', 'pengaturan', null, "Memperbarui informasi halaman PPDB");
 
         $_SESSION['_flash_success'] = 'Informasi PPDB berhasil diperbarui.';
         header('Location: ' . base_url('admin/ppdb'));
@@ -86,7 +86,7 @@ class AdminPpdbController
 
     public function storeDocument(): void
     {
-        $this->guard();
+        $user = $this->guard();
 
         if (!Csrf::verify($_POST['_csrf'] ?? null)) {
             $_SESSION['_flash_error'] = 'Token CSRF tidak valid.';
@@ -96,10 +96,9 @@ class AdminPpdbController
 
         $title = trim((string) ($_POST['title'] ?? ''));
         $description = trim((string) ($_POST['description'] ?? ''));
-        $category = trim((string) ($_POST['category'] ?? 'umum'));
         $sortOrder = (int) ($_POST['sort_order'] ?? 0);
         $filePath = trim((string) ($_POST['file_path'] ?? ''));
-        $fileType = 'PDF';
+        $mimeType = 'application/pdf';
         $fileSize = 0;
 
         if ($title === '') {
@@ -118,8 +117,8 @@ class AdminPpdbController
                 $filename = 'ppdb_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
                 if (move_uploaded_file($_FILES['doc_file']['tmp_name'], $targetDir . '/' . $filename)) {
                     $filePath = 'uploads/ppdb/' . $filename;
-                    $fileType = strtoupper($ext);
                     $fileSize = (int) filesize($targetDir . '/' . $filename);
+                    $mimeType = trim((string) ($_FILES['doc_file']['type'] ?? '')) ?: 'application/octet-stream';
                 }
             }
         }
@@ -131,18 +130,21 @@ class AdminPpdbController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("INSERT INTO dokumen_ppdb (title, description, category, file_path, file_type, file_size, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
+        // Skema produksi memakai `judul` + `mime_type` (tidak ada `category`/`file_type`).
+        $stmt = $pdo->prepare("INSERT INTO dokumen_ppdb (title, judul, description, file_path, file_url, file_size, mime_type, sort_order, is_active, uploaded_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())");
         $stmt->execute([
             $title,
+            $title,
             $description !== '' ? $description : null,
-            $category,
             $filePath,
-            $fileType,
+            $filePath,
             $fileSize,
+            $mimeType,
             $sortOrder,
+            $user['id'] ?? null,
         ]);
 
-        AuditLog::write('ppdb.create_doc', 'dokumen_ppdb', (int) $pdo->lastInsertId(), "Menambah dokumen PPDB: {$title}");
+        Auth::log('ppdb.create_doc', 'dokumen_ppdb', (int) $pdo->lastInsertId(), "Menambah dokumen PPDB: {$title}");
 
         $_SESSION['_flash_success'] = 'Dokumen PPDB berhasil ditambahkan.';
         header('Location: ' . base_url('admin/ppdb'));
@@ -180,7 +182,7 @@ class AdminPpdbController
         $stmt = $pdo->prepare("DELETE FROM dokumen_ppdb WHERE id = ?");
         $stmt->execute([$id]);
 
-        AuditLog::write('ppdb.delete_doc', 'dokumen_ppdb', $id, "Menghapus dokumen PPDB ID {$id}");
+        Auth::log('ppdb.delete_doc', 'dokumen_ppdb', $id, "Menghapus dokumen PPDB ID {$id}");
 
         $_SESSION['_flash_success'] = 'Dokumen berhasil dihapus.';
         header('Location: ' . base_url('admin/ppdb'));

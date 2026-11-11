@@ -1,0 +1,7 @@
+$kind: collection
+id: ee1e60600e417fc4306dc1a2
+name: '07 - Tulis Data (manual)'
+order: 7000
+description: |-
+  Endpoint POST yang menulis data asli. Hanya berjalan jika environment
+  allowWrites = true. Jangan aktifkan di produksi tanpa akun uji.

@@ -1,0 +1,22 @@
+$kind: http-request
+name: '19. Presensi hari ini'
+method: GET
+url: '{{baseUrl}}/attendance/today'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const role = pm.collectionVariables.get('userRole');
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      if (!role) {
+        pm.test('Dilewati: role belum diketahui (jalankan Login)', () => pm.expect(true).to.eql(true));
+      } else if (role === 'guru') {
+        pm.test('Status 200 untuk guru', () => pm.response.to.have.status(200));
+        pm.test('rules presensi ada', () => pm.expect(body.data && body.data.rules).to.be.an('object'));
+        pm.test('daftar jadwal hari ini array', () => pm.expect(body.data && body.data.schedules).to.be.an('array'));
+        pm.test('server_time ada', () => pm.expect(body.data && body.data.server_time).to.be.a('string'));
+      } else {
+        pm.test('Status 403 untuk non-guru', () => pm.response.to.have.status(403));
+      }

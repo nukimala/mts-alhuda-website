@@ -19,6 +19,22 @@ class AdminJadwalController
         return $user;
     }
 
+    /**
+     * Skema produksi menyimpan hari sebagai ENUM nama, bukan hanya angka.
+     */
+    private function dayName(int $day): string
+    {
+        return match ($day) {
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+            7 => 'Minggu',
+            default => 'Senin',
+        };
+    }
+
     public function index(): void
     {
         $user = $this->guard();
@@ -96,8 +112,8 @@ class AdminJadwalController
         $endTime = trim((string) ($_POST['end_time'] ?? ''));
         $room = trim((string) ($_POST['room'] ?? ''));
 
-        if ($classId <= 0 || $subjectId <= 0 || $teacherId <= 0 || $startTime === '' || $endTime === '') {
-            $_SESSION['_flash_error'] = 'Mohon lengkapi semua kolom wajib (kelas, mapel, guru, hari, jam).';
+        if ($classId <= 0 || $subjectId <= 0 || $teacherId <= 0 || $yearId <= 0 || $startTime === '' || $endTime === '') {
+            $_SESSION['_flash_error'] = 'Mohon lengkapi semua kolom wajib (tahun ajaran, kelas, mapel, guru, hari, jam).';
             header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));
             return;
         }
@@ -110,8 +126,8 @@ class AdminJadwalController
         $classSubjectId = $csStmt->fetchColumn();
 
         if (!$classSubjectId) {
-            $insertCs = $pdo->prepare("INSERT INTO mata_pelajaran_kelas (class_id, subject_id, teacher_id, is_active, created_at, updated_at) VALUES (?, ?, ?, 1, NOW(), NOW())");
-            $insertCs->execute([$classId, $subjectId, $teacherId]);
+            $insertCs = $pdo->prepare("INSERT INTO mata_pelajaran_kelas (class_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, weekly_hours, jam_mingguan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 2, 2, 1, NOW(), NOW())");
+            $insertCs->execute([$classId, $classId, $subjectId, $subjectId, $teacherId, $teacherId]);
             $classSubjectId = (int) $pdo->lastInsertId();
         }
 
@@ -138,18 +154,26 @@ class AdminJadwalController
             return;
         }
 
-        $insStmt = $pdo->prepare("INSERT INTO jadwal (class_subject_id, teacher_id, academic_year_id, day_of_week, start_time, end_time, room, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
+        $insStmt = $pdo->prepare("INSERT INTO jadwal (class_subject_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, academic_year_id, day_of_week, hari, start_time, jam_mulai, end_time, jam_selesai, room, ruangan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
         $insStmt->execute([
             $classSubjectId,
+            $classId,
+            $subjectId,
+            $subjectId,
+            $teacherId,
             $teacherId,
             $yearId,
             $dayOfWeek,
+            $this->dayName($dayOfWeek),
+            $startTime,
             $startTime,
             $endTime,
+            $endTime,
+            $room !== '' ? $room : null,
             $room !== '' ? $room : null,
         ]);
 
-        AuditLog::write('jadwal.create', 'jadwal', (int) $pdo->lastInsertId(), "Menambah jadwal kelas ID {$classId}");
+        Auth::log('jadwal.create', 'jadwal', (int) $pdo->lastInsertId(), "Menambah jadwal kelas ID {$classId}");
 
         $_SESSION['_flash_success'] = 'Jadwal pelajaran berhasil ditambahkan.';
         header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));
@@ -172,7 +196,7 @@ class AdminJadwalController
         $stmt = $pdo->prepare("DELETE FROM jadwal WHERE id = ?");
         $stmt->execute([$id]);
 
-        AuditLog::write('jadwal.delete', 'jadwal', $id, "Menghapus jadwal ID {$id}");
+        Auth::log('jadwal.delete', 'jadwal', $id, "Menghapus jadwal ID {$id}");
 
         $_SESSION['_flash_success'] = 'Jadwal berhasil dihapus.';
         header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));

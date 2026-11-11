@@ -1,0 +1,22 @@
+name: MTs Al-Huda Online
+values:
+  - key: baseUrl
+    value: 'https://mts-alhuda.shulkhimaulana.my.id/api/v1'
+    enabled: true
+    type: default
+    description: Base URL API server online.
+  - key: username
+    value: ''
+    enabled: true
+    type: default
+    description: Username akun uji di server online (jangan akun admin asli).
+  - key: password
+    value: ''
+    enabled: true
+    type: secret
+    description: Password akun uji di server online.
+  - key: allowWrites
+    value: 'false'
+    enabled: true
+    type: default
+    description: Set 'true' hanya jika ingin menjalankan folder 07 (menulis data asli).

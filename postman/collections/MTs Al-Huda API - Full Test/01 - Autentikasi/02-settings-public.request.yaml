@@ -1,0 +1,20 @@
+$kind: http-request
+name: '02. Settings publik'
+method: GET
+url: '{{baseUrl}}/settings/public'
+order: 2000
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      const s = body.data ? body.data.pengaturan : null;
+      pm.test('pengaturan berupa objek', () => pm.expect(s).to.be.an('object'));
+      if (s) {
+        pm.test('site_name terisi', () => pm.expect(s.site_name).to.be.a('string').and.not.empty);
+        pm.test('contact_email terisi', () => pm.expect(s.contact_email).to.be.a('string').and.not.empty);
+      }

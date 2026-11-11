@@ -1,0 +1,15 @@
+$kind: http-request
+name: '28. Endpoint tidak ada (404)'
+method: GET
+url: '{{baseUrl}}/tidak-ada'
+order: 5000
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 404', () => pm.response.to.have.status(404));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode ENDPOINT_NOT_FOUND', () => pm.expect(body.error && body.error.code).to.eql('ENDPOINT_NOT_FOUND'));

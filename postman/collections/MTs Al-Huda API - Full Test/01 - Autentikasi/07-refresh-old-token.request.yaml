@@ -1,0 +1,29 @@
+$kind: http-request
+name: '07. Refresh dengan token lama (harus 401)'
+method: POST
+url: '{{baseUrl}}/auth/refresh'
+order: 7000
+auth:
+  type: noauth
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    { "refresh_token": "{{oldRefreshToken}}" }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (!pm.collectionVariables.get('oldRefreshToken')) {
+        pm.test('Dilewati: belum ada refresh token lama', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 401', () => pm.response.to.have.status(401));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode INVALID_REFRESH_TOKEN', () => pm.expect(body.error && body.error.code).to.eql('INVALID_REFRESH_TOKEN'));

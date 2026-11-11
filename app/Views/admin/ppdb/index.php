@@ -117,7 +117,7 @@ $documents = $data['documents'] ?? [];
                                     <div class="t-sub"><?= htmlspecialchars($doc['file_path'], ENT_QUOTES, 'UTF-8') ?></div>
                                 </td>
                                 <td>
-                                    <span class="pill red"><?= htmlspecialchars($doc['file_type'] ?? 'FILE', ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="pill red"><?= htmlspecialchars($doc['mime_type'] ?? 'FILE', ENT_QUOTES, 'UTF-8') ?></span>
                                 </td>
                                 <td>
                                     <form method="post" action="<?= base_url('admin/ppdb/toggle-doc/' . $doc['id']) ?>" style="display:inline">
@@ -167,17 +167,7 @@ $documents = $data['documents'] ?? [];
                 </div>
 
                 <div class="field">
-                    <label for="doc_category">Kategori Dokumen</label>
-                    <select id="doc_category" name="category">
-                        <option value="brosur">Brosur / Pamflet</option>
-                        <option value="formulir">Formulir Manual</option>
-                        <option value="panduan">Panduan &amp; Tata Tertib</option>
-                        <option value="umum">Umum</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>Pilih Berkas Dokumen (PDF, DOCX, XLS) <span class="req">*</span></label>
+                    <label>Pilih Berkas Dokumen (PDF, DOC, DOCX, XLS, XLSX) <span class="req">*</span></label>
                     <input type="file" name="doc_file" style="margin-bottom:8px">
                     <div class="hint">Atau path relatif berkas jika sudah ada:</div>
                     <input type="text" name="file_path" placeholder="uploads/ppdb/brosur.pdf">

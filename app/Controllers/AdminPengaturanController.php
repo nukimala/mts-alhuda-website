@@ -172,7 +172,7 @@ class AdminPengaturanController
             }
         }
 
-        AuditLog::write('pengaturan.update', 'pengaturan', null, "Memperbarui pengaturan situs tab {$tab}");
+        Auth::log('pengaturan.update', 'pengaturan', null, "Memperbarui pengaturan situs tab {$tab}");
 
         $_SESSION['_flash_success'] = 'Seluruh pengaturan berhasil disimpan.';
         header('Location: ' . base_url('admin/pengaturan?tab=' . $tab));

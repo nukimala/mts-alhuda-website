@@ -1,0 +1,44 @@
+$kind: collection
+name: 'MTs Al-Huda API - Full Test'
+description: |-
+  Skenario uji lengkap REST API v1 MTs Al-Huda (web + aplikasi MADRASAHKU).
+
+  Urutan folder:
+  01 Autentikasi -> 02 Konten Publik -> 03 Akademik -> 04 Presensi
+  -> 05 Notifikasi -> 06 Negatif -> 07 Tulis Data (manual) -> 08 Cleanup.
+
+  Sebelum menjalankan:
+  - Pilih environment "MTs Al-Huda Online" atau "MTs Al-Huda Local".
+  - Isi username dan password pada environment.
+  - Biarkan allowWrites = false untuk uji baca saja.
+    Folder 07 hanya berjalan jika allowWrites = true.
+
+  Catatan: folder 07 menulis data asli (presensi, pengumpulan tugas,
+  notifikasi). Jangan aktifkan di produksi tanpa akun uji.
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+variables:
+  - key: accessToken
+    value: ''
+    description: 'Diisi otomatis oleh request Login dan Refresh.'
+  - key: refreshToken
+    value: ''
+    description: 'Diisi otomatis oleh request Login dan Refresh.'
+  - key: oldRefreshToken
+    value: ''
+    description: 'Refresh token sebelum rotasi, untuk uji token lama.'
+  - key: userRole
+    value: ''
+    description: 'Role pengguna hasil login (guru/siswa/admin/operator).'
+  - key: postSlug
+    value: ''
+    description: 'Slug berita pertama dari GET /posts.'
+  - key: assignmentPublicId
+    value: ''
+    description: 'public_id tugas pertama dari GET /assignments.'
+  - key: notificationId
+    value: ''
+    description: 'ID notifikasi pertama dari GET /notifications.'

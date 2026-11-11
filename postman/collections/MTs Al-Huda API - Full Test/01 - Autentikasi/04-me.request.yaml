@@ -1,0 +1,21 @@
+$kind: http-request
+name: '04. Profil saya (/me)'
+method: GET
+url: '{{baseUrl}}/me'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      const user = body.data ? body.data.user : null;
+      pm.test('user ada', () => pm.expect(user).to.be.an('object'));
+      if (user) {
+        pm.test('username terisi', () => pm.expect(user.username).to.be.a('string').and.not.empty);
+        pm.test('role sama dengan hasil login', () => {
+          const role = pm.collectionVariables.get('userRole');
+          if (role) pm.expect(user.role).to.eql(role);
+        });
+      }

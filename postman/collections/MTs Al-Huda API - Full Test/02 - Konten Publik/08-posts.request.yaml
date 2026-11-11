@@ -1,0 +1,31 @@
+$kind: http-request
+name: '08. Daftar berita'
+method: GET
+url: '{{baseUrl}}/posts?per_page=5'
+order: 1000
+queryParams:
+  - key: per_page
+    value: '5'
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      if (pm.response.code === 200 && body.data) {
+        pm.test('data.berita array', () => pm.expect(body.data.berita).to.be.an('array'));
+        pm.test('meta pagination ada', () => {
+          pm.expect(body.meta).to.be.an('object');
+          pm.expect(body.meta).to.have.property('total');
+          pm.expect(body.meta).to.have.property('has_next');
+        });
+        if (body.data.berita.length > 0) {
+          pm.collectionVariables.set('postSlug', body.data.berita[0].slug);
+          pm.test('item berita punya slug', () => pm.expect(body.data.berita[0].slug).to.be.a('string').and.not.empty);
+        }
+      } else {
+        pm.test('Endpoint berita gagal (cek skema tabel berita)', () => pm.expect(pm.response.code).to.eql(200));
+      }

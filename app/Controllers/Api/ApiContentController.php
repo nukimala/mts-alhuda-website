@@ -131,8 +131,13 @@ class ApiContentController
             return;
         }
 
-        $pdo->prepare('UPDATE berita SET views = views + 1 WHERE id = ?')
-            ->execute([(int) $row['id']]);
+        // Penghitung tampilan: skema produksi hanya punya `views_count`.
+        try {
+            $pdo->prepare('UPDATE berita SET views_count = views_count + 1 WHERE id = ?')
+                ->execute([(int) $row['id']]);
+        } catch (Throwable $e) {
+            // Jangan gagalkan detail berita hanya karena penghitung tampilan.
+        }
 
         ApiResponse::ok([
             'post' => [
@@ -165,47 +170,24 @@ class ApiContentController
     public function announcements(array $params = []): void
     {
         $page = ApiFormat::paginate();
-
-        $audiences = ['semua'];
-        $user = ApiAuth::authenticate();
-
-        if ($user !== null) {
-            $role = (string) ($user['role'] ?? '');
-            $map = [
-                'siswa' => 'siswa',
-                'guru'  => 'guru',
-                'wali'  => 'wali',
-            ];
-
-            if (isset($map[$role])) {
-                $audiences[] = $map[$role];
-            } elseif (in_array($role, ['admin', 'operator', 'kepala', 'akreditasi'], true)) {
-                // Staf melihat semuanya.
-                $audiences = ['semua', 'siswa', 'guru', 'wali'];
-            }
-        }
-
-        $placeholders = implode(', ', array_fill(0, count($audiences), '?'));
-
-        $where = "a.status = 'published'
-                  AND a.published_at IS NOT NULL
-                  AND (a.expires_at IS NULL OR a.expires_at > NOW())
-                  AND a.audience IN ({$placeholders})";
-
         $pdo = Database::connection();
 
+        // Skema produksi tidak punya kolom audience/expires_at; semua pengumuman
+        // tayang untuk semua pembaca, jadi filter audiens tidak bisa dipakai.
+        $where = "a.status = 'published' AND a.published_at IS NOT NULL";
+
         $countStmt = $pdo->prepare("SELECT COUNT(*) FROM pengumuman a WHERE {$where}");
-        $countStmt->execute($audiences);
+        $countStmt->execute();
         $total = (int) $countStmt->fetchColumn();
 
         $stmt = $pdo->prepare(
-            "SELECT a.id, a.title, a.slug, a.content, a.audience, a.is_pinned, a.published_at
+            "SELECT a.id, a.title, a.slug, a.content, a.is_pinned, a.published_at
              FROM pengumuman a
              WHERE {$where}
              ORDER BY a.is_pinned DESC, a.published_at DESC, a.id DESC
              LIMIT {$page['per_page']} OFFSET {$page['offset']}"
         );
-        $stmt->execute($audiences);
+        $stmt->execute();
 
         $items = [];
         foreach ($stmt->fetchAll() as $row) {
@@ -214,7 +196,7 @@ class ApiContentController
                 'title'        => (string) $row['title'],
                 'slug'         => (string) $row['slug'],
                 'content'      => (string) $row['content'],
-                'audience'     => (string) $row['audience'],
+                'audience'     => 'semua',
                 'is_pinned'    => (int) $row['is_pinned'] === 1,
                 'published_at' => ApiFormat::iso($row['published_at']),
             ];
@@ -299,7 +281,7 @@ class ApiContentController
         )->fetchColumn();
 
         $stmt = $pdo->query(
-            "SELECT id, name, description, image_path, icon, sort_order
+            "SELECT id, name, nama_fasilitas, description, deskripsi, image_path, gambar, category, sort_order
              FROM fasilitas
              WHERE is_active = 1 AND deleted_at IS NULL
              ORDER BY sort_order ASC, id ASC
@@ -310,10 +292,11 @@ class ApiContentController
         foreach ($stmt->fetchAll() as $row) {
             $items[] = [
                 'id'          => (int) $row['id'],
-                'name'        => (string) $row['name'],
-                'description' => $row['description'],
-                'image_url'   => ApiFormat::mediaUrl($row['image_path']),
-                'icon'        => $row['icon'],
+                'name'        => (string) ($row['nama_fasilitas'] ?? $row['name']),
+                'description' => $row['deskripsi'] ?? $row['description'],
+                'image_url'   => ApiFormat::mediaUrl($row['gambar'] ?? $row['image_path']),
+                // `icon` tidak ada di skema produksi; kategori dipakai sebagai penggantinya.
+                'icon'        => $row['category'],
             ];
         }
 
@@ -387,10 +370,11 @@ class ApiContentController
             return;
         }
 
+        // Tabel `halaman` di produksi memakai `is_active`, tanpa kolom meta_*.
         $stmt = Database::connection()->prepare(
-            "SELECT slug, title, content, meta_title, meta_description, updated_at
+            "SELECT slug, title, content, updated_at
              FROM halaman
-             WHERE slug = ? AND status = 'published' AND deleted_at IS NULL
+             WHERE slug = ? AND is_active = 1 AND deleted_at IS NULL
              LIMIT 1"
         );
         $stmt->execute([$slug]);
@@ -406,8 +390,8 @@ class ApiContentController
                 'slug'             => (string) $row['slug'],
                 'title'            => (string) $row['title'],
                 'content'          => (string) $row['content'],
-                'meta_title'       => $row['meta_title'],
-                'meta_description' => $row['meta_description'],
+                'meta_title'       => null,
+                'meta_description' => null,
                 'updated_at'       => ApiFormat::iso($row['updated_at']),
             ],
         ]);

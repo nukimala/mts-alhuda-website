@@ -1,0 +1,25 @@
+$kind: http-request
+name: '17. Detail tugas'
+method: GET
+url: '{{baseUrl}}/assignments/{{assignmentPublicId}}'
+order: 3000
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      if (!pm.collectionVariables.get('assignmentPublicId')) {
+        pm.test('Dilewati: belum ada public_id tugas', () => pm.expect(true).to.eql(true));
+        pm.execution.skipRequest();
+      }
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      const a = body.data ? body.data.assignment : null;
+      pm.test('assignment ada', () => pm.expect(a).to.be.an('object'));
+      if (a) {
+        pm.test('public_id sesuai', () => pm.expect(a.public_id).to.eql(pm.collectionVariables.get('assignmentPublicId')));
+        pm.test('max_score angka', () => pm.expect(a.max_score).to.be.a('number'));
+      }

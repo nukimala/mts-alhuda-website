@@ -73,16 +73,20 @@ class KontakController
 
         try {
             $pdo = Database::connection();
+            // Skema produksi memakai kolom Bahasa Indonesia: nama, telepon, subjek, pesan.
+            // Panjang mengikuti kolom: nama 100, email 100, telepon 30, subjek 150.
             $stmt = $pdo->prepare("
-                INSERT INTO pesan_kontak (name, email, phone, subject, message, status, created_at, updated_at)
-                VALUES (:name, :email, :phone, :subject, :message, 'baru', NOW(), NOW())
+                INSERT INTO pesan_kontak (nama, email, telepon, subjek, pesan, status, ip_address, user_agent, created_at, updated_at)
+                VALUES (:nama, :email, :telepon, :subjek, :pesan, 'baru', :ip, :ua, NOW(), NOW())
             ");
             $stmt->execute([
-                ':name' => mb_substr($name, 0, 120),
-                ':email' => mb_substr($email, 0, 160),
-                ':phone' => $phone !== '' ? mb_substr($phone, 0, 24) : null,
-                ':subject' => $subject !== '' ? mb_substr($subject, 0, 200) : null,
-                ':message' => $message,
+                ':nama' => mb_substr($name, 0, 100),
+                ':email' => mb_substr($email, 0, 100),
+                ':telepon' => $phone !== '' ? mb_substr($phone, 0, 30) : null,
+                ':subjek' => mb_substr($subject !== '' ? $subject : 'Pesan dari situs', 0, 150),
+                ':pesan' => $message,
+                ':ip' => mb_substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45) ?: null,
+                ':ua' => mb_substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255) ?: null,
             ]);
 
             unset($_SESSION['_old_input']);

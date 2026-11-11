@@ -44,8 +44,10 @@ class ApiNotificationController
 
         $page = ApiFormat::paginate();
 
+        // Skema produksi memakai `action_url` dan tidak punya `read_at`;
+        // waktu dibaca dipetakan dari `updated_at`.
         $stmt = $pdo->prepare(
-            "SELECT id, title, body, link, type, is_read, read_at, created_at
+            "SELECT id, title, body, action_url, type, is_read, created_at, updated_at
              FROM notifikasi
              WHERE user_id = ?
              ORDER BY is_read ASC, created_at DESC
@@ -56,14 +58,15 @@ class ApiNotificationController
 
         $items = [];
         foreach ($rows as $r) {
+            $isRead = (int) $r['is_read'] === 1;
             $items[] = [
                 'id'         => (int) $r['id'],
                 'title'      => (string) $r['title'],
                 'body'       => (string) $r['body'],
-                'link'       => $r['link'],
+                'link'       => $r['action_url'],
                 'type'       => $r['type'],
-                'is_read'    => (int) $r['is_read'] === 1,
-                'read_at'    => ApiFormat::iso($r['read_at']),
+                'is_read'    => $isRead,
+                'read_at'    => $isRead ? ApiFormat::iso($r['updated_at']) : null,
                 'created_at' => ApiFormat::iso($r['created_at']),
             ];
         }
@@ -97,7 +100,7 @@ class ApiNotificationController
         $userId = (int) $user['id'];
         $pdo = Database::connection();
 
-        $stmt = $pdo->prepare("UPDATE notifikasi SET is_read = 1, read_at = NOW() WHERE id = ? AND user_id = ?");
+        $stmt = $pdo->prepare("UPDATE notifikasi SET is_read = 1, updated_at = NOW() WHERE id = ? AND user_id = ?");
         $stmt->execute([$id, $userId]);
 
         ApiResponse::ok(['message' => 'Notifikasi telah ditandai dibaca.']);
@@ -116,7 +119,7 @@ class ApiNotificationController
         $userId = (int) $user['id'];
         $pdo = Database::connection();
 
-        $stmt = $pdo->prepare("UPDATE notifikasi SET is_read = 1, read_at = NOW() WHERE user_id = ? AND is_read = 0");
+        $stmt = $pdo->prepare("UPDATE notifikasi SET is_read = 1, updated_at = NOW() WHERE user_id = ? AND is_read = 0");
         $stmt->execute([$userId]);
 
         ApiResponse::ok(['message' => 'Semua notifikasi telah ditandai dibaca.']);

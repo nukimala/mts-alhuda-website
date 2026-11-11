@@ -110,7 +110,7 @@ $statusCurrent = $data['status'] ?? 'semua';
                             </div>
                             <?php if (!empty($m['replied_by_name'])): ?>
                                 <div style="font-size:11px; color:#15803D; margin-top:6px; font-weight:600;">
-                                    ✓ Dibalas oleh <?= htmlspecialchars($m['replied_by_name'], ENT_QUOTES, 'UTF-8') ?> (<?= date('d/m/Y H:i', strtotime($m['replied_at'])) ?>)
+                                    ✓ Dibalas oleh <?= htmlspecialchars($m['replied_by_name'], ENT_QUOTES, 'UTF-8') ?> (<?= date('d/m/Y H:i', strtotime($m['dibalas_pada'] ?? '')) ?>)
                                 </div>
                             <?php endif; ?>
                         </td>

@@ -1,0 +1,16 @@
+$kind: http-request
+name: '29. Metode salah (405)'
+method: DELETE
+url: '{{baseUrl}}/health'
+order: 6000
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 405', () => pm.response.to.have.status(405));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode METHOD_NOT_ALLOWED', () => pm.expect(body.error && body.error.code).to.eql('METHOD_NOT_ALLOWED'));
+      pm.test('header Allow ada', () => pm.expect(pm.response.headers.get('Allow')).to.be.a('string').and.not.empty);

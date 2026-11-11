@@ -1,0 +1,19 @@
+$kind: http-request
+name: '14. Halaman statis (profil)'
+method: GET
+url: '{{baseUrl}}/pages/profil'
+order: 7000
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200 atau 404 (data halaman opsional)', () => pm.expect([200, 404]).to.include(pm.response.code));
+      if (pm.response.code === 200) {
+        let body = {};
+        try { body = pm.response.json(); } catch (e) {}
+        const page = body.data ? body.data.page : null;
+        pm.test('page ada', () => pm.expect(page).to.be.an('object'));
+        if (page) pm.test('slug profil', () => pm.expect(page.slug).to.eql('profil'));
+      }

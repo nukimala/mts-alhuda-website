@@ -141,25 +141,21 @@ class AdminGaleriController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('INSERT INTO galeri (album, title, judul, image_path, caption, sort_order, is_active, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())');
+        // Kolom kembar (Inggris + Indonesia) diisi bersamaan.
+        $stmt = $pdo->prepare("INSERT INTO galeri (album, title, judul, image_path, gambar, caption, keterangan, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $album !== '' ? $album : 'Kegiatan Madrasah',
             $title,
             $title,
             $imagePath,
+            $imagePath,
+            $caption !== '' ? $caption : null,
             $caption !== '' ? $caption : null,
             $sortOrder,
             $isActive,
         ]);
 
-        AuditLog::write(
-            Auth::id(),
-            'galeri.create',
-            'galeri',
-            (int) $pdo->lastInsertId(),
-            "Menambah foto galeri: {$title}",
-        );
+        Auth::log('galeri.create', 'galeri', (int) $pdo->lastInsertId(), "Menambah foto galeri: {$title}");
 
         $_SESSION['_flash_success'] = 'Foto berhasil ditambahkan ke galeri.';
         header('Location: ' . base_url('admin/galeri'));
@@ -253,20 +249,21 @@ class AdminGaleriController
             }
         }
 
-        $updateStmt = $pdo->prepare(
-            'UPDATE galeri SET album = ?, title = ?, image_path = ?, caption = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?',
-        );
+        $updateStmt = $pdo->prepare("UPDATE galeri SET album = ?, title = ?, judul = ?, image_path = ?, gambar = ?, caption = ?, keterangan = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
         $updateStmt->execute([
             $album !== '' ? $album : null,
             $title,
+            $title,
             $imagePath,
+            $imagePath,
+            $caption !== '' ? $caption : null,
             $caption !== '' ? $caption : null,
             $sortOrder,
             $isActive,
             $id,
         ]);
 
-        AuditLog::write(Auth::id(), 'galeri.update', 'galeri', $id, "Memperbarui foto galeri: {$title}");
+        Auth::log('galeri.update', 'galeri', $id, "Memperbarui foto galeri: {$title}");
 
         $_SESSION['_flash_success'] = 'Perubahan foto galeri berhasil disimpan.';
         header('Location: ' . base_url('admin/galeri'));
@@ -286,7 +283,7 @@ class AdminGaleriController
         $stmt = $pdo->prepare('UPDATE galeri SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL');
         $stmt->execute([$id]);
 
-        AuditLog::write(Auth::id(), 'galeri.delete', 'galeri', $id, "Menghapus foto galeri ID {$id}");
+        Auth::log('galeri.delete', 'galeri', $id, "Menghapus foto galeri ID {$id}");
 
         $_SESSION['_flash_success'] = 'Foto berhasil dihapus dari galeri.';
         header('Location: ' . base_url('admin/galeri'));

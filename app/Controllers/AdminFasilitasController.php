@@ -19,6 +19,39 @@ class AdminFasilitasController
         return $user;
     }
 
+    /**
+     * Slug unik untuk fasilitas. Skema produksi mewajibkan slug NOT NULL + UNIQUE.
+     */
+    private function slugFor(string $name, ?int $ignoreId = null): string
+    {
+        $base = strtolower(trim((string) preg_replace('/[^A-Za-z0-9-]+/', '-', $name), '-'));
+        if ($base === '') {
+            $base = 'fasilitas';
+        }
+
+        $pdo = Database::connection();
+        $slug = $base;
+        $i = 2;
+
+        while (true) {
+            $sql = 'SELECT COUNT(*) FROM fasilitas WHERE slug = ?';
+            $params = [$slug];
+            if ($ignoreId !== null) {
+                $sql .= ' AND id != ?';
+                $params[] = $ignoreId;
+            }
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($params);
+            if ((int) $stmt->fetchColumn() === 0) {
+                return $slug;
+            }
+
+            $slug = $base . '-' . $i;
+            $i++;
+        }
+    }
+
     public function index(): void
     {
         $user = $this->guard();
@@ -114,17 +147,26 @@ class AdminFasilitasController
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("INSERT INTO fasilitas (name, description, image_path, icon, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+
+        // `icon` tidak ada di skema produksi; nilainya disimpan ke `category`.
+        $category = $icon !== '' ? $icon : 'Sarana Pembelajaran';
+        $slug = $this->slugFor($name);
+
+        $stmt = $pdo->prepare("INSERT INTO fasilitas (name, nama_fasilitas, slug, category, description, deskripsi, image_path, gambar, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $name,
+            $name,
+            $slug,
+            $category,
+            $description !== '' ? $description : null,
             $description !== '' ? $description : null,
             $imagePath !== '' ? $imagePath : null,
-            $icon !== '' ? $icon : null,
+            $imagePath !== '' ? $imagePath : null,
             $sortOrder,
             $isActive,
         ]);
 
-        AuditLog::write('fasilitas.create', 'fasilitas', (int) $pdo->lastInsertId(), "Menambah fasilitas: {$name}");
+        Auth::log('fasilitas.create', 'fasilitas', (int) $pdo->lastInsertId(), "Menambah fasilitas: {$name}");
 
         $_SESSION['_flash_success'] = 'Fasilitas berhasil ditambahkan.';
         header('Location: ' . base_url('admin/fasilitas'));
@@ -208,18 +250,25 @@ class AdminFasilitasController
             }
         }
 
-        $updateStmt = $pdo->prepare("UPDATE fasilitas SET name = ?, description = ?, image_path = ?, icon = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+        $category = $icon !== '' ? $icon : 'Sarana Pembelajaran';
+        $slug = $this->slugFor($name, $id);
+
+        $updateStmt = $pdo->prepare("UPDATE fasilitas SET name = ?, nama_fasilitas = ?, slug = ?, category = ?, description = ?, deskripsi = ?, image_path = ?, gambar = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
         $updateStmt->execute([
             $name,
+            $name,
+            $slug,
+            $category,
+            $description !== '' ? $description : null,
             $description !== '' ? $description : null,
             $imagePath !== '' ? $imagePath : null,
-            $icon !== '' ? $icon : null,
+            $imagePath !== '' ? $imagePath : null,
             $sortOrder,
             $isActive,
             $id,
         ]);
 
-        AuditLog::write('fasilitas.update', 'fasilitas', $id, "Memperbarui fasilitas: {$name}");
+        Auth::log('fasilitas.update', 'fasilitas', $id, "Memperbarui fasilitas: {$name}");
 
         $_SESSION['_flash_success'] = 'Perubahan fasilitas berhasil disimpan.';
         header('Location: ' . base_url('admin/fasilitas'));
@@ -239,7 +288,7 @@ class AdminFasilitasController
         $stmt = $pdo->prepare("UPDATE fasilitas SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$id]);
 
-        AuditLog::write('fasilitas.delete', 'fasilitas', $id, "Menghapus fasilitas ID {$id}");
+        Auth::log('fasilitas.delete', 'fasilitas', $id, "Menghapus fasilitas ID {$id}");
 
         $_SESSION['_flash_success'] = 'Fasilitas berhasil dihapus.';
         header('Location: ' . base_url('admin/fasilitas'));

@@ -1,0 +1,13 @@
+$kind: http-request
+name: '34. /me setelah logout (401)'
+method: GET
+url: '{{baseUrl}}/me'
+order: 2000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 401 setelah logout', () => pm.response.to.have.status(401));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('kode UNAUTHORIZED', () => pm.expect(body.error && body.error.code).to.eql('UNAUTHORIZED'));

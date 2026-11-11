@@ -1,0 +1,21 @@
+$kind: http-request
+name: '15. Jadwal'
+method: GET
+url: '{{baseUrl}}/schedules'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      let body = {};
+      try { body = pm.response.json(); } catch (e) {}
+      pm.test('data.schedules array', () => pm.expect(body.data && body.data.schedules).to.be.an('array'));
+      pm.test('scope sesuai peran', () => pm.expect(['teacher', 'student', 'staff']).to.include(body.meta && body.meta.scope));
+      if (body.data && body.data.schedules.length > 0) {
+        const s = body.data.schedules[0];
+        pm.test('item jadwal punya kelas dan mapel', () => {
+          pm.expect(s.class).to.be.an('object');
+          pm.expect(s.subject).to.be.an('object');
+        });
+      }

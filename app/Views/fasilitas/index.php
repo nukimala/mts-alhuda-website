@@ -50,8 +50,9 @@ $facilities = $data['facilities'] ?? [];
                     <?php foreach ($facilities as $fac): ?>
                         <div style="background: #ffffff; border-radius: 14px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.05); display: flex; flex-direction: column;">
                             <div style="height: 200px; background: #E2E8F0; position: relative; overflow: hidden;">
-                                <?php if (!empty($fac['image_path'])): ?>
-                                    <img src="<?= base_url($fac['image_path']) ?>" alt="<?= htmlspecialchars($fac['name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <?php $facImage = $fac['image_path'] ?? $fac['gambar'] ?? ''; ?>
+                                <?php if (!empty($facImage)): ?>
+                                    <img src="<?= base_url($facImage) ?>" alt="<?= htmlspecialchars($fac['name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                                 <?php else: ?>
                                     <div style="width:100%;height:100%;background:linear-gradient(135deg, #15803D 0%, #0B3D1E 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px">
                                         <span style="font-size: 32px; margin-bottom: 4px;">🏛️</span>
@@ -60,7 +61,7 @@ $facilities = $data['facilities'] ?? [];
                                 <?php endif; ?>
                                 
                                 <span style="position: absolute; top: 12px; left: 12px; background: #15803D; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,.15);">
-                                    <?= htmlspecialchars($fac['icon'] ?? 'Gedung / Sarpras') ?>
+                                    <?= htmlspecialchars($fac['category'] ?? $fac['icon'] ?? 'Gedung / Sarpras') ?>
                                 </span>
                             </div>
 
@@ -69,7 +70,7 @@ $facilities = $data['facilities'] ?? [];
                                     <?= htmlspecialchars($fac['name']) ?>
                                 </h3>
                                 <p style="font-size: 13.5px; color: #475569; line-height: 1.6; margin: 0; flex: 1;">
-                                    <?= htmlspecialchars($fac['description'] ?? 'Fasilitas penunjang pembelajaran santri MTs Al-Huda Gondang.') ?>
+                                    <?= htmlspecialchars($fac['deskripsi'] ?? $fac['description'] ?? 'Fasilitas penunjang pembelajaran santri MTs Al-Huda Gondang.') ?>
                                 </p>
                             </div>
 
