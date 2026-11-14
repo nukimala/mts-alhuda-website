@@ -46,31 +46,34 @@ class AdminJadwalController
 
         $yearId = isset($_GET['year_id']) ? (int) $_GET['year_id'] : (int) ($activeYear['id'] ?? 0);
 
-        // Get classes for selected year
-        $classesStmt = $pdo->prepare("SELECT * FROM kelas WHERE academic_year_id = ? ORDER BY level ASC, name ASC");
-        $classesStmt->execute([$yearId]);
+        // Get classes for selected year (dengan fallback jika academic_year_id fleksibel)
+        $classesStmt = $pdo->prepare("SELECT * FROM kelas WHERE academic_year_id = ? OR ? = 0 ORDER BY level ASC, name ASC");
+        $classesStmt->execute([$yearId, $yearId]);
         $classes = $classesStmt->fetchAll();
+        if (empty($classes)) {
+            $classes = $pdo->query("SELECT * FROM kelas ORDER BY level ASC, name ASC")->fetchAll();
+        }
 
         $selectedClassId = isset($_GET['class_id']) ? (int) $_GET['class_id'] : (int) ($classes[0]['id'] ?? 0);
 
         // Get schedules for selected class and year
         $schedules = [];
         if ($selectedClassId > 0) {
-            $sStmt = $pdo->prepare("SELECT s.*, cs.class_id, sub.name as subject_name, sub.code as subject_code, u.name as teacher_name
+            $sStmt = $pdo->prepare("SELECT s.*, cs.class_id, sub.name as subject_name, sub.code as subject_code, COALESCE(u.name, t.nama_lengkap, 'Guru') as teacher_name
                                     FROM jadwal s
                                     JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
                                     JOIN mata_pelajaran sub ON sub.id = cs.subject_id
-                                    JOIN guru t ON t.id = s.teacher_id
-                                    JOIN pengguna u ON u.id = t.user_id
-                                    WHERE cs.class_id = ? AND s.academic_year_id = ?
+                                    LEFT JOIN guru t ON t.id = s.teacher_id
+                                    LEFT JOIN pengguna u ON u.id = t.user_id
+                                    WHERE (cs.class_id = ? OR s.kelas_id = ?) AND (s.academic_year_id = ? OR ? = 0)
                                     ORDER BY s.day_of_week ASC, s.start_time ASC");
-            $sStmt->execute([$selectedClassId, $yearId]);
+            $sStmt->execute([$selectedClassId, $selectedClassId, $yearId, $yearId]);
             $schedules = $sStmt->fetchAll();
         }
 
         // Get subjects & teachers for modal dropdown
         $subjects = $pdo->query("SELECT * FROM mata_pelajaran WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
-        $teachers = $pdo->query("SELECT t.id, u.name, t.nip FROM guru t JOIN pengguna u ON u.id = t.user_id WHERE u.is_active = 1 AND u.deleted_at IS NULL ORDER BY u.name ASC")->fetchAll();
+        $teachers = $pdo->query("SELECT t.id, COALESCE(u.name, t.nama_lengkap) as name, t.nip FROM guru t LEFT JOIN pengguna u ON u.id = t.user_id WHERE t.is_active = 1 ORDER BY name ASC")->fetchAll();
 
         $data = [
             'title' => 'Jadwal Pelajaran | Panel Admin MTs Al-Huda',
@@ -78,12 +81,17 @@ class AdminJadwalController
             'role' => Auth::displayRole(),
             'active_menu' => 'jadwal',
             'tahun_akademik' => $academicYears,
+            'academic_years' => $academicYears,
             'current_year_id' => $yearId,
             'kelas' => $classes,
+            'classes' => $classes,
             'current_class_id' => $selectedClassId,
             'jadwal' => $schedules,
+            'schedules' => $schedules,
             'mata_pelajaran' => $subjects,
+            'subjects' => $subjects,
             'guru' => $teachers,
+            'teachers' => $teachers,
             'flash' => $_SESSION['_flash_success'] ?? null,
             'error' => $_SESSION['_flash_error'] ?? null,
         ];

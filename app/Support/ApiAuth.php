@@ -198,6 +198,12 @@ class ApiAuth
             }
         }
 
+        // Fallback: cek X-Authorization (dikirim oleh app mobile
+        // sebagai pertahanan ganda jika hosting strip header Authorization)
+        if ($raw === null && isset($_SERVER['HTTP_X_AUTHORIZATION'])) {
+            $raw = (string) $_SERVER['HTTP_X_AUTHORIZATION'];
+        }
+
         if ($raw === null || $raw === '') {
             return null;
         }

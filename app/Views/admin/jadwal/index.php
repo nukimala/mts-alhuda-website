@@ -20,18 +20,24 @@ $dayIcons = [
 ];
 
 // Group schedules by day
+$schedulesList = $data['schedules'] ?? $data['jadwal'] ?? [];
+$classesList = $data['classes'] ?? $data['kelas'] ?? [];
+$academicYearsList = $data['academic_years'] ?? $data['tahun_akademik'] ?? [];
+$subjectsList = $data['subjects'] ?? $data['mata_pelajaran'] ?? [];
+$teachersList = $data['teachers'] ?? $data['guru'] ?? [];
+
 $schedulesByDay = [];
 for ($d = 1; $d <= 6; $d++) {
     $schedulesByDay[$d] = [];
 }
-foreach (($data['schedules'] ?? []) as $s) {
+foreach ($schedulesList as $s) {
     $schedulesByDay[(int) $s['day_of_week']][] = $s;
 }
 
 // Calculate summary stats
-$totalSchedules = count($data['schedules'] ?? []);
-$uniqueSubjects = count(array_unique(array_column($data['schedules'] ?? [], 'subject_id')));
-$uniqueTeachers = count(array_unique(array_column($data['schedules'] ?? [], 'teacher_id')));
+$totalSchedules = count($schedulesList);
+$uniqueSubjects = count(array_unique(array_column($schedulesList, 'subject_id')));
+$uniqueTeachers = count(array_unique(array_column($schedulesList, 'teacher_id')));
 $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayList)));
 ?>
 
@@ -117,7 +123,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
             <div class="field-inline" style="background:#F8FAFC">
                 <span style="font-size:11.5px;font-weight:700;color:var(--gray)">TAHUN:</span>
                 <select name="year_id" onchange="this.form.submit()" style="font-weight:700;color:var(--text);cursor:pointer">
-                    <?php foreach (($data['academic_years'] ?? []) as $ay): ?>
+                    <?php foreach ($academicYearsList as $ay): ?>
                         <option value="<?= $ay['id'] ?>" <?= (int) $data['current_year_id'] === (int) $ay['id'] ? 'selected' : '' ?>>
                             Tahun Ajaran <?= htmlspecialchars($ay['name'], ENT_QUOTES, 'UTF-8') ?> <?= (int) $ay['is_active'] === 1 ? '★' : '' ?>
                         </option>
@@ -128,7 +134,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
             <div class="field-inline" style="background:#F0FDF4;border-color:#BBF7D0">
                 <span style="font-size:11.5px;font-weight:700;color:var(--green)">KELAS:</span>
                 <select name="class_id" onchange="this.form.submit()" style="font-weight:800;color:#15803D;cursor:pointer">
-                    <?php foreach (($data['classes'] ?? []) as $c): ?>
+                    <?php foreach ($classesList as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= (int) $data['current_class_id'] === (int) $c['id'] ? 'selected' : '' ?>>
                             Kelas <?= htmlspecialchars($c['name'], ENT_QUOTES, 'UTF-8') ?> (Tingkat <?= $c['level'] ?>)
                         </option>
@@ -240,7 +246,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
                 </tr>
             </thead>
             <tbody>
-            <?php if (empty($data['schedules'])): ?>
+            <?php if (empty($schedulesList)): ?>
                 <tr>
                     <td colspan="6" style="padding:36px 16px;text-align:center;color:#6B7280">
                         <b>Belum ada jadwal yang diatur untuk kelas ini.</b>
@@ -299,7 +305,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
                 <div class="field">
                     <label>Target Kelas</label>
                     <input type="text" value="<?php
-                        foreach (($data['classes'] ?? []) as $c) {
+                        foreach ($classesList as $c) {
                             if ((int) $c['id'] === (int) $data['current_class_id']) {
                                 echo 'Kelas ' . htmlspecialchars($c['name'], ENT_QUOTES, 'UTF-8') . ' (Tingkat ' . $c['level'] . ')';
                                 break;
@@ -335,7 +341,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
                     <label for="modal_subject">Mata Pelajaran <span class="req">*</span></label>
                     <select id="modal_subject" name="subject_id" required>
                         <option value="">-- Pilih Mata Pelajaran --</option>
-                        <?php foreach (($data['subjects'] ?? []) as $sub): ?>
+                        <?php foreach ($subjectsList as $sub): ?>
                             <option value="<?= $sub['id'] ?>"><?= htmlspecialchars($sub['name'], ENT_QUOTES, 'UTF-8') ?> (<?= htmlspecialchars($sub['code'], ENT_QUOTES, 'UTF-8') ?>)</option>
                         <?php endforeach; ?>
                     </select>
@@ -345,7 +351,7 @@ $activeDays = count(array_filter($schedulesByDay, fn($dayList) => !empty($dayLis
                     <label for="modal_teacher">Guru Pengampu <span class="req">*</span></label>
                     <select id="modal_teacher" name="teacher_id" required>
                         <option value="">-- Pilih Guru --</option>
-                        <?php foreach (($data['teachers'] ?? []) as $tch): ?>
+                        <?php foreach ($teachersList as $tch): ?>
                             <option value="<?= $tch['id'] ?>"><?= htmlspecialchars($tch['name'], ENT_QUOTES, 'UTF-8') ?></option>
                         <?php endforeach; ?>
                     </select>

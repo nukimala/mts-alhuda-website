@@ -81,6 +81,7 @@ class AdminBeritaController
             'role' => Auth::displayRole(),
             'active_menu' => 'berita',
             'berita' => $posts,
+            'posts' => $posts,
             'total' => $total,
             'stat_published' => $statPublished,
             'stat_draft' => $statDraft,

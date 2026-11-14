@@ -38,6 +38,7 @@ class AdminPpdbController
             'role' => Auth::displayRole(),
             'active_menu' => 'ppdb',
             'pengaturan' => $settingsRaw,
+            'settings' => $settingsRaw,
             'documents' => $documents,
             'total_downloads' => $totalDownloads,
             'flash' => $_SESSION['_flash_success'] ?? null,
