@@ -17,10 +17,10 @@
     <div class="login-card">
         <div class="card">
             <div class="card-pad">
-                <img class="login-logo" src="<?= base_url('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTs Al-Huda">
+                <img class="login-logo" src="<?= base_url('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTS Al-Huda Gondang">
 
                 <h1>Masuk Panel Admin</h1>
-                <p class="sub">Website MTs Al-Huda Gondang</p>
+                <p class="sub">Portal Resmi MTS Al-Huda Gondang</p>
 
                 <?php if (!empty($data['error'])): ?>
                     <div class="notice warn" style="margin-bottom:16px">
@@ -72,7 +72,7 @@
     </div>
 </div>
 
-<div class="foot-strip">MTs Al-Huda Gondang &middot; Panel Admin</div>
+<div class="foot-strip">MTS Al-Huda Gondang &middot; Panel Admin</div>
 
 <script>
     document.querySelectorAll('[data-toggle]').forEach(function (btn) {

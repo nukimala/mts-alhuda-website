@@ -1251,8 +1251,8 @@ $sql .= "(3, 3, 3, CURDATE(), CURDATE(), 'daily', NOW(), '06:55:00', 'hadir', 'H
 // 10. Pengaturan Dasar (Settings)
 $sql .= "-- 10. Pengaturan Dasar Madrasah\n";
 $settingsData = [
-    ['site_name', 'MTs Al-Huda', 'string', 'identitas', 'Nama madrasah', 1],
-    ['site_subtitle', 'Gondang', 'string', 'identitas', 'Keterangan nama', 1],
+    ['site_name', 'MTS Al-Huda Gondang', 'string', 'identitas', 'Nama madrasah', 1],
+    ['site_subtitle', 'Nganjuk', 'string', 'identitas', 'Keterangan nama', 1],
     ['site_full_name', 'Madrasah Tsanawiyah Al-Huda Gondang', 'string', 'identitas', 'Nama lengkap madrasah', 1],
     ['site_logo', 'assets/images/LOGO_MTS 1.png', 'string', 'identitas', 'Logo resmi madrasah', 1],
     ['site_favicon', 'assets/images/LOGO_MTS 1.png', 'string', 'identitas', 'Favicon situs', 1],

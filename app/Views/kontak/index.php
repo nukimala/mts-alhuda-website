@@ -14,7 +14,7 @@ $old = $data['old'] ?? [];
     <section class="page-hero-clean">
         <div class="container">
             <div class="hero-label">Layanan Informasi &amp; Komunikasi</div>
-            <h1>Hubungi <span>MTs Al-Huda</span> Gondang</h1>
+            <h1>Hubungi <span>MTS Al-Huda Gondang</span></h1>
             <p>
                 Kami siap membantu menjawab pertanyaan seputar program madrasah, kegiatan santri, akademik, serta pendaftaran siswa baru (PPDB).
             </p>

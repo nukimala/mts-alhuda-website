@@ -57,6 +57,80 @@ button:disabled, [aria-disabled="true"] {
     width: min(var(--container), calc(100% - 40px));
     margin-inline: auto;
 }
+
+/* TOPBAR RESMI MADRASAH */
+.site-topbar {
+    background: #064E3B;
+    color: #E2E8F0;
+    font-size: 11.5px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.site-topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.site-topbar-left, .site-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.topbar-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.topbar-sep {
+    opacity: 0.35;
+}
+.topbar-akreditasi {
+    color: #86EFAC;
+    font-weight: 700;
+}
+.topbar-link {
+    color: #A7F3D0;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.15s ease;
+}
+.topbar-link:hover {
+    color: #FFFFFF;
+}
+.topbar-portal {
+    color: #E2E8F0;
+    text-decoration: none;
+    opacity: 0.9;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    transition: all 0.15s ease;
+}
+.topbar-portal:hover {
+    background: rgba(255,255,255,0.2);
+    color: #FFFFFF;
+}
+@media (max-width: 860px) {
+    .site-topbar {
+        font-size: 11px;
+        padding: 5px 0;
+    }
+    .site-topbar-left .topbar-address {
+        display: none;
+    }
+    .site-topbar-left .topbar-sep:first-of-type {
+        display: none;
+    }
+}
+@media (max-width: 520px) {
+    .site-topbar-right .topbar-link,
+    .site-topbar-right .topbar-sep {
+        display: none;
+    }
+}
+
 /* NAVBAR */
 .site-header {
     height: 62px;
