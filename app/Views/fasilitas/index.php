@@ -56,7 +56,7 @@ $facilities = $data['facilities'] ?? [];
                                 <?php else: ?>
                                     <div style="width:100%;height:100%;background:linear-gradient(135deg, #15803D 0%, #0B3D1E 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px">
                                         <span style="font-size: 32px; margin-bottom: 4px;">🏛️</span>
-                                        <b style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Sarana MTs Al-Huda</b>
+                                        <b style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Sarana MTS Al-Huda Gondang</b>
                                     </div>
                                 <?php endif; ?>
                                 

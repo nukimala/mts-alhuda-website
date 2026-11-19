@@ -70,7 +70,8 @@ ob_start();
                 </tr>
             </thead>
             <tbody>
-            <?php if (empty($data['posts'])): ?>
+            <?php $postsList = $data['posts'] ?? $data['berita'] ?? []; ?>
+            <?php if (empty($postsList)): ?>
                 <tr>
                     <td colspan="6" style="padding:36px 16px;text-align:center;color:#6B7280">
                         <svg viewBox="0 0 24 24" style="width:32px;height:32px;stroke:#94A3B8;fill:none;stroke-width:1.8;margin:0 auto 8px;display:block"><path d="M4 5h16v14H4z"/><path d="M7 9h7M7 13h10M7 17h5"/></svg>
@@ -81,7 +82,7 @@ ob_start();
                     </td>
                 </tr>
             <?php else: ?>
-                <?php $i = 1 + (($data['page'] - 1) * 10); foreach ($data['posts'] as $p): ?>
+                <?php $i = 1 + (($data['page'] - 1) * 10); foreach ($postsList as $p): ?>
                     <tr>
                         <td class="muted"><?= $i++ ?></td>
                         <td>

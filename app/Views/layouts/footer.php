@@ -3,17 +3,17 @@
         <!-- Profil Madrasah -->
         <div class="footer-about">
             <a href="<?= url('/') ?>" style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px; text-decoration: none;">
-                <img src="<?= asset('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTs Al-Huda" width="44" height="44" style="width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px;">
+                <img src="<?= asset('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTS Al-Huda Gondang" width="44" height="44" style="width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px;">
                 <div>
-                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0; line-height: 1.2;">MTs Al-Huda Gondang</h3>
+                    <h3 style="color: #ffffff; font-size: 17px; font-weight: 800; margin: 0; line-height: 1.2;">MTS Al-Huda Gondang</h3>
                     <span style="font-size: 11px; color: #4ADE80; font-weight: 700;">Terakreditasi "A" (Unggul) BAN-PDM</span>
                 </div>
             </a>
             <p style="color: #E2E8F0; line-height: 1.65; font-size: 13px; margin-bottom: 14px;">
-                Madrasah Tsanawiyah terpadu yang memadukan kurikulum nasional dan nilai-nilai kepesantrenan untuk membina generasi cerdas, mandiri, dan berakhlakul karimah.
+                Madrasah Tsanawiyah terpadu yang memadukan kurikulum nasional dan nilai-nilai kepesantrenan untuk membina generasi cerdas, mandiri, dan berakhlakul karimah di Gondang, Nganjuk.
             </p>
             <div style="font-size: 12px; color: #BBF7D0;">
-                NPSN: <strong>20582910</strong> • NSM: <strong>121235180039</strong>
+                NPSN: <strong>20582234</strong> • NSM: <strong>121235180039</strong>
             </div>
         </div>
 
@@ -51,21 +51,22 @@
                 Kontak &amp; Alamat
             </h4>
             <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; color: #E2E8F0;">
-                <div>📍 Jl. Letjend Suprapto No. 16, Desa Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur</div>
-                <div>☎ Telepon: (0358) 123456</div>
-                <div>✉ Email: info@mtsalhuda.sch.id</div>
+                <div>📍 Jln. Letjen Soeprapto No.16, Ds. Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur</div>
+                <div>☎ Telepon: (0358) 771234</div>
+                <div>💬 WhatsApp: 0812-3456-7890</div>
+                <div>✉ Email: info@mts-alhuda.sch.id</div>
                 <div>⏰ Pelayanan: Senin - Sabtu (07.00 - 14.00 WIB)</div>
             </div>
         </div>
     </div>
 
     <!-- Copyright -->
-    <div class="container" style="border-top: 1px solid rgba(255,255,255,.1); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12px; color: #CBD5E1;">
-        <span>© <?= date('Y') ?> MTs Al-Huda Gondang. Terakreditasi "A" BAN-PDM. Seluruh hak cipta dilindungi.</span>
-        <span>Sistem Informasi Madrasah Terpadu</span>
+    <div class="container" style="border-top: 1px solid rgba(255,255,255,.1); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; color: rgba(255,255,255,.6);">
+        <span>© <?= date('Y') ?> MTS Al-Huda Gondang. Terakreditasi "A" BAN-PDM. Seluruh hak cipta dilindungi.</span>
+        <span>Kecamatan Gondang, Kabupaten Nganjuk, Jawa Timur</span>
     </div>
 </footer>
 
-<script src="<?= asset('js/script.js') ?>"></script>
+<script src="<?= base_url('js/main.js') ?>" defer></script>
 </body>
 </html>

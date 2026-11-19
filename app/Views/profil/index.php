@@ -20,7 +20,7 @@ function get_initials(string $name): string {
     <section class="page-hero-clean">
         <div class="container">
             <div class="hero-label">Identitas &amp; Dokumen Resmi Madrasah</div>
-            <h1>Profil Lengkap <span>MTs Al-Huda</span> Gondang</h1>
+            <h1>Profil Lengkap <span>MTS Al-Huda Gondang</span></h1>
             <p>
                 Membina generasi yang berilmu amaliah, cerdas dalam ilmu pengetahuan, dan teguh dalam akhlakul karimah di bawah naungan Yayasan Pendidikan Islam Al-Huda Pandean, Gondang, Nganjuk.
             </p>

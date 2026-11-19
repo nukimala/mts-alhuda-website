@@ -40,7 +40,7 @@ $facilities = $data['facilities'] ?? [];
                          fetchpriority="high">
                     <div class="hero-visual-caption">
                         <span>🏛️</span>
-                        <span>Dokumentasi Kegiatan &amp; Kepanduan Santri MTs Al-Huda</span>
+                        <span>Dokumentasi Kegiatan &amp; Kepanduan Santri MTS Al-Huda Gondang</span>
                     </div>
                 </div>
             </div>

@@ -203,11 +203,13 @@ class ApiAcademicController
                     a.due_at, a.max_score, a.is_published, a.created_at,
                     c.id AS class_id, c.name AS class_name, c.level,
                     sub.code AS subject_code, sub.name AS subject_name,
+                    tk.id AS topic_id, tk.minggu AS topic_minggu, tk.nama AS topic_nama,
                     {$summarySelect}
              FROM tugas a
              JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
              JOIN kelas c         ON c.id = cs.class_id
              JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
+             LEFT JOIN topik tk   ON tk.id = a.topik_id
              {$studentJoin}
              WHERE {$whereSql}
              ORDER BY (a.due_at IS NULL) ASC, a.due_at DESC, a.id DESC
@@ -293,6 +295,7 @@ class ApiAcademicController
                     a.due_at, a.max_score, a.is_published, a.created_at,
                     c.id AS class_id, c.name AS class_name, c.level,
                     sub.code AS subject_code, sub.name AS subject_name,
+                    tk.id AS topic_id, tk.minggu AS topic_minggu, tk.nama AS topic_nama,
                     (SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id) AS submission_count,
                     (SELECT COUNT(*) FROM pengumpulan_tugas s WHERE s.assignment_id = a.id AND s.graded_at IS NULL) AS ungraded_count
                     {$studentSelect}
@@ -300,6 +303,7 @@ class ApiAcademicController
              JOIN mata_pelajaran_kelas cs ON cs.id = a.class_subject_id
              JOIN kelas c         ON c.id = cs.class_id
              JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
+             LEFT JOIN topik tk   ON tk.id = a.topik_id
              {$studentJoin}
              WHERE " . implode(' AND ', $where) . '
              LIMIT 1'
@@ -370,11 +374,13 @@ class ApiAcademicController
             "SELECT m.id, m.title, m.description, m.file_path, m.external_url, m.published_at,
                     c.id AS class_id, c.name AS class_name,
                     sub.code AS subject_code, sub.name AS subject_name,
+                    tk.id AS topic_id, tk.minggu AS topic_minggu, tk.nama AS topic_nama,
                     u.name AS author_name
              FROM materi m
              JOIN mata_pelajaran_kelas cs ON cs.id = m.class_subject_id
              JOIN kelas c         ON c.id = cs.class_id
              JOIN mata_pelajaran sub      ON sub.id = cs.subject_id
+             LEFT JOIN topik tk   ON tk.id = m.topik_id
              LEFT JOIN pengguna u      ON u.id = m.created_by
              WHERE {$whereSql}
              ORDER BY m.published_at DESC, m.id DESC
@@ -399,6 +405,7 @@ class ApiAcademicController
                     'code' => (string) $row['subject_code'],
                     'name' => (string) $row['subject_name'],
                 ],
+                'topic'        => $this->topicPayload($row),
                 'author_name'  => $row['author_name'],
             ];
         }
@@ -430,6 +437,23 @@ class ApiAcademicController
         }
 
         return $user;
+    }
+
+    /**
+     * @param array<string,mixed> $row
+     * @return array{id:int,minggu:int,nama:string}|null
+     */
+    private function topicPayload(array $row): ?array
+    {
+        if (!isset($row['topic_id']) || $row['topic_id'] === null) {
+            return null;
+        }
+
+        return [
+            'id'     => (int) $row['topic_id'],
+            'minggu' => (int) $row['topic_minggu'],
+            'nama'   => (string) $row['topic_nama'],
+        ];
     }
 
     /**
@@ -510,6 +534,7 @@ class ApiAcademicController
                 'code' => (string) $row['subject_code'],
                 'name' => (string) $row['subject_name'],
             ],
+            'topic'          => $this->topicPayload($row),
         ];
 
         if ($scope['type'] === 'student') {

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= htmlspecialchars($data['title'] ?? 'Panel Admin | MTs Al-Huda Gondang') ?></title>
+    <title><?= htmlspecialchars($data['title'] ?? 'Panel Admin | MTS Al-Huda Gondang') ?></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,10 +17,10 @@
 
     <aside class="sidebar">
         <div class="side-brand">
-            <img src="<?= base_url('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTs Al-Huda">
+            <img src="<?= base_url('assets/images/LOGO_MTS 1.png') ?>" alt="Logo MTS Al-Huda Gondang">
             <div>
-                <b>MTs Al-Huda</b>
-                <span>Panel Admin</span>
+                <b>MTS Al-Huda Gondang</b>
+                <span>Panel Administrasi</span>
             </div>
         </div>
 
@@ -93,6 +93,16 @@
 
     <div class="main">
         <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="pill green plain" style="font-size: 10.5px; font-weight: 700; padding: 2px 7px;">Madrasah</span>
+                <span style="font-weight: 800; font-size: 14.5px; color: var(--text);">MTS Al-Huda Gondang</span>
+                <a href="<?= base_url() ?>" target="_blank" class="btn btn-ghost btn-xs" style="color: var(--gray); font-size: 11.5px; padding: 3px 8px; text-decoration: none;" title="Buka Website Publik">
+                    Lihat Situs ↗
+                </a>
+            </div>
+
+            <div class="spacer"></div>
+
             <div class="top-user">
                 <div class="avatar"><?= htmlspecialchars(strtoupper(mb_substr((string) ($data['user']['name'] ?? 'A'), 0, 2)), ENT_QUOTES, 'UTF-8') ?></div>
                 <div>
@@ -100,8 +110,6 @@
                     <span><?= htmlspecialchars((string) ($data['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
             </div>
-
-            <div class="spacer"></div>
 
             <a class="btn btn-ghost" href="<?= base_url('admin/ganti-sandi') ?>">Ganti Sandi</a>
 

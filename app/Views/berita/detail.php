@@ -18,7 +18,7 @@ $otherPosts = $data['other_posts'] ?? [];
             <div style="display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: rgba(255,255,255,.8); flex-wrap: wrap;">
                 <span>📅 <?= !empty($post['published_at']) ? date('d F Y', strtotime($post['published_at'])) : date('d F Y') ?></span>
                 <span>•</span>
-                <span>✍️ Oleh <?= htmlspecialchars($post['author_name'] ?? 'Humas MTs Al-Huda', ENT_QUOTES, 'UTF-8') ?></span>
+                <span>✍️ Oleh <?= htmlspecialchars($post['author_name'] ?? 'Humas MTS Al-Huda Gondang', ENT_QUOTES, 'UTF-8') ?></span>
                 <span>•</span>
                 <span>👁️ <?= (int) ($post['views'] ?? $post['views_count'] ?? 0) ?> Kali Dilihat</span>
             </div>
