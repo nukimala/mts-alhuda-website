@@ -18,6 +18,13 @@ class ApiRouter
         $this->sendCors();
 
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($method === 'POST') {
+            if (isset($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
+                $method = strtoupper((string) $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+            } elseif (isset($_POST['_method'])) {
+                $method = strtoupper((string) $_POST['_method']);
+            }
+        }
 
         if ($method === 'OPTIONS') {
             http_response_code(204);
@@ -134,6 +141,12 @@ class ApiRouter
                 'attendance/today'       => ['ApiAttendanceController', 'today'],
                 'attendance/history'     => ['ApiAttendanceController', 'history'],
                 'notifications'          => ['ApiNotificationController', 'index'],
+                'guru'                   => ['ApiGuruController', 'index'],
+                'guru/{id}'              => ['ApiGuruController', 'detail'],
+                'siswa'                  => ['ApiSiswaController', 'index'],
+                'siswa/{id}'             => ['ApiSiswaController', 'detail'],
+                'kelas'                  => ['ApiMasterDataController', 'kelas'],
+                'mata-pelajaran'         => ['ApiMasterDataController', 'mataPelajaran'],
             ],
             'POST' => [
                 'auth/login'   => ['ApiAuthController', 'login'],
@@ -144,6 +157,22 @@ class ApiRouter
                 'notifications/{id}/read'       => ['ApiNotificationController', 'markRead'],
                 'notifications/read-all'        => ['ApiNotificationController', 'markAllRead'],
                 'assignments/{publicId}/submit' => ['ApiAcademicController', 'submitAssignment'],
+                'guru'                          => ['ApiGuruController', 'store'],
+                'guru/{id}'                     => ['ApiGuruController', 'update'],
+                'guru/{id}/update'              => ['ApiGuruController', 'update'],
+                'guru/{id}/delete'              => ['ApiGuruController', 'delete'],
+                'siswa'                         => ['ApiSiswaController', 'store'],
+                'siswa/{id}'                    => ['ApiSiswaController', 'update'],
+                'siswa/{id}/update'             => ['ApiSiswaController', 'update'],
+                'siswa/{id}/delete'             => ['ApiSiswaController', 'delete'],
+            ],
+            'PUT' => [
+                'guru/{id}'  => ['ApiGuruController', 'update'],
+                'siswa/{id}' => ['ApiSiswaController', 'update'],
+            ],
+            'DELETE' => [
+                'guru/{id}'  => ['ApiGuruController', 'delete'],
+                'siswa/{id}' => ['ApiSiswaController', 'delete'],
             ],
         ];
 
@@ -265,8 +294,8 @@ class ApiRouter
     private function sendCors(): void
     {
         header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-        header('Access-Control-Allow-Headers: Authorization, Content-Type, Accept');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, X-Authorization, Content-Type, Accept, X-HTTP-Method-Override');
         header('Access-Control-Max-Age: 86400');
         header('Vary: Origin');
     }
