@@ -140,6 +140,7 @@ class ApiRouter
                 'materials'              => ['ApiAcademicController', 'materials'],
                 'attendance/today'       => ['ApiAttendanceController', 'today'],
                 'attendance/history'     => ['ApiAttendanceController', 'history'],
+                'attendance/recap'       => ['ApiAttendanceController', 'recap'],
                 'notifications'          => ['ApiNotificationController', 'index'],
                 'guru'                   => ['ApiGuruController', 'index'],
                 'guru/{id}'              => ['ApiGuruController', 'detail'],

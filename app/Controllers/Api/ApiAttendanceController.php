@@ -519,4 +519,105 @@ class ApiAttendanceController
             'items'   => $items,
         ], 200, ['meta' => ApiFormat::meta($total, $page['page'], $page['per_page'])]);
     }
+
+    /**
+     * GET /api/v1/attendance/recap
+     *
+     * Rekap presensi untuk admin / mobile app:
+     * - filter waktu: month=2026-11 (atau "semua"), start_date=YYYY-MM-DD, end_date=YYYY-MM-DD
+     * - filter mapel: mapel=Matematika (atau "Semua Mapel")
+     * - filter kelas: kelas=Kelas VII A / VII A (atau "Semua Kelas")
+     */
+    public function recap(array $params = []): void
+    {
+        $user = ApiAuth::authenticate();
+        if ($user === null) {
+            ApiResponse::unauthorized('Silakan login terlebih dahulu.');
+            return;
+        }
+
+        $pdo = Database::connection();
+
+        $month = trim((string) ($_GET['month'] ?? ''));
+        $startDate = trim((string) ($_GET['start_date'] ?? ''));
+        $endDate = trim((string) ($_GET['end_date'] ?? ''));
+        $mapel = trim((string) ($_GET['mapel'] ?? ''));
+        $kelas = trim((string) ($_GET['kelas'] ?? ''));
+
+        $where = ['p.deleted_at IS NULL'];
+        $args = [];
+
+        if ($month !== '' && $month !== 'semua' && preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $where[] = "p.attendance_date LIKE ?";
+            $args[] = $month . '-%';
+        }
+
+        if ($startDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
+            $where[] = "p.attendance_date >= ?";
+            $args[] = $startDate;
+        }
+
+        if ($endDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
+            $where[] = "p.attendance_date <= ?";
+            $args[] = $endDate;
+        }
+
+        $whereSql = implode(' AND ', $where);
+
+        $sql = "SELECT p.id, p.teacher_id, p.attendance_date, p.attendance_type,
+                       p.check_in_at, p.check_out_at, p.status, p.notes,
+                       COALESCE(g.nama_lengkap, u.name, 'Guru') AS teacher_name,
+                       g.nip, g.nuptk,
+                       COALESCE(sub.name, g.bidang_studi, g.subject_specialty, 'Umum') AS mapel,
+                       COALESCE(c.name, c.nama_kelas, 'Semua Kelas') AS kelas
+                FROM presensi_guru p
+                LEFT JOIN guru g ON g.id = p.teacher_id
+                LEFT JOIN pengguna u ON u.id = g.user_id
+                LEFT JOIN jadwal s ON s.id = p.schedule_id
+                LEFT JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
+                LEFT JOIN mata_pelajaran sub ON (sub.id = cs.subject_id OR sub.id = s.subject_id)
+                LEFT JOIN kelas c ON (c.id = cs.class_id OR c.id = s.kelas_id)
+                WHERE {$whereSql}
+                ORDER BY p.attendance_date DESC, p.check_in_at DESC";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($args);
+        $rows = $stmt->fetchAll();
+
+        $items = [];
+        foreach ($rows as $r) {
+            $rowMapel = (string) ($r['mapel'] ?? 'Umum');
+            $rowKelas = (string) ($r['kelas'] ?? 'Semua Kelas');
+
+            if ($mapel !== '' && $mapel !== 'Semua Mapel' && strcasecmp($rowMapel, $mapel) !== 0) {
+                continue;
+            }
+
+            if ($kelas !== '' && $kelas !== 'Semua Kelas') {
+                $cleanFilterKelas = preg_replace('/^Kelas\s+/i', '', $kelas);
+                $cleanRowKelas = preg_replace('/^Kelas\s+/i', '', $rowKelas);
+                if (strcasecmp($cleanFilterKelas, $cleanRowKelas) !== 0) {
+                    continue;
+                }
+            }
+
+            $items[] = [
+                'id'              => (int) $r['id'],
+                'teacher_id'      => (int) ($r['teacher_id'] ?? 0),
+                'nama'            => (string) $r['teacher_name'],
+                'teacher_name'    => (string) $r['teacher_name'],
+                'mapel'           => $rowMapel,
+                'kelas'           => $rowKelas,
+                'tanggal'         => $r['attendance_date'],
+                'attendance_date' => $r['attendance_date'],
+                'check_in_at'     => $r['check_in_at'],
+                'check_out_at'    => $r['check_out_at'],
+                'pulang'          => !empty($r['check_out_at']),
+                'status'          => (string) $r['status'],
+                'notes'           => (string) ($r['notes'] ?? ''),
+            ];
+        }
+
+        ApiResponse::ok($items);
+    }
 }
