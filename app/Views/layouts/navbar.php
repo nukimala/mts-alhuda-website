@@ -52,8 +52,7 @@ if (str_starts_with($navWa, '0')) {
                  width="42"
                  height="42">
             <div>
-                <span class="brand-title">MTS Al-Huda Gondang</span>
-                <span class="brand-subtitle">Madrasah Tsanawiyah Terakreditasi A &middot; Nganjuk</span>
+                <span class="brand-title">MTs Al-Huda Gondang</span>
             </div>
         </a>
 

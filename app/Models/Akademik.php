@@ -112,8 +112,8 @@ class Akademik
             return (int) $existingId;
         }
 
-        $insert = $this->pdo->prepare("INSERT INTO mata_pelajaran_kelas (class_id, subject_id, teacher_id, weekly_hours, is_active, created_at, updated_at) VALUES (?, ?, ?, 2, 1, NOW(), NOW())");
-        $insert->execute([$classId, $subjectId, $teacherId]);
+        $insert = $this->pdo->prepare("INSERT INTO mata_pelajaran_kelas (class_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, weekly_hours, jam_mingguan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 2, 2, 1, NOW(), NOW())");
+        $insert->execute([$classId, $classId, $subjectId, $subjectId, $teacherId, $teacherId]);
         return (int) $this->pdo->lastInsertId();
     }
 
@@ -147,17 +147,26 @@ class Akademik
      */
     public function addSchedule(array $payload): int
     {
-        $sql = "INSERT INTO jadwal (class_subject_id, teacher_id, academic_year_id, day_of_week, start_time, end_time, room, is_active, created_at, updated_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())";
+        $room = ($payload['room'] ?? '') !== '' ? $payload['room'] : 'Ruang Kelas';
+        $sql = "INSERT INTO jadwal (class_subject_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, academic_year_id, day_of_week, hari, start_time, jam_mulai, end_time, jam_selesai, room, ruangan, is_active, created_at, updated_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             $payload['class_subject_id'],
+            $payload['class_id'],
+            $payload['subject_id'],
+            $payload['subject_id'],
+            $payload['teacher_id'],
             $payload['teacher_id'],
             $payload['academic_year_id'],
             $payload['day_of_week'],
+            $payload['hari'] ?? 'Senin',
+            $payload['start_time'],
             $payload['start_time'],
             $payload['end_time'],
-            $payload['room'] ?? null,
+            $payload['end_time'],
+            $room,
+            $room,
         ]);
         return (int) $this->pdo->lastInsertId();
     }
