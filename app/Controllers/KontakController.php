@@ -38,6 +38,14 @@ class KontakController
             exit;
         }
 
+        $rate = RateLimiter::hit('kontak:' . RateLimiter::clientIp(), 5, 600);
+        if (!$rate['allowed']) {
+            $waitMin = max(1, (int) ceil($rate['retry_after'] / 60));
+            $_SESSION['_flash_error'] = "Terlalu banyak pengiriman pesan. Silakan coba lagi dalam {$waitMin} menit.";
+            header('Location: ' . base_url('kontak'));
+            exit;
+        }
+
         $name = trim((string) ($_POST['name'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));

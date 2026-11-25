@@ -4,19 +4,7 @@ class AdminPpdbController
 {
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        return Auth::requireAdmin();
     }
 
     public function index(): void
@@ -108,20 +96,16 @@ class AdminPpdbController
             return;
         }
 
-        if (isset($_FILES['doc_file']) && $_FILES['doc_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['doc_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'png'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/ppdb';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'ppdb_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['doc_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $filePath = 'uploads/ppdb/' . $filename;
-                    $fileSize = (int) filesize($targetDir . '/' . $filename);
-                    $mimeType = trim((string) ($_FILES['doc_file']['type'] ?? '')) ?: 'application/octet-stream';
-                }
+        if (isset($_FILES['doc_file']) && $_FILES['doc_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeDocument($_FILES['doc_file'], 'ppdb', 'ppdb');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url('admin/ppdb'));
+                return;
             }
+            $filePath = $upload['path'];
+            $fileSize = (int) $upload['size'];
+            $mimeType = (string) $upload['mime'];
         }
 
         if ($filePath === '') {

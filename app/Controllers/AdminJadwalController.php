@@ -1,27 +1,21 @@
 <?php
 
+require_once __DIR__ . '/../Models/Akademik.php';
+
 class AdminJadwalController
 {
-    private function guard(): array
+    private Akademik $akademikModel;
+
+    public function __construct()
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        $this->akademikModel = new Akademik();
     }
 
-    /**
-     * Skema produksi menyimpan hari sebagai ENUM nama, bukan hanya angka.
-     */
+    private function guard(): array
+    {
+        return Auth::requireAdmin();
+    }
+
     private function dayName(int $day): string
     {
         return match ($day) {
@@ -38,42 +32,22 @@ class AdminJadwalController
     public function index(): void
     {
         $user = $this->guard();
-        $pdo = Database::connection();
 
-        // Get academic years
-        $academicYears = $pdo->query("SELECT * FROM tahun_akademik ORDER BY is_active DESC, name DESC")->fetchAll();
+        // 1. Ambil tahun ajaran melalui Model
+        $academicYears = $this->akademikModel->getAllAcademicYears();
         $activeYear = $academicYears[0] ?? null;
-
         $yearId = isset($_GET['year_id']) ? (int) $_GET['year_id'] : (int) ($activeYear['id'] ?? 0);
 
-        // Get classes for selected year (dengan fallback jika academic_year_id fleksibel)
-        $classesStmt = $pdo->prepare("SELECT * FROM kelas WHERE academic_year_id = ? OR ? = 0 ORDER BY level ASC, name ASC");
-        $classesStmt->execute([$yearId, $yearId]);
-        $classes = $classesStmt->fetchAll();
-        if (empty($classes)) {
-            $classes = $pdo->query("SELECT * FROM kelas ORDER BY level ASC, name ASC")->fetchAll();
-        }
-
+        // 2. Ambil kelas untuk tahun ajaran terpilih melalui Model
+        $classes = $this->akademikModel->getClassesByYear($yearId);
         $selectedClassId = isset($_GET['class_id']) ? (int) $_GET['class_id'] : (int) ($classes[0]['id'] ?? 0);
 
-        // Get schedules for selected class and year
-        $schedules = [];
-        if ($selectedClassId > 0) {
-            $sStmt = $pdo->prepare("SELECT s.*, cs.class_id, sub.name as subject_name, sub.code as subject_code, COALESCE(u.name, t.nama_lengkap, 'Guru') as teacher_name
-                                    FROM jadwal s
-                                    JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
-                                    JOIN mata_pelajaran sub ON sub.id = cs.subject_id
-                                    LEFT JOIN guru t ON t.id = s.teacher_id
-                                    LEFT JOIN pengguna u ON u.id = t.user_id
-                                    WHERE (cs.class_id = ? OR s.kelas_id = ?) AND (s.academic_year_id = ? OR ? = 0)
-                                    ORDER BY s.day_of_week ASC, s.start_time ASC");
-            $sStmt->execute([$selectedClassId, $selectedClassId, $yearId, $yearId]);
-            $schedules = $sStmt->fetchAll();
-        }
+        // 3. Ambil jadwal pelajaran melalui Model
+        $schedules = $selectedClassId > 0 ? $this->akademikModel->getSchedulesByClass($selectedClassId, $yearId) : [];
 
-        // Get subjects & teachers for modal dropdown
-        $subjects = $pdo->query("SELECT * FROM mata_pelajaran WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
-        $teachers = $pdo->query("SELECT t.id, COALESCE(u.name, t.nama_lengkap) as name, t.nip FROM guru t LEFT JOIN pengguna u ON u.id = t.user_id WHERE t.is_active = 1 ORDER BY name ASC")->fetchAll();
+        // 4. Ambil mata pelajaran dan guru untuk modal dropdown melalui Model
+        $subjects = $this->akademikModel->getAllSubjects();
+        $teachers = $this->akademikModel->getAllTeachers();
 
         $data = [
             'title' => 'Jadwal Pelajaran | Panel Admin MTs Al-Huda',
@@ -126,62 +100,37 @@ class AdminJadwalController
             return;
         }
 
-        $pdo = Database::connection();
+        // Dapatkan/buat class_subject_id
+        $classSubjectId = $this->akademikModel->getOrCreateClassSubject($classId, $subjectId, $teacherId);
 
-        // Ensure class_subjects entry exists or find it
-        $csStmt = $pdo->prepare("SELECT id FROM mata_pelajaran_kelas WHERE class_id = ? AND subject_id = ?");
-        $csStmt->execute([$classId, $subjectId]);
-        $classSubjectId = $csStmt->fetchColumn();
-
-        if (!$classSubjectId) {
-            $insertCs = $pdo->prepare("INSERT INTO mata_pelajaran_kelas (class_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, weekly_hours, jam_mingguan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 2, 2, 1, NOW(), NOW())");
-            $insertCs->execute([$classId, $classId, $subjectId, $subjectId, $teacherId, $teacherId]);
-            $classSubjectId = (int) $pdo->lastInsertId();
-        }
-
-        // Check teacher clash: same teacher, same year, same day, overlapping time
-        $clashStmt = $pdo->prepare("SELECT COUNT(*) FROM jadwal 
-                                    WHERE teacher_id = ? AND academic_year_id = ? AND day_of_week = ? 
-                                    AND (start_time < ? AND end_time > ?)");
-        $clashStmt->execute([$teacherId, $yearId, $dayOfWeek, $endTime, $startTime]);
-        if ((int) $clashStmt->fetchColumn() > 0) {
+        // Cek bentrok jadwal guru
+        if ($this->akademikModel->hasTeacherClash($teacherId, $yearId, $dayOfWeek, $startTime, $endTime)) {
             $_SESSION['_flash_error'] = 'Bentrok jadwal! Guru yang dipilih sudah memiliki jadwal mengajar di kelas lain pada jam dan hari tersebut.';
             header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));
             return;
         }
 
-        // Check class clash: same class, same year, same day, overlapping time
-        $classClashStmt = $pdo->prepare("SELECT COUNT(*) FROM jadwal s
-                                         JOIN mata_pelajaran_kelas cs ON cs.id = s.class_subject_id
-                                         WHERE cs.class_id = ? AND s.academic_year_id = ? AND s.day_of_week = ?
-                                         AND (s.start_time < ? AND s.end_time > ?)");
-        $classClashStmt->execute([$classId, $yearId, $dayOfWeek, $endTime, $startTime]);
-        if ((int) $classClashStmt->fetchColumn() > 0) {
+        // Cek bentrok jadwal kelas
+        if ($this->akademikModel->hasClassClash($classId, $yearId, $dayOfWeek, $startTime, $endTime)) {
             $_SESSION['_flash_error'] = 'Bentrok jadwal! Kelas ini sudah memiliki mata pelajaran lain pada jam dan hari tersebut.';
             header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));
             return;
         }
 
-        $insStmt = $pdo->prepare("INSERT INTO jadwal (class_subject_id, kelas_id, subject_id, mata_pelajaran_id, teacher_id, guru_id, academic_year_id, day_of_week, hari, start_time, jam_mulai, end_time, jam_selesai, room, ruangan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())");
-        $insStmt->execute([
-            $classSubjectId,
-            $classId,
-            $subjectId,
-            $subjectId,
-            $teacherId,
-            $teacherId,
-            $yearId,
-            $dayOfWeek,
-            $this->dayName($dayOfWeek),
-            $startTime,
-            $startTime,
-            $endTime,
-            $endTime,
-            $room !== '' ? $room : null,
-            $room !== '' ? $room : null,
+        $scheduleId = $this->akademikModel->addSchedule([
+            'class_subject_id' => $classSubjectId,
+            'class_id' => $classId,
+            'subject_id' => $subjectId,
+            'teacher_id' => $teacherId,
+            'academic_year_id' => $yearId,
+            'day_of_week' => $dayOfWeek,
+            'hari' => $this->dayName($dayOfWeek),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'room' => $room,
         ]);
 
-        Auth::log('jadwal.create', 'jadwal', (int) $pdo->lastInsertId(), "Menambah jadwal kelas ID {$classId}");
+        Auth::log('jadwal.create', 'jadwal', $scheduleId, "Menambah jadwal kelas ID {$classId}");
 
         $_SESSION['_flash_success'] = 'Jadwal pelajaran berhasil ditambahkan.';
         header('Location: ' . base_url('admin/jadwal?class_id=' . $classId . '&year_id=' . $yearId));
@@ -200,9 +149,7 @@ class AdminJadwalController
         $classId = (int) ($_POST['class_id'] ?? 0);
         $yearId = (int) ($_POST['year_id'] ?? 0);
 
-        $pdo = Database::connection();
-        $stmt = $pdo->prepare("DELETE FROM jadwal WHERE id = ?");
-        $stmt->execute([$id]);
+        $this->akademikModel->deleteSchedule($id);
 
         Auth::log('jadwal.delete', 'jadwal', $id, "Menghapus jadwal ID {$id}");
 

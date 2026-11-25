@@ -4,19 +4,7 @@ class AdminGaleriController
 {
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit();
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit();
-        }
-
-        return $user;
+        return Auth::requireAdmin();
     }
 
     public function index(): void
@@ -120,18 +108,14 @@ class AdminGaleriController
             return;
         }
 
-        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/galeri';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'galeri_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $imagePath = 'uploads/galeri/' . $filename;
-                }
+        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['image_file'], 'galeri', 'galeri');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url('admin/galeri/create'));
+                return;
             }
+            $imagePath = $upload['path'];
         }
 
         if ($imagePath === '') {
@@ -235,18 +219,14 @@ class AdminGaleriController
             return;
         }
 
-        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/galeri';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'galeri_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $imagePath = 'uploads/galeri/' . $filename;
-                }
+        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['image_file'], 'galeri', 'galeri');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url("admin/galeri/edit/{$id}"));
+                return;
             }
+            $imagePath = $upload['path'];
         }
 
         $updateStmt = $pdo->prepare("UPDATE galeri SET album = ?, title = ?, judul = ?, image_path = ?, gambar = ?, caption = ?, keterangan = ?, sort_order = ?, is_active = ?, updated_at = NOW() WHERE id = ?");

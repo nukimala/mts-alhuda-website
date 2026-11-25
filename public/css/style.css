@@ -155,6 +155,12 @@ button:disabled, [aria-disabled="true"] {
     font-weight: 800; 
     white-space: nowrap; 
 }
+.brand-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+}
 
 /* LOGO SEKOLAH */
 .brand-logo {
@@ -592,6 +598,13 @@ button:disabled, [aria-disabled="true"] {
     background: #022D14;
     color: rgba(255,255,255,.72);
     padding: 36px 0 16px;
+}
+.site-footer.footer-custom {
+    background: #0B3D1E;
+    color: rgba(255,255,255,.8);
+    padding: 50px 0 24px;
+    font-size: 13.5px;
+    border-top: 4px solid #15803D;
 }
 .footer-grid {
     display: grid;
@@ -1581,4 +1594,246 @@ button:disabled, [aria-disabled="true"] {
     .visi-misi-v2-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ============================================================
+   EXTRACTED INLINE STYLES - Phase 1 UI Cleanup
+   ============================================================ */
+
+/* Brand styles (extracted from navbar.php) */
+.brand-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--text);
+    display: block;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+.brand-subtitle {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* Nav CTA button (extracted from navbar.php) */
+.nav-cta-custom {
+    background: var(--green);
+    color: var(--white);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12.5px;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
+}
+.nav-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Nav Toggle button (extracted from navbar.php) */
+.nav-toggle-custom {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Footer container grid (extracted from footer.php) */
+.footer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 36px;
+    margin-bottom: 40px;
+}
+
+/* Footer section headings */
+.footer-section-title {
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--light-green);
+    padding-left: 8px;
+}
+
+/* Footer links container */
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Footer link styles */
+.footer-link {
+    color: var(--pale-green);
+    text-decoration: none;
+    font-size: 13px;
+}
+.footer-link-primary {
+    color: var(--light-green);
+    font-weight: 700;
+}
+.footer-link-dark {
+    color: var(--pale-green);
+}
+
+/* Footer contact items */
+.footer-contact {
+    color: var(--pale-green);
+    font-size: 12.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Footer bottom */
+.footer-bottom-custom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Footer logo link */
+.footer-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    text-decoration: none;
+}
+.footer-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background: var(--white);
+    border-radius: 8px;
+    padding: 4px;
+}
+.footer-brand-title {
+    color: var(--white);
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+}
+.footer-accreditation {
+    font-size: 11px;
+    color: var(--light-green);
+    font-weight: 700;
+}
+
+/* Footer description */
+.footer-description {
+    color: var(--pale-green);
+    line-height: 1.65;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+/* Footer info lines */
+.footer-info {
+    font-size: 12px;
+    color: var(--pale-green);
+}
+
+/* News section container (extracted from home/index.php) */
+.news-section {
+    padding: 64px 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+}
+
+/* News section header flex container */
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+/* News empty state */
+.news-empty {
+    color: var(--gray);
+    grid-column: 1 / -1;
+    padding: 24px;
+    background: var(--soft);
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* Facilities section container (extracted from home/index.php) */
+.facilities-section {
+    padding: 64px 0;
+    background: var(--soft);
+    border-bottom: 1px solid var(--border);
+}
+
+/* Facilities section header flex container */
+.facilities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+/* Facilities empty state */
+.facilities-empty {
+    color: var(--gray);
+    grid-column: 1 / -1;
+    padding: 24px;
+    background: var(--white);
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* CTA button variants (extracted from home/index.php) */
+.btn-cta-primary {
+    background: var(--white) !important;
+    color: var(--green) !important;
+    border-color: var(--white) !important;
+}
+.btn-cta-secondary {
+    background: transparent !important;
+    color: var(--white) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* CTA section title */
+.cta-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--white);
+    margin: 0 0 12px;
+}
+.cta-text {
+    font-size: 15px;
+    color: var(--pale-green);
+    line-height: 1.65;
+    margin: 0 0 28px;
+}
+
+/* CTA button container */
+.cta-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
 }

@@ -91,6 +91,44 @@ class Auth
         return $user === null ? null : (string) $user['role'];
     }
 
+    /**
+     * Pastikan pengguna sudah login dan memiliki role yang diizinkan mengakses Panel Admin.
+     *
+     * @param list<string> $allowedRoles
+     * @return array<string,mixed>
+     */
+    public static function requireAdmin(array $allowedRoles = ['admin', 'operator', 'kepala', 'akreditasi']): array
+    {
+        self::start();
+        if (!self::check()) {
+            header('Location: ' . base_url('admin/login'));
+            exit;
+        }
+
+        $user = self::user();
+        if ($user === null || !in_array((string) ($user['role'] ?? ''), $allowedRoles, true)) {
+            self::log(
+                'access.denied',
+                'admin_panel',
+                $user !== null ? (int) $user['id'] : null,
+                'Akses panel admin ditolak untuk role: ' . (string) ($user['role'] ?? 'unknown'),
+                $_SERVER['REMOTE_ADDR'] ?? null
+            );
+            self::logout();
+            self::start();
+            $_SESSION['_flash_error'] = 'Akun Anda tidak memiliki hak akses ke Panel Admin.';
+            header('Location: ' . base_url('admin/login'));
+            exit;
+        }
+
+        if ((int) ($user['must_change_password'] ?? 0) === 1) {
+            header('Location: ' . base_url('admin/ganti-sandi'));
+            exit;
+        }
+
+        return $user;
+    }
+
     public static function displayRole(): string
     {
         $user = self::user();
@@ -159,6 +197,16 @@ class Auth
             || (hash('sha256', $password) === (string) $user['password_hash']);
 
         if (!$isPasswordCorrect) {
+            $attempts = ((int) $user['failed_login_attempts']) + 1;
+            $lockedUntil = $attempts >= $maxAttempts
+                ? date('Y-m-d H:i:s', time() + ($lockMinutes * 60))
+                : null;
+
+            $failUpd = $pdo->prepare(
+                'UPDATE pengguna SET failed_login_attempts = ?, locked_until = ? WHERE id = ?'
+            );
+            $failUpd->execute([$attempts, $lockedUntil, $userId]);
+
             self::log('login.failed', 'pengguna', $userId, 'Percobaan login gagal', $ip);
 
             return 'Nama pengguna atau kata sandi salah.';
