@@ -213,6 +213,47 @@ class ApiAuthController
     }
 
     /**
+     * POST /api/v1/auth/change-password
+     */
+    public function changePassword(): void
+    {
+        $user = ApiAuth::authenticate();
+        if ($user === null) {
+            ApiResponse::unauthorized();
+            return;
+        }
+
+        $input = ApiResponse::input();
+        $currentPassword = (string) ($input['current_password'] ?? '');
+        $newPassword = (string) ($input['new_password'] ?? '');
+
+        if ($currentPassword === '' || strlen($newPassword) < 6) {
+            ApiResponse::validation([
+                'current_password' => $currentPassword === '' ? 'Kata sandi saat ini wajib diisi.' : null,
+                'new_password'     => strlen($newPassword) < 6 ? 'Kata sandi baru minimal 6 karakter.' : null,
+            ]);
+            return;
+        }
+
+        $pdo = Database::connection();
+        $userId = (int) $user['id'];
+        $stmt = $pdo->prepare('SELECT password_hash FROM pengguna WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $hash = (string) ($stmt->fetchColumn() ?: '');
+
+        if ($hash === '' || !password_verify($currentPassword, $hash)) {
+            ApiResponse::error('INVALID_PASSWORD', 'Kata sandi saat ini tidak sesuai.', 400);
+            return;
+        }
+
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $upd = $pdo->prepare('UPDATE pengguna SET password_hash = ?, must_change_password = 0, updated_at = NOW() WHERE id = ?');
+        $upd->execute([$newHash, $userId]);
+
+        ApiResponse::ok(['message' => 'Kata sandi berhasil diperbarui.']);
+    }
+
+    /**
      * GET /api/v1/me
      */
     public function me(): void
@@ -225,6 +266,61 @@ class ApiAuthController
         }
 
         ApiResponse::ok(['user' => $this->userPayload($user, true)]);
+    }
+
+    /**
+     * PUT/POST /api/v1/me
+     */
+    public function updateProfile(): void
+    {
+        $user = ApiAuth::authenticate();
+        if ($user === null) {
+            ApiResponse::unauthorized();
+            return;
+        }
+
+        $input = ApiResponse::input();
+        $email = trim((string) ($input['email'] ?? ''));
+        $alamat = trim((string) ($input['alamat'] ?? $input['address'] ?? ''));
+        $noHp = trim((string) ($input['no_hp'] ?? $input['phone'] ?? ''));
+
+        $pdo = Database::connection();
+        $userId = (int) $user['id'];
+        $role = strtolower((string) ($user['role'] ?? ''));
+
+        if ($email !== '') {
+            $uStmt = $pdo->prepare("UPDATE pengguna SET email = ?, updated_at = NOW() WHERE id = ?");
+            $uStmt->execute([$email, $userId]);
+        }
+
+        if ($role === 'guru') {
+            $gStmt = $pdo->prepare(
+                "UPDATE guru
+                 SET address = COALESCE(NULLIF(?, ''), address),
+                     alamat = COALESCE(NULLIF(?, ''), alamat),
+                     phone = COALESCE(NULLIF(?, ''), phone),
+                     no_hp = COALESCE(NULLIF(?, ''), no_hp),
+                     updated_at = NOW()
+                 WHERE user_id = ?"
+            );
+            $gStmt->execute([$alamat, $alamat, $noHp, $noHp, $userId]);
+        } elseif ($role === 'siswa') {
+            $sStmt = $pdo->prepare(
+                "UPDATE siswa
+                 SET address = COALESCE(NULLIF(?, ''), address),
+                     alamat = COALESCE(NULLIF(?, ''), alamat),
+                     updated_at = NOW()
+                 WHERE user_id = ?"
+            );
+            $sStmt->execute([$alamat, $alamat, $userId]);
+        }
+
+        // Ambil user terbaru
+        $freshStmt = $pdo->prepare("SELECT * FROM pengguna WHERE id = ? LIMIT 1");
+        $freshStmt->execute([$userId]);
+        $freshUser = $freshStmt->fetch() ?: $user;
+
+        ApiResponse::ok(['user' => $this->userPayload($freshUser, true)]);
     }
 
     /**
@@ -297,6 +393,62 @@ class ApiAuthController
 
         if ($withFlags) {
             $payload['must_change_password'] = (int) ($user['must_change_password'] ?? 0) === 1;
+            $pdo = Database::connection();
+            $role = strtolower((string) ($user['role'] ?? ''));
+            $uid = (int) $user['id'];
+
+            if ($role === 'guru') {
+                $gStmt = $pdo->prepare(
+                    "SELECT g.id, g.nip, g.nuptk, COALESCE(g.bidang_studi, g.subject_specialty) AS bidang_studi,
+                            COALESCE(g.no_hp, g.phone) AS no_hp, COALESCE(g.alamat, g.address) AS alamat,
+                            (SELECT GROUP_CONCAT(COALESCE(k.name, k.nama_kelas) SEPARATOR ', ')
+                             FROM kelas k
+                             WHERE (k.homeroom_teacher_id = g.id OR k.wali_kelas_id = g.id) AND k.is_active = 1 AND k.deleted_at IS NULL) AS wali_kelas
+                     FROM guru g
+                     WHERE g.user_id = ? LIMIT 1"
+                );
+                $gStmt->execute([$uid]);
+                $g = $gStmt->fetch();
+                if ($g !== false) {
+                    $payload['profile'] = [
+                        'id'           => (int) $g['id'],
+                        'nip'          => (string) ($g['nip'] ?? $g['nuptk'] ?? ''),
+                        'nuptk'        => (string) ($g['nuptk'] ?? ''),
+                        'bidang_studi' => (string) ($g['bidang_studi'] ?? ''),
+                        'no_hp'        => (string) ($g['no_hp'] ?? ''),
+                        'alamat'       => (string) ($g['alamat'] ?? ''),
+                        'wali_kelas'   => (string) ($g['wali_kelas'] ?? ''),
+                    ];
+                }
+            } elseif ($role === 'siswa') {
+                $sStmt = $pdo->prepare(
+                    "SELECT s.id, s.nis, s.nisn, COALESCE(s.kelas_id, s.class_id) AS kelas_id,
+                            COALESCE(s.alamat, s.address) AS alamat,
+                            COALESCE(s.nama_wali, s.guardian_name) AS nama_wali,
+                            COALESCE(k.name, k.nama_kelas) AS nama_kelas,
+                            COALESCE(wk.nama_lengkap, wku.name) AS wali_kelas
+                     FROM siswa s
+                     LEFT JOIN kelas k ON k.id = COALESCE(s.kelas_id, s.class_id)
+                     LEFT JOIN guru wk ON wk.id = COALESCE(k.wali_kelas_id, k.homeroom_teacher_id)
+                     LEFT JOIN pengguna wku ON wku.id = wk.user_id
+                     WHERE s.user_id = ? LIMIT 1"
+                );
+                $sStmt->execute([$uid]);
+                $s = $sStmt->fetch();
+                if ($s !== false) {
+                    $payload['profile'] = [
+                        'id'         => (int) $s['id'],
+                        'nis'        => (string) ($s['nis'] ?? ''),
+                        'nisn'       => (string) ($s['nisn'] ?? ''),
+                        'kelas_id'   => $s['kelas_id'] !== null ? (int) $s['kelas_id'] : null,
+                        'kelas'      => (string) ($s['nama_kelas'] ?? ''),
+                        'nama_kelas' => (string) ($s['nama_kelas'] ?? ''),
+                        'wali_kelas' => (string) ($s['wali_kelas'] ?? ''),
+                        'alamat'     => (string) ($s['alamat'] ?? ''),
+                        'nama_wali'  => (string) ($s['nama_wali'] ?? ''),
+                    ];
+                }
+            }
         }
 
         return $payload;

@@ -38,16 +38,15 @@ $navItems = [
 
 <header class="site-header">
     <div class="container navbar">
-        <a href="<?= url('/') ?>" class="brand" style="display: flex; align-items: center; gap: 11px; text-decoration: none;">
+        <a href="<?= url('/') ?>" class="brand brand-logo-link">
             <img src="<?= asset('assets/images/LOGO_MTS 1.png') ?>"
                  alt="Logo MTS Al-Huda Gondang"
                  class="brand-logo"
                  width="42"
-                 height="42"
-                 style="width: 42px; height: 42px; object-fit: contain;">
+                 height="42">
             <div>
-                <span style="font-size: 15.5px; font-weight: 800; color: #0F172A; display: block; line-height: 1.2; letter-spacing: -0.01em;">MTS Al-Huda Gondang</span>
-                <span style="font-size: 11px; color: #15803D; font-weight: 700; letter-spacing: 0.02em;">Madrasah Tsanawiyah Terakreditasi A &middot; Nganjuk</span>
+                <span class="brand-title">MTS Al-Huda Gondang</span>
+                <span class="brand-subtitle">Madrasah Tsanawiyah Terakreditasi A &middot; Nganjuk</span>
             </div>
         </a>
 
@@ -58,11 +57,11 @@ $navItems = [
             <?php endforeach; ?>
         </nav>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <a href="<?= url('ppdb') ?>" class="nav-cta" style="background: #15803D; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 12.5px; text-decoration: none; box-shadow: 0 2px 6px rgba(21,128,61,.25);">
+        <div class="nav-group">
+            <a href="<?= url('ppdb') ?>" class="nav-cta nav-cta-custom">
                 Daftar PPDB Online
             </a>
-            <button class="nav-toggle" type="button" aria-label="Buka menu navigasi" style="display: none; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 1px solid #CBD5E1; border-radius: 8px; cursor: pointer;">
+            <button class="nav-toggle nav-toggle-custom" type="button" aria-label="Buka menu navigasi">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="6" x2="21" y2="6"></line>

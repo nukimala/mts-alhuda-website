@@ -129,12 +129,12 @@ $facilities = $data['facilities'] ?? [];
     </section>
 
     <!-- WARTA TERKINI (LIVE DARI DATABASE) -->
-    <section style="padding: 64px 0; background: #FFFFFF; border-bottom: 1px solid var(--border);">
+    <section class="news-section">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 14px;">
+            <div class="news-header">
                 <div>
                     <div class="section-pretitle">Warta &amp; Informasi</div>
-                    <h2 class="section-title" style="margin: 0;">Kabar &amp; Prestasi Madrasah</h2>
+                    <h2 class="section-title">Kabar &amp; Prestasi Madrasah</h2>
                 </div>
                 <a href="<?= url('berita') ?>" class="btn btn-secondary">
                     Semua Berita
@@ -143,7 +143,7 @@ $facilities = $data['facilities'] ?? [];
 
             <div class="news-v2-grid">
                 <?php if (empty($latestPosts)): ?>
-                    <p style="color: #64748B; grid-column: 1 / -1; padding: 24px; background: #F8FAFC; border-radius: 12px; text-align: center;">
+                    <p class="news-empty">
                         Belum ada warta berita yang diterbitkan saat ini.
                     </p>
                 <?php else: ?>
@@ -186,12 +186,12 @@ $facilities = $data['facilities'] ?? [];
     </section>
 
     <!-- FASILITAS & SARANA (LIVE DARI DATABASE) -->
-    <section style="padding: 64px 0; background: #F8FAFC; border-bottom: 1px solid var(--border);">
+    <section class="facilities-section">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 14px;">
+            <div class="facilities-header">
                 <div>
                     <div class="section-pretitle">Sarana &amp; Prasarana</div>
-                    <h2 class="section-title" style="margin: 0;">Fasilitas Pendukung Belajar</h2>
+                    <h2 class="section-title">Fasilitas Pendukung Belajar</h2>
                 </div>
                 <a href="<?= url('fasilitas') ?>" class="btn btn-secondary">
                     Semua Fasilitas
@@ -200,7 +200,7 @@ $facilities = $data['facilities'] ?? [];
 
             <div class="fac-v2-grid">
                 <?php if (empty($facilities)): ?>
-                    <p style="color: #64748B; grid-column: 1 / -1; padding: 24px; background: #FFFFFF; border-radius: 12px; text-align: center;">
+                    <p class="facilities-empty">
                         Informasi fasilitas sedang diperbarui.
                     </p>
                 <?php else: ?>
@@ -240,17 +240,17 @@ $facilities = $data['facilities'] ?? [];
     <!-- CALL TO ACTION RESMI PPDB -->
     <section class="cta-official">
         <div class="container cta-official-inner">
-            <h2 class="cta-official-h2">
+            <h2 class="cta-title">
                 Penerimaan Peserta Didik Baru (PPDB) 2026/2027
             </h2>
-            <p class="cta-official-p">
+            <p class="cta-text">
                 Bergabunglah bersama keluarga besar MTs Al-Huda Gondang. Pendaftaran dibuka untuk lulusan SD/MI dengan kuota terbatas guna menjamin efektivitas pendampingan santri.
             </p>
-            <div class="cta-official-btns">
-                <a href="<?= url('ppdb') ?>" class="btn btn-primary" style="background: #FFFFFF !important; color: #15803D !important; border-color: #FFFFFF !important;">
+            <div class="cta-buttons">
+                <a href="<?= url('ppdb') ?>" class="btn btn-primary btn-cta-primary">
                     Daftar Secara Online
                 </a>
-                <a href="<?= url('kontak') ?>" class="btn btn-secondary" style="background: transparent !important; color: #FFFFFF !important; border-color: rgba(255,255,255,0.4) !important;">
+                <a href="<?= url('kontak') ?>" class="btn btn-secondary btn-cta-secondary">
                     Hubungi Panitia PPDB
                 </a>
             </div>
