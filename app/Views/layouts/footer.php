@@ -37,19 +37,26 @@
                 <a href="<?= url('ppdb') ?>" class="footer-link footer-link-primary">Pendaftaran PPDB Online</a>
                 <a href="<?= url('akademik#jadwal') ?>" class="footer-link">Jadwal Pelajaran Siswa</a>
                 <a href="<?= url('kontak') ?>" class="footer-link">Hubungi Tata Usaha</a>
-                <a href="<?= url('admin') ?>" target="_blank" class="footer-link">Login Sistem &amp; Guru</a>
+                <a href="<?= url('admin') ?>" target="_blank" rel="noopener noreferrer" class="footer-link">Login Sistem &amp; Guru</a>
             </div>
         </div>
 
         <!-- Alamat & Jam Kerja -->
+        <?php
+        $fAlamat = Auth::setting('school_address', 'Jln. Letjen Soeprapto No.16, Ds. Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur');
+        $fTelp = Auth::setting('school_phone', '(0358) 771234');
+        $fWa = Auth::setting('school_whatsapp', '0812-3456-7890');
+        $fEmail = Auth::setting('school_email', 'info@mts-alhuda.sch.id');
+        $fJam = Auth::setting('school_hours', 'Senin - Sabtu (07.00 - 14.00 WIB)');
+        ?>
         <div>
             <h4 class="footer-section-title">Kontak &amp; Alamat</h4>
             <div class="footer-contact">
-                <div>📍 Jln. Letjen Soeprapto No.16, Ds. Pandean, Kec. Gondang, Kab. Nganjuk, Jawa Timur</div>
-                <div>☎ Telepon: (0358) 771234</div>
-                <div>💬 WhatsApp: 0812-3456-7890</div>
-                <div>✉ Email: info@mts-alhuda.sch.id</div>
-                <div>⏰ Pelayanan: Senin - Sabat (07.00 - 14.00 WIB)</div>
+                <div>📍 <?= e($fAlamat) ?></div>
+                <div>☎ Telepon: <?= e($fTelp) ?></div>
+                <div>💬 WhatsApp: <?= e($fWa) ?></div>
+                <div>✉ Email: <?= e($fEmail) ?></div>
+                <div>⏰ Pelayanan: <?= e($fJam) ?></div>
             </div>
         </div>
     </div>
@@ -61,6 +68,6 @@
     </div>
 </footer>
 
-<script src="<?= base_url('js/main.js') ?>" defer></script>
+<script src="<?= base_url('js/script.js') ?>" defer></script>
 </body>
 </html>

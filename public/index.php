@@ -38,7 +38,20 @@ if ($page === 'api') {
 
 if ($page === 'admin') {
     $action = $segments[1] ?? '';
+    $sub = $segments[2] ?? '';
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+
+    $postOnlySubs = [
+        'store', 'update', 'delete', 'correct',
+        'reset-password', 'toggle-status', 'toggle-document', 'delete-document',
+        'mark-read', 'mark-replied', 'read', 'archive',
+    ];
+    if ($sub !== '' && in_array($sub, $postOnlySubs, true) && $method !== 'POST') {
+        http_response_code(405);
+        header('Allow: POST');
+        header('Location: ' . base_url('admin/' . $action));
+        return;
+    }
 
     $auth = new AuthController();
 

@@ -96,7 +96,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="pill green plain" style="font-size: 10.5px; font-weight: 700; padding: 2px 7px;">Madrasah</span>
                 <span style="font-weight: 800; font-size: 14.5px; color: var(--text);">MTS Al-Huda Gondang</span>
-                <a href="<?= base_url() ?>" target="_blank" class="btn btn-ghost btn-xs" style="color: var(--gray); font-size: 11.5px; padding: 3px 8px; text-decoration: none;" title="Buka Website Publik">
+                <a href="<?= base_url() ?>" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-xs" style="color: var(--gray); font-size: 11.5px; padding: 3px 8px; text-decoration: none;" title="Buka Website Publik">
                     Lihat Situs ↗
                 </a>
             </div>

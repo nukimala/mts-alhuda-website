@@ -4,19 +4,7 @@ class AdminBeritaController
 {
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        return Auth::requireAdmin();
     }
 
     public function index(): void
@@ -151,18 +139,15 @@ class AdminBeritaController
         }
 
         // Handle file upload if present
-        if (isset($_FILES['cover_file']) && $_FILES['cover_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['cover_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/berita';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'berita_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['cover_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $coverPath = 'uploads/berita/' . $filename;
-                }
+        if (isset($_FILES['cover_file']) && $_FILES['cover_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['cover_file'], 'berita', 'berita');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                $_SESSION['_flash_old'] = $_POST;
+                header('Location: ' . base_url('admin/berita/create'));
+                return;
             }
+            $coverPath = $upload['path'];
         }
 
         $pdo = Database::connection();
@@ -286,18 +271,14 @@ class AdminBeritaController
         }
 
         // Handle file upload
-        if (isset($_FILES['cover_file']) && $_FILES['cover_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['cover_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/berita';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'berita_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['cover_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $coverPath = 'uploads/berita/' . $filename;
-                }
+        if (isset($_FILES['cover_file']) && $_FILES['cover_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['cover_file'], 'berita', 'berita');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url("admin/berita/edit/{$id}"));
+                return;
             }
+            $coverPath = $upload['path'];
         }
 
         $publishedAt = $post['published_at'];

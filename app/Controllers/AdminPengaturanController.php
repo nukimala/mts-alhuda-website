@@ -4,19 +4,7 @@ class AdminPengaturanController
 {
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        return Auth::requireAdmin();
     }
 
     public function index(): void

@@ -73,7 +73,11 @@ class Presensi
         $stmtIzin->execute([$date]);
         $statIzin = (int) $stmtIzin->fetchColumn();
 
-        $statBelum = max(0, $totalTeachers - ($statHadir + $statTerlambat + $statIzin));
+        $stmtRecorded = $this->pdo->prepare("SELECT COUNT(DISTINCT teacher_id) FROM presensi_guru WHERE attendance_date = ? AND attendance_type = 'daily'");
+        $stmtRecorded->execute([$date]);
+        $totalRecorded = (int) $stmtRecorded->fetchColumn();
+
+        $statBelum = max(0, $totalTeachers - $totalRecorded);
 
         return [
             'stat_hadir' => $statHadir,
@@ -91,38 +95,75 @@ class Presensi
         $teacherId = (int) $data['teacher_id'];
         $date = $data['date'];
         $status = $data['status'];
-        $checkInTime = $data['check_in_time'] ?? '';
-        $checkOutTime = $data['check_out_time'] ?? '';
+        $checkInTime = trim((string) ($data['check_in_time'] ?? ''));
+        $checkOutTime = trim((string) ($data['check_out_time'] ?? ''));
         $note = $data['note'] ?? '';
         $verifiedBy = $data['verified_by'] ?? null;
 
-        $checkInAt = $checkInTime !== '' ? ($date . ' ' . $checkInTime . ':00') : ($date . ' 07:00:00');
-        $checkOutAt = $checkOutTime !== '' ? ($date . ' ' . $checkOutTime . ':00') : null;
+        if (!preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $checkInTime)) {
+            $checkInTime = '';
+        }
+        if (!preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $checkOutTime)) {
+            $checkOutTime = '';
+        }
+
+        $isPresentStatus = in_array($status, ['hadir', 'terlambat'], true);
+        if ($checkInTime !== '') {
+            $checkInAt = $date . ' ' . (strlen($checkInTime) === 5 ? $checkInTime . ':00' : $checkInTime);
+        } else {
+            $checkInAt = $isPresentStatus ? ($date . ' 07:00:00') : null;
+        }
+
+        $checkOutAt = $checkOutTime !== ''
+            ? ($date . ' ' . (strlen($checkOutTime) === 5 ? $checkOutTime . ':00' : $checkOutTime))
+            : null;
         $noteValue = $note !== '' ? $note : null;
+
+        $jamMasuk = $checkInAt !== null ? substr($checkInAt, 11, 8) : null;
+        $jamPulang = $checkOutAt !== null ? substr($checkOutAt, 11, 8) : null;
 
         $existingStmt = $this->pdo->prepare("SELECT id FROM presensi_guru WHERE teacher_id = ? AND attendance_date = ? AND attendance_type = 'daily' LIMIT 1");
         $existingStmt->execute([$teacherId, $date]);
         $existingId = $existingStmt->fetchColumn();
 
         if ($existingId) {
-            $stmt = $this->pdo->prepare("UPDATE presensi_guru SET check_in_at = ?, check_out_at = ?, status = ?, note = ?, method = 'manual', verified_by = ?, verified_at = NOW(), updated_at = NOW() WHERE id = ?");
+            $stmt = $this->pdo->prepare(
+                "UPDATE presensi_guru
+                 SET guru_id = ?, tanggal = ?, check_in_at = ?, jam_masuk = ?, check_out_at = ?, jam_pulang = ?,
+                     status = ?, notes = ?, keterangan = ?, verified_by = ?, updated_at = NOW()
+                 WHERE id = ?"
+            );
             return $stmt->execute([
+                $teacherId,
+                $date,
                 $checkInAt,
+                $jamMasuk,
                 $checkOutAt,
+                $jamPulang,
                 $status,
+                $noteValue,
                 $noteValue,
                 $verifiedBy,
                 $existingId,
             ]);
         }
 
-        $stmt = $this->pdo->prepare("INSERT INTO presensi_guru (teacher_id, attendance_date, attendance_type, check_in_at, check_out_at, status, note, method, verified_by, verified_at, created_at, updated_at) VALUES (?, ?, 'daily', ?, ?, ?, ?, 'manual', ?, NOW(), NOW(), NOW())");
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO presensi_guru
+                (teacher_id, guru_id, attendance_date, tanggal, attendance_type, check_in_at, jam_masuk, check_out_at, jam_pulang, status, notes, keterangan, verified_by, created_at, updated_at)
+             VALUES (?, ?, ?, ?, 'daily', ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())"
+        );
         return $stmt->execute([
             $teacherId,
+            $teacherId,
+            $date,
             $date,
             $checkInAt,
+            $jamMasuk,
             $checkOutAt,
+            $jamPulang,
             $status,
+            $noteValue,
             $noteValue,
             $verifiedBy,
         ]);

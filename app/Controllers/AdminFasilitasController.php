@@ -4,19 +4,7 @@ class AdminFasilitasController
 {
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
-        }
-
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        return Auth::requireAdmin();
     }
 
     /**
@@ -132,18 +120,14 @@ class AdminFasilitasController
             return;
         }
 
-        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/fasilitas';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'fasilitas_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $imagePath = 'uploads/fasilitas/' . $filename;
-                }
+        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['image_file'], 'fasilitas', 'fasilitas');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url('admin/fasilitas/create'));
+                return;
             }
+            $imagePath = $upload['path'];
         }
 
         $pdo = Database::connection();
@@ -236,18 +220,14 @@ class AdminFasilitasController
             return;
         }
 
-        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['image_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
-                $targetDir = __DIR__ . '/../../public/uploads/fasilitas';
-                if (!is_dir($targetDir)) {
-                    mkdir($targetDir, 0755, true);
-                }
-                $filename = 'fasilitas_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $targetDir . '/' . $filename)) {
-                    $imagePath = 'uploads/fasilitas/' . $filename;
-                }
+        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload = UploadHelper::storeImage($_FILES['image_file'], 'fasilitas', 'fasilitas');
+            if (!$upload['ok']) {
+                $_SESSION['_flash_error'] = $upload['error'];
+                header('Location: ' . base_url("admin/fasilitas/edit/{$id}"));
+                return;
             }
+            $imagePath = $upload['path'];
         }
 
         $category = $icon !== '' ? $icon : 'Sarana Pembelajaran';

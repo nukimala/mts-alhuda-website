@@ -13,26 +13,26 @@ class AdminPresensiController
 
     private function guard(): array
     {
-        Auth::start();
-        if (!Auth::check()) {
-            header('Location: ' . base_url('admin/login'));
-            exit;
+        return Auth::requireAdmin();
+    }
+
+    private function sanitizeDate(string $value): string
+    {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            $dt = DateTimeImmutable::createFromFormat('Y-m-d', $value);
+            if ($dt !== false && $dt->format('Y-m-d') === $value) {
+                return $value;
+            }
         }
 
-        $user = Auth::user();
-        if ($user !== null && (int) ($user['must_change_password'] ?? 0) === 1) {
-            header('Location: ' . base_url('admin/ganti-sandi'));
-            exit;
-        }
-
-        return $user;
+        return date('Y-m-d');
     }
 
     public function index(): void
     {
         $user = $this->guard();
 
-        $date = trim((string) ($_GET['date'] ?? date('Y-m-d')));
+        $date = $this->sanitizeDate(trim((string) ($_GET['date'] ?? date('Y-m-d'))));
         $status = trim((string) ($_GET['status'] ?? ''));
         $q = trim((string) ($_GET['q'] ?? ''));
 
@@ -83,7 +83,7 @@ class AdminPresensiController
         }
 
         $teacherId = (int) ($_POST['teacher_id'] ?? 0);
-        $date = trim((string) ($_POST['attendance_date'] ?? date('Y-m-d')));
+        $date = $this->sanitizeDate(trim((string) ($_POST['attendance_date'] ?? date('Y-m-d'))));
         $status = trim((string) ($_POST['status'] ?? 'hadir'));
         $checkInTime = trim((string) ($_POST['check_in_time'] ?? ''));
         $checkOutTime = trim((string) ($_POST['check_out_time'] ?? ''));

@@ -1,7 +1,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Paksa HTTPS Redirect
+    # Paksa HTTPS Redirect (kecuali localhost/pengembangan lokal)
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

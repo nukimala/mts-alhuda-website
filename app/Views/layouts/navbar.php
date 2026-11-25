@@ -12,13 +12,20 @@ $navItems = [
     'kontak' => 'Kontak',
 ];
 ?>
+<?php
+$navAlamat = Auth::setting('school_address', 'Jln. Letjen Soeprapto No.16, Ds. Pandean, Kec. Gondang, Kab. Nganjuk');
+$navWa = preg_replace('/[^0-9]/', '', (string) Auth::setting('school_whatsapp', '6281234567890'));
+if (str_starts_with($navWa, '0')) {
+    $navWa = '62' . substr($navWa, 1);
+}
+?>
 <!-- TOPBAR RESMI MTS AL-HUDA GONDANG -->
 <div class="site-topbar">
     <div class="container site-topbar-inner">
         <div class="site-topbar-left">
             <span class="topbar-item topbar-address">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span>Jln. Letjen Soeprapto No.16, Ds. Pandean, Kec. Gondang, Kab. Nganjuk</span>
+                <span><?= e($navAlamat) ?></span>
             </span>
             <span class="topbar-sep">•</span>
             <span class="topbar-item topbar-akreditasi">
@@ -27,7 +34,7 @@ $navItems = [
             </span>
         </div>
         <div class="site-topbar-right">
-            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" class="topbar-link">
+            <a href="https://wa.me/<?= e($navWa) ?>" target="_blank" rel="noopener noreferrer" class="topbar-link">
                 <span>💬 WhatsApp</span>
             </a>
             <span class="topbar-sep">•</span>
